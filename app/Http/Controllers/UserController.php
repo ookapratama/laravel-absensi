@@ -12,6 +12,9 @@ class UserController extends Controller
         protected UserService $service
     ) {}
 
+    public function index() {
+        return true;
+    }
     public function store(UserRequest $request)
     {
         $data = $request->validated();

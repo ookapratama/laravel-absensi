@@ -9,6 +9,15 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
 {
     public function __construct(User $model)
     {
-        $this->model = $model;
+        parent::__construct($model);
+    }
+
+    public function paginated(array $request)
+    {
+        $perPage = $request['per_page'] ?? 5;
+        $field = $request['sort_field'] ?? 'id';
+        $sortOrder = $request['sort_order'] ?? 'desc';
+
+        return $this->model->orderBy($field, $sortOrder)->paginate($perPage);
     }
 }

@@ -19,8 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
             Log::error($e);
 
             return \App\Helpers\ResponseHelper::error(
-                'Internal Server Error',
-                500
+                'Internal Server Error : ' . $e->getMessage(),
+                code: 500
             );
         });
     })->create();
