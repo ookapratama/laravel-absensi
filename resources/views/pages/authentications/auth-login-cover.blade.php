@@ -1,6 +1,7 @@
 @php
 $configData = Helper::appClasses();
 $customizerHidden = 'customizer-hide';
+$pageConfigs = ['myLayout' => 'blank'];
 @endphp
 
 @extends('layouts/layoutMaster')
@@ -55,10 +56,11 @@ $customizerHidden = 'customizer-hide';
         <h4 class="mb-1">Welcome to {{config('variables.templateName')}}! 👋</h4>
         <p class="mb-5">Please sign-in to your account and start the adventure</p>
 
-        <form id="formAuthentication" class="mb-5" action="{{url('/')}}" method="GET">
+        <form id="formAuthentication" class="mb-5" action="{{ route('login') }}" method="POST">
+          @csrf
           <div class="form-floating form-floating-outline mb-5">
-            <input type="text" class="form-control" id="email" name="email-username" placeholder="Enter your email or username" autofocus>
-            <label for="email">Email or Username</label>
+            <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email" autofocus>
+            <label for="email">Email</label>
           </div>
           <div class="mb-5">
             <div class="form-password-toggle">
