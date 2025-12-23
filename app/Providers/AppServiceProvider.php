@@ -32,6 +32,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Define Gates for authorization
+        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+            if ($user->role && $user->role->slug === 'super-admin') {
+                return true;
+            }
+        });
+
+        \Illuminate\Support\Facades\Gate::define('access', function ($user, $slug, $action) {
+            return $user->hasPermission($slug, $action);
+        });
         // Create Helper alias for ViewConfigHelper
         if (!class_exists('Helper')) {
             class_alias(ViewConfigHelper::class, 'Helper');

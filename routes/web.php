@@ -4,14 +4,23 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Dashboard as home page
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+use App\Http\Controllers\AuthController;
 
-// User CRUD routes
-Route::resource('user', UserController::class);
+// Auth Routes
+Route::get('login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('login', [AuthController::class, 'login']);
+Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-// Role & Menu Management
-Route::resource('role', \App\Http\Controllers\RoleController::class);
-Route::resource('menu', \App\Http\Controllers\MenuController::class);
-Route::get('permission', [\App\Http\Controllers\PermissionController::class, 'index'])->name('permission.index');
-Route::put('permission', [\App\Http\Controllers\PermissionController::class, 'update'])->name('permission.update');
+Route::middleware(['auth'])->group(function () {
+    // Dashboard as home page
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    // User CRUD routes
+    Route::resource('user', UserController::class)->middleware('check.permission:user.index');
+
+    // Role & Menu Management
+    Route::resource('role', \App\Http\Controllers\RoleController::class)->middleware('check.permission:role.index');
+    Route::resource('menu', \App\Http\Controllers\MenuController::class)->middleware('check.permission:menu.index');
+    Route::get('permission', [\App\Http\Controllers\PermissionController::class, 'index'])->name('permission.index')->middleware('check.permission:permission.index');
+    Route::put('permission', [\App\Http\Controllers\PermissionController::class, 'update'])->name('permission.update')->middleware('check.permission:permission.index');
+});

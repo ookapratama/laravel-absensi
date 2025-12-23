@@ -51,14 +51,14 @@ $configData = Helper::appClasses();
       
       $hasChildren = (isset($menu->submenu) && count($menu->submenu) > 0) || (isset($menu->children) && count($menu->children) > 0);
 
-      if ($currentRouteName === $menu->slug || ($menu->url && request()->is(ltrim($menu->url, '/') . '*'))) {
+      if ($currentRouteName === $menu->slug || (isset($menu->path) && request()->is(ltrim($menu->path, '/') . '*')) || (isset($menu->url) && request()->is(ltrim($menu->url, '/') . '*'))) {
         $activeClass = 'active';
       }
       
       if ($hasChildren) {
         $children = $menu->submenu ?? $menu->children;
         foreach($children as $child) {
-          if ($currentRouteName === $child->slug || ($child->url && request()->is(ltrim($child->url, '/') . '*'))) {
+          if ($currentRouteName === $child->slug || (isset($child->path) && request()->is(ltrim($child->path, '/') . '*')) || (isset($child->url) && request()->is(ltrim($child->url, '/') . '*'))) {
             $activeClass = 'active open';
             break;
           }
@@ -68,7 +68,7 @@ $configData = Helper::appClasses();
 
       {{-- main menu --}}
       <li class="menu-item {{$activeClass}}">
-        <a href="{{ isset($menu->url) ? url($menu->url) : 'javascript:void(0);' }}" class="{{ $hasChildren ? 'menu-link menu-toggle' : 'menu-link' }}" @if (isset($menu->target) and !empty($menu->target)) target="_blank" @endif>
+        <a href="{{ isset($menu->path) ? url($menu->path) : (isset($menu->url) ? url($menu->url) : 'javascript:void(0);') }}" class="{{ $hasChildren ? 'menu-link menu-toggle' : 'menu-link' }}" @if (isset($menu->target) and !empty($menu->target)) target="_blank" @endif>
           @isset($menu->icon)
             <i class="menu-icon tf-icons {{ $menu->icon }} me-3"></i>
           @endisset
