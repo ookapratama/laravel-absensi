@@ -187,12 +187,82 @@ namespace App\Http\Controllers;
 
 use App\Services\\{$this->feature}Service;
 use App\Http\Requests\\{$this->feature}Request;
+use Illuminate\Http\Request;
 
-class {$this->feature}Controller extends BaseCrudController
+class {$this->feature}Controller extends Controller
 {
-    public function __construct({$this->feature}Service \$service)
+    public function __construct(
+        protected {$this->feature}Service \$service
+    ) {}
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
-        \$this->service = \$service;
+        // \$data = \$this->service->all();
+        // return view('pages.{$this->feature}.index', compact('data'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        // return view('pages.{$this->feature}.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store({$this->feature}Request \$request)
+    {
+        \$data = \$request->validated();
+        \$this->service->store(\$data);
+
+        return redirect()->route('{$this->feature}.index')
+            ->with('success', 'Data berhasil ditambahkan!');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(\$id)
+    {
+        // \$data = \$this->service->find(\$id);
+        // return view('pages.{$this->feature}.show', compact('data'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(\$id)
+    {
+        // \$data = \$this->service->find(\$id);
+        // return view('pages.{$this->feature}.edit', compact('data'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update({$this->feature}Request \$request, \$id)
+    {
+        \$data = \$request->validated();
+        \$this->service->update(\$id, \$data);
+
+        return redirect()->route('{$this->feature}.index')
+            ->with('success', 'Data berhasil diperbarui!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(\$id)
+    {
+        \$this->service->delete(\$id);
+
+        return redirect()->route('{$this->feature}.index')
+            ->with('success', 'Data berhasil dihapus!');
     }
 }
 PHP);
