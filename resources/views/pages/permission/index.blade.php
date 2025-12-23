@@ -56,10 +56,30 @@
               <th colspan="4" class="text-center">{{ $selectedRole->name }}</th>
             </tr>
             <tr>
-              <th class="text-center">C</th>
-              <th class="text-center">R</th>
-              <th class="text-center">U</th>
-              <th class="text-center">D</th>
+              <th class="text-center">
+                <div class="form-check d-flex justify-content-center">
+                  <input type="checkbox" class="form-check-input check-col" data-col="c" id="check-all-c" title="Check All Create">
+                </div>
+                <span class="d-block small mt-1">C</span>
+              </th>
+              <th class="text-center">
+                <div class="form-check d-flex justify-content-center">
+                  <input type="checkbox" class="form-check-input check-col" data-col="r" id="check-all-r" title="Check All Read">
+                </div>
+                <span class="d-block small mt-1">R</span>
+              </th>
+              <th class="text-center">
+                <div class="form-check d-flex justify-content-center">
+                  <input type="checkbox" class="form-check-input check-col" data-col="u" id="check-all-u" title="Check All Update">
+                </div>
+                <span class="d-block small mt-1">U</span>
+              </th>
+              <th class="text-center">
+                <div class="form-check d-flex justify-content-center">
+                  <input type="checkbox" class="form-check-input check-col" data-col="d" id="check-all-d" title="Check All Delete">
+                </div>
+                <span class="d-block small mt-1">D</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -70,16 +90,16 @@
                   $pivot = $selectedRole->menus->find($menu->id)?->pivot;
                 @endphp
                 <td class="text-center">
-                  <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $menu->id }}][c]" value="1" {{ $pivot?->can_create ? 'checked' : '' }} class="form-check-input perm-check">
+                  <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $menu->id }}][c]" value="1" {{ $pivot?->can_create ? 'checked' : '' }} class="form-check-input perm-check perm-c">
                 </td>
                 <td class="text-center">
-                  <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $menu->id }}][r]" value="1" {{ $pivot?->can_read ? 'checked' : '' }} class="form-check-input perm-check">
+                  <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $menu->id }}][r]" value="1" {{ $pivot?->can_read ? 'checked' : '' }} class="form-check-input perm-check perm-r">
                 </td>
                 <td class="text-center">
-                  <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $menu->id }}][u]" value="1" {{ $pivot?->can_update ? 'checked' : '' }} class="form-check-input perm-check">
+                  <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $menu->id }}][u]" value="1" {{ $pivot?->can_update ? 'checked' : '' }} class="form-check-input perm-check perm-u">
                 </td>
                 <td class="text-center">
-                  <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $menu->id }}][d]" value="1" {{ $pivot?->can_delete ? 'checked' : '' }} class="form-check-input perm-check">
+                  <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $menu->id }}][d]" value="1" {{ $pivot?->can_delete ? 'checked' : '' }} class="form-check-input perm-check perm-d">
                 </td>
               </tr>
               @foreach($menu->children as $child)
@@ -89,16 +109,16 @@
                     $pivotChild = $selectedRole->menus->find($child->id)?->pivot;
                   @endphp
                   <td class="text-center">
-                    <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $child->id }}][c]" value="1" {{ $pivotChild?->can_create ? 'checked' : '' }} class="form-check-input perm-check">
+                    <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $child->id }}][c]" value="1" {{ $pivotChild?->can_create ? 'checked' : '' }} class="form-check-input perm-check perm-c">
                   </td>
                   <td class="text-center">
-                    <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $child->id }}][r]" value="1" {{ $pivotChild?->can_read ? 'checked' : '' }} class="form-check-input perm-check">
+                    <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $child->id }}][r]" value="1" {{ $pivotChild?->can_read ? 'checked' : '' }} class="form-check-input perm-check perm-r">
                   </td>
                   <td class="text-center">
-                    <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $child->id }}][u]" value="1" {{ $pivotChild?->can_update ? 'checked' : '' }} class="form-check-input perm-check">
+                    <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $child->id }}][u]" value="1" {{ $pivotChild?->can_update ? 'checked' : '' }} class="form-check-input perm-check perm-u">
                   </td>
                   <td class="text-center">
-                    <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $child->id }}][d]" value="1" {{ $pivotChild?->can_delete ? 'checked' : '' }} class="form-check-input perm-check">
+                    <input type="checkbox" name="permissions[{{ $selectedRole->id }}][{{ $child->id }}][d]" value="1" {{ $pivotChild?->can_delete ? 'checked' : '' }} class="form-check-input perm-check perm-d">
                   </td>
                 </tr>
               @endforeach
@@ -121,20 +141,47 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const checkAllBtn = document.getElementById('checkAllBtn');
+  const checkboxes = document.querySelectorAll('.perm-check');
+  const columnChecks = document.querySelectorAll('.check-col');
+
+  // Global Check All
   if (checkAllBtn) {
     checkAllBtn.addEventListener('click', function() {
-      const checkboxes = document.querySelectorAll('.perm-check');
       const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-      
-      checkboxes.forEach(cb => {
-        cb.checked = !allChecked;
-      });
+      checkboxes.forEach(cb => cb.checked = !allChecked);
+      columnChecks.forEach(cb => cb.checked = !allChecked);
       
       this.innerHTML = !allChecked 
         ? '<i class="ri-checkbox-blank-line me-1"></i> Uncheck All' 
         : '<i class="ri-check-double-line me-1"></i> Check All';
     });
   }
+
+  // Column Check All
+  columnChecks.forEach(colCheck => {
+    colCheck.addEventListener('change', function() {
+      const col = this.dataset.col;
+      const targetCheckboxes = document.querySelectorAll('.perm-' + col);
+      targetCheckboxes.forEach(cb => cb.checked = this.checked);
+    });
+  });
+
+  // Sync state (optional: update header checkbox if all in column are manually checked/unchecked)
+  const syncColumnHeader = (col) => {
+    const header = document.querySelector('#check-all-' + col);
+    const colChecks = document.querySelectorAll('.perm-' + col);
+    header.checked = Array.from(colChecks).every(cb => cb.checked);
+  };
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', function() {
+      const classList = Array.from(this.classList);
+      const colClass = classList.find(c => c.startsWith('perm-') && c.length === 6);
+      if (colClass) {
+        syncColumnHeader(colClass.split('-')[1]);
+      }
+    });
+  });
 });
 </script>
 </div>

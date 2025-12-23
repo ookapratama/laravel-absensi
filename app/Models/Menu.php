@@ -10,7 +10,7 @@ class Menu extends Model
         'parent_id',
         'name',
         'icon',
-        'url',
+        'path',
         'slug',
         'order_no',
         'is_active',

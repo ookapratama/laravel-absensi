@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->constrained('menus')->onDelete('cascade');
             $table->string('name');
             $table->string('icon')->nullable();
-            $table->string('url')->nullable();
+            $table->string('path')->nullable();
             $table->string('slug')->unique();
             $table->integer('order_no')->default(0);
             $table->boolean('is_active')->default(true);

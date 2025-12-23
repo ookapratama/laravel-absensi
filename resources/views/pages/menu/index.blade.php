@@ -28,7 +28,7 @@
             <th>Urutan</th>
             <th>Nama</th>
             <th>Icon</th>
-            <th>URL</th>
+            <th>Path</th>
             <th>Slug</th>
             <th>Status</th>
             <th>Aksi</th>
@@ -40,7 +40,7 @@
               <td>{{ $menu->order_no }}</td>
               <td><strong>{{ $menu->name }}</strong></td>
               <td><i class="{{ $menu->icon }}"></i></td>
-              <td><code>{{ $menu->url }}</code></td>
+              <td><code>{{ $menu->path }}</code></td>
               <td>{{ $menu->slug }}</td>
               <td>
                 <span class="badge bg-label-{{ $menu->is_active ? 'success' : 'danger' }}">
