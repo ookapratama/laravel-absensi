@@ -14,7 +14,7 @@
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
-@vite(['resources/assets/js/main.js'])
+@vite(['resources/js/app.js', 'resources/assets/js/main.js'])
 
 <!-- END: Theme JS-->
 <!-- Pricing Modal JS-->
@@ -23,3 +23,26 @@
 <!-- BEGIN: Page JS-->
 @yield('page-script')
 <!-- END: Page JS-->
+<!-- Global Alert Handler Integration -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Check for success message
+    @if(session('success'))
+      window.AlertHandler.showSuccess("{{ session('success') }}");
+    @endif
+
+    // Check for error message
+    @if(session('error'))
+      window.AlertHandler.showError("{{ session('error') }}");
+    @endif
+
+    // Check for validation errors (if any)
+    @if($errors->any())
+      const validationErrors = {};
+      @foreach($errors->messages() as $key => $messages)
+        validationErrors['{{ $key }}'] = @json($messages);
+      @endforeach
+      window.AlertHandler.showError('Please check your input', validationErrors);
+    @endif
+  });
+</script>

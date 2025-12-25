@@ -41,13 +41,9 @@
               <a href="{{ route('role.edit', $role->id) }}" class="btn btn-sm btn-outline-primary">
                 <i class="ri-pencil-line"></i>
               </a>
-              <form action="{{ route('role.destroy', $role->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus role ini?')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-outline-danger">
-                  <i class="ri-delete-bin-line"></i>
-                </button>
-              </form>
+              <button type="button" class="btn btn-sm btn-outline-danger delete-record" data-action="{{ route('role.destroy', $role->id) }}">
+                <i class="ri-delete-bin-line"></i>
+              </button>
             </td>
           </tr>
           @endforeach
@@ -56,4 +52,8 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('page-script')
+@vite(['resources/assets/js/app-role-index.js'])
 @endsection

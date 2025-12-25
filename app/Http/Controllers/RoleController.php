@@ -49,7 +49,19 @@ class RoleController extends Controller
 
     public function destroy(int $id)
     {
-        $this->service->delete($id);
-        return redirect()->route('role.index')->with('success', 'Role berhasil dihapus');
+        try {
+            $this->service->delete($id);
+
+            if (request()->wantsJson()) {
+                return \App\Helpers\ResponseHelper::success(null, 'Role berhasil dihapus');
+            }
+
+            return redirect()->route('role.index')->with('success', 'Role berhasil dihapus');
+        } catch (\Exception $e) {
+            if (request()->wantsJson()) {
+                return \App\Helpers\ResponseHelper::error('Gagal menghapus role: ' . $e->getMessage());
+            }
+            return redirect()->back()->with('error', 'Gagal menghapus role');
+        }
     }
 }

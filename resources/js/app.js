@@ -1,4 +1,6 @@
 import './bootstrap';
+import './utils/alert-handler'; // Import Global Alert Handler
+
 /*
   Add custom scripts here
 */
