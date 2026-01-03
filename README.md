@@ -1,185 +1,78 @@
-# Base Laravel - Service Repository Pattern
+# 🚀 Base Laravel - Enterprise Ready Template
 
-Template Laravel dengan Service Repository Pattern untuk pengembangan aplikasi yang terstruktur dan maintainable.
+Template Laravel modern dengan arsitektur **Service Repository Pattern**, sistem **Audit Trail**, dan **File Management** yang powerful. Dirancang untuk skalabilitas perusahaan dan kemudahan maintenance.
 
-## 📋 Fitur
+---
 
-- **Service Repository Pattern** - Pemisahan business logic, data access, dan presentation
-- **Base Classes** - `BaseRepository`, `BaseService`, `BaseRequest` yang reusable
-- **Response Helper** - Standarisasi response API
-- **Admin Template** - Template Sneat Bootstrap 5
+## 🌟 Fitur Unggulan
 
-## 📁 Struktur Folder
+-   🏗️ **Service Repository Pattern** - Arsitektur terstruktur dan testable.
+-   🛡️ **Granular Role & Permission** - RBAC (Role Based Access Control) hingga tingkat aksi per menu.
+-   🕵️ **Activity Log (Audit Trail)** - Melacak setiap perubahan data otomatis (Before/After).
+-   📁 **File Upload Manager** - Upload tersentralisasi dengan auto-resize & optimasi gambar.
+-   🎨 **Premium Admin UI** - Menggunakan Sneat Bootstrap 5 Admin Template.
+-   🤖 **Custom Code Generator** - Buat modul CRUD lengkap dengan satu perintah.
+-   🔔 **Global Alert System** - Terintegrasi dengan SweetAlert2 & Toastr.
 
-```
-app/
-├── Helpers/
-│   ├── ResponseHelper.php      # Standarisasi JSON response
-│   └── ViewConfigHelper.php    # Konfigurasi view/template
-├── Http/
-│   ├── Controllers/
-│   │   └── UserController.php  # Contoh controller
-│   └── Requests/
-│       ├── BaseRequest.php     # Base form request
-│       └── UserRequest.php     # Contoh request validation
-├── Interfaces/
-│   └── Repositories/
-│       ├── BaseRepositoryInterface.php
-│       └── UserRepositoryInterface.php
-├── Models/
-│   └── User.php
-├── Repositories/
-│   ├── BaseRepository.php      # Implementasi CRUD dasar
-│   └── UserRepository.php      # Contoh repository
-├── Services/
-│   ├── BaseService.php         # Wrapper CRUD methods
-│   └── UserService.php         # Contoh service dengan business logic
-└── Providers/
-    └── AppServiceProvider.php  # Binding interface ke implementasi
-```
+---
 
-## 🚀 Instalasi
+## 📁 Struktur Proyek & Panduan Detail
+
+Untuk penjelasan mendalam mengenai fitur-fitur di atas, silakan baca dokumentasi khusus berikut:
+
+| Dokumentasi                                           | Deskripsi                                          |
+| ----------------------------------------------------- | -------------------------------------------------- |
+| 📘 **[FEATURES_GUIDE.md](FEATURES_GUIDE.md)**         | **PANDUAN LENGKAP** semua fitur dan cara pakainya. |
+| 🕵️ **[ACTIVITY_LOG_GUIDE.md](ACTIVITY_LOG_GUIDE.md)** | Detail sistem audit trail & monitoring user.       |
+| 🔔 **[ALERT_SYSTEM_GUIDE.md](ALERT_SYSTEM_GUIDE.md)** | Cara menggunakan SweetAlert & Toastr global.       |
+
+---
+
+## 🚀 Instalasi Cepat
 
 ```bash
-# Clone repository
+# 1. Clone & Install
 git clone <repo-url>
 cd base-laravel
+composer install && npm install
 
-# Install dependencies
-composer install
-npm install
-
-# Setup environment
+# 2. Setup Environment
 cp .env.example .env
 php artisan key:generate
 
-# Migrate database
-php artisan migrate
-
-# Build assets
+# 3. Setup Database & Assets
+php artisan migrate:fresh --seed
 npm run build
 
-# Run development server
+# 4. Run Project
 composer dev
 ```
 
-## 💡 Cara Penggunaan
+---
 
-### 1. Membuat Feature Baru
+## 💡 Quick Start: Membuat Fitur Baru
 
-**Step 1: Buat Model & Migration**
-```bash
-php artisan make:model Product -m
-```
-
-**Step 2: Buat Interface Repository**
-```php
-// app/Interfaces/Repositories/ProductRepositoryInterface.php
-interface ProductRepositoryInterface extends BaseRepositoryInterface
-{
-    // Tambah method spesifik jika diperlukan
-}
-```
-
-**Step 3: Buat Repository**
-```php
-// app/Repositories/ProductRepository.php
-class ProductRepository extends BaseRepository implements ProductRepositoryInterface
-{
-    public function __construct(Product $model)
-    {
-        parent::__construct($model);
-    }
-}
-```
-
-**Step 4: Buat Service**
-```php
-// app/Services/ProductService.php
-class ProductService extends BaseService
-{
-    public function __construct(ProductRepository $repository)
-    {
-        parent::__construct($repository);
-    }
-}
-```
-
-**Step 5: Buat Controller**
-```php
-// app/Http/Controllers/ProductController.php
-class ProductController extends Controller
-{
-    public function __construct(protected ProductService $service) {}
-    
-    // CRUD methods...
-}
-```
-
-**Step 6: Daftarkan di AppServiceProvider**
-```php
-$this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
-```
-
-### 2. Response API
-
-Gunakan `ResponseHelper` untuk response yang konsisten:
-
-```php
-use App\Helpers\ResponseHelper;
-
-// Success response
-return ResponseHelper::success($data, 'Data retrieved successfully');
-
-// Error response
-return ResponseHelper::error('Something went wrong', 400);
-```
-
-### 3. Form Request Validation
-
-Extend `BaseRequest` untuk validasi dengan error format standar:
-
-```php
-class ProductRequest extends BaseRequest
-{
-    public function rules(): array
-    {
-        return [
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-        ];
-    }
-}
-```
-
-## 🧪 Testing
+Ingin membuat modul baru (misal: Produk)? Cukup jalankan:
 
 ```bash
-# Run all tests
-php artisan test
-
-# Run specific test
-php artisan test --filter=UserPostTest
+php artisan make:feature Product
 ```
 
-## 📝 API Endpoints (User)
+Lalu ikuti petunjuk yang muncul di terminal untuk mendaftarkan route & service provider.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/user` | List all users |
-| GET | `/user/{id}` | Get user by ID |
-| POST | `/user` | Create new user |
-| PUT | `/user/{id}` | Update user |
-| DELETE | `/user/{id}` | Delete user |
+---
 
-## 🛠 Scripts
+## 📦 Tech Stack
 
-```bash
-composer setup    # Full setup termasuk npm install & migrate
-composer dev      # Jalankan server, queue, pail, dan vite
-composer test     # Jalankan tests
-```
+-   **Core**: Laravel 12.x, PHP 8.2+
+-   **Frontend**: Bootstrap 5, Vite, jQuery (Sneat Template)
+-   **Database**: MySQL / PostgreSQL / SQLite
+-   **Processing**: Intervention Image v3
+
+---
 
 ## 📄 License
 
-MIT License
+MIT License. Free to use for commercial or personal projects.
+
+_Developed with ❤️ by Ooka Pratama_

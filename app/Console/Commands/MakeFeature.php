@@ -46,7 +46,9 @@ class MakeFeature extends Command
         $this->makeController();
         $this->makeRequest();
 
-        $this->info("CRUD {$this->feature} generated successfully");
+        $this->newLine();
+        $this->info("✅ CRUD {$this->feature} generated successfully!");
+        $this->showBindingHint();
     }
 
     /**
@@ -177,6 +179,8 @@ PHP);
     protected function makeController(): void
     {
         $controllerPath = app_path("Http/Controllers/{$this->feature}Controller.php");
+        $slug = Str::kebab($this->feature);
+        $viewPath = Str::snake($this->feature, '-');
 
         if ($this->files->exists($controllerPath)) return;
 
@@ -200,8 +204,8 @@ class {$this->feature}Controller extends Controller
      */
     public function index()
     {
-        // \$data = \$this->service->all();
-        // return view('pages.{$this->feature}.index', compact('data'));
+        \$data = \$this->service->all();
+        return view('pages.{$viewPath}.index', compact('data'));
     }
 
     /**
@@ -209,7 +213,7 @@ class {$this->feature}Controller extends Controller
      */
     public function create()
     {
-        // return view('pages.{$this->feature}.create');
+        return view('pages.{$viewPath}.create');
     }
 
     /**
@@ -218,9 +222,9 @@ class {$this->feature}Controller extends Controller
     public function store({$this->feature}Request \$request)
     {
         \$data = \$request->validated();
-        \$this->service->store(\$data);
+        \$this->service->create(\$data);
 
-        return redirect()->route('{$this->feature}.index')
+        return redirect()->route('{$slug}.index')
             ->with('success', 'Data berhasil ditambahkan!');
     }
 
@@ -229,8 +233,8 @@ class {$this->feature}Controller extends Controller
      */
     public function show(\$id)
     {
-        // \$data = \$this->service->find(\$id);
-        // return view('pages.{$this->feature}.show', compact('data'));
+        \$data = \$this->service->find(\$id);
+        return view('pages.{$viewPath}.show', compact('data'));
     }
 
     /**
@@ -238,8 +242,8 @@ class {$this->feature}Controller extends Controller
      */
     public function edit(\$id)
     {
-        // \$data = \$this->service->find(\$id);
-        // return view('pages.{$this->feature}.edit', compact('data'));
+        \$data = \$this->service->find(\$id);
+        return view('pages.{$viewPath}.edit', compact('data'));
     }
 
     /**
@@ -250,7 +254,7 @@ class {$this->feature}Controller extends Controller
         \$data = \$request->validated();
         \$this->service->update(\$id, \$data);
 
-        return redirect()->route('{$this->feature}.index')
+        return redirect()->route('{$slug}.index')
             ->with('success', 'Data berhasil diperbarui!');
     }
 
@@ -261,10 +265,28 @@ class {$this->feature}Controller extends Controller
     {
         \$this->service->delete(\$id);
 
-        return redirect()->route('{$this->feature}.index')
+        return redirect()->route('{$slug}.index')
             ->with('success', 'Data berhasil dihapus!');
     }
 }
 PHP);
+
+        $this->info("💡 Jangan lupa tambahkan route di routes/web.php:");
+        $this->line("   Route::resource('{$slug}', \\App\\Http\\Controllers\\{$this->feature}Controller::class);");
+    }
+
+    /**
+     * ===============================
+     * AUTO BINDING HINT
+     * ===============================
+     */
+    protected function showBindingHint(): void
+    {
+        $this->newLine();
+        $this->info("📌 Tambahkan binding di AppServiceProvider::register():");
+        $this->line("   \$this->app->bind(");
+        $this->line("       \\App\\Interfaces\\Repositories\\{$this->feature}RepositoryInterface::class,");
+        $this->line("       \\App\\Repositories\\{$this->feature}Repository::class");
+        $this->line("   );");
     }
 }

@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        protected ActivityLogService $activityLogService
+    ) {}
+
     public function showLogin()
     {
         return view('pages.authentications.auth-login-basic');
@@ -21,6 +26,10 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            
+            // Log aktivitas login
+            $this->activityLogService->logLogin();
+            
             return redirect()->intended('/');
         }
 
@@ -31,9 +40,13 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        // Log aktivitas logout sebelum logout
+        $this->activityLogService->logLogout();
+        
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/login');
     }
 }
+

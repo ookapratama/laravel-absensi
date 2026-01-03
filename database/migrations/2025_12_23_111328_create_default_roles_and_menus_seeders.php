@@ -38,7 +38,7 @@ return new class extends Migration
                 'parent_id' => $parentId,
                 'name' => $m['name'],
                 'slug' => $m['slug'],
-                'url' => $m['url'],
+                'path' => $m['url'],
                 'icon' => $m['icon'],
                 'order_no' => $m['order_no'],
                 'is_active' => true,
