@@ -13,7 +13,7 @@ class MenuRequest extends BaseRequest
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:menus,slug,' . $menuId,
             'icon' => 'nullable|string|max:255',
-            'url' => 'nullable|string|max:255',
+            'path' => 'nullable|string|max:255',
             'order_no' => 'required|integer|min:0',
             'is_active' => 'required|boolean',
         ];
