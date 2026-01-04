@@ -25,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
             \App\Interfaces\Repositories\MenuRepositoryInterface::class,
             \App\Repositories\MenuRepository::class
         );
+        $this->app->bind(
+            \App\Interfaces\Repositories\ProductsRepositoryInterface::class,
+            \App\Repositories\ProductsRepository::class
+        );
     }
 
     /**

@@ -44,8 +44,8 @@
           </div>
           <div class="col-md-6 mb-4">
             <div class="form-floating form-floating-outline">
-              <input type="text" name="url" id="url" class="form-control" value="{{ old('url', $menu->url) }}">
-              <label for="url">URL</label>
+              <input type="text" name="path" id="path" class="form-control" value="{{ old('path', $menu->path) }}">
+              <label for="path">Path</label>
             </div>
           </div>
           <div class="col-md-6 mb-4">

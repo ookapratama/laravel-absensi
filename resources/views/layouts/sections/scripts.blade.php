@@ -26,23 +26,33 @@
 <!-- Global Alert Handler Integration -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Check for success message
-    @if(session('success'))
-      window.AlertHandler.showSuccess("{{ session('success') }}");
-    @endif
+    const showMessage = () => {
+      if (!window.AlertHandler) {
+          // If AlertHandler not ready yet (deferred module), wait a tiny bit
+          setTimeout(showMessage, 50);
+          return;
+      }
 
-    // Check for error message
-    @if(session('error'))
-      window.AlertHandler.showError("{{ session('error') }}");
-    @endif
+      // Check for success message
+      @if(session('success'))
+        window.AlertHandler.showSuccess("{{ session('success') }}", true);
+      @endif
 
-    // Check for validation errors (if any)
-    @if($errors->any())
-      const validationErrors = {};
-      @foreach($errors->messages() as $key => $messages)
-        validationErrors['{{ $key }}'] = @json($messages);
-      @endforeach
-      window.AlertHandler.showError('Please check your input', validationErrors);
-    @endif
+      // Check for error message
+      @if(session('error'))
+        window.AlertHandler.showError("{{ session('error') }}");
+      @endif
+
+      // Check for validation errors
+      @if($errors->any())
+        const validationErrors = {};
+        @foreach($errors->messages() as $key => $messages)
+          validationErrors['{{ $key }}'] = @json($messages);
+        @endforeach
+        window.AlertHandler.showError('Please check your input', validationErrors);
+      @endif
+    };
+
+    showMessage();
   });
 </script>
