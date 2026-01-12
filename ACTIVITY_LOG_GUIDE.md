@@ -1,10 +1,10 @@
-# 📋 Panduan Activity Log System
+# 📋 Activity Log System Guide
 
-Sistem Activity Log ini menyediakan audit trail otomatis untuk melacak semua aktivitas CRUD dan aksi penting dalam aplikasi.
+This Activity Log system provides an automatic audit trail to track all CRUD activities and important actions within the application.
 
 ---
 
-## 🏗️ Arsitektur
+## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -30,30 +30,28 @@ Sistem Activity Log ini menyediakan audit trail otomatis untuk melacak semua akt
 │  │  • user_id      • action       • description              │   │
 │  │  • subject_type • subject_id   • old_values              │   │
 │  │  • new_values   • properties   • ip_address              │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📦 Komponen
+## 📦 Components
 
-| File | Deskripsi |
-|------|-----------|
-| `app/Models/ActivityLog.php` | Model untuk menyimpan log |
-| `app/Traits/LogsActivity.php` | Trait untuk auto-logging CRUD |
-| `app/Services/ActivityLogService.php` | Service untuk operasi log manual |
-| `app/Http/Controllers/ActivityLogController.php` | Controller untuk view |
-| `resources/views/pages/activity-log/index.blade.php` | UI untuk melihat log |
+| File                                                 | Description                       |
+| ---------------------------------------------------- | --------------------------------- |
+| `app/Models/ActivityLog.php`                         | Model for storing logs            |
+| `app/Traits/LogsActivity.php`                        | Trait for automatic CRUD logging  |
+| `app/Services/ActivityLogService.php`                | Service for manual log operations |
+| `app/Http/Controllers/ActivityLogController.php`     | Controller for the log view       |
+| `resources/views/pages/activity-log/index.blade.php` | UI for viewing logs               |
 
 ---
 
-## 🚀 Cara Penggunaan
+## 🚀 How to Use
 
-### 1. Auto-Logging CRUD (Menggunakan Trait)
+### 1. Automatic CRUD Logging (Using Trait)
 
-Tambahkan `LogsActivity` trait ke Model yang ingin di-track:
+Add the `LogsActivity` trait to the Model you want to track:
 
 ```php
 <?php
@@ -68,24 +66,25 @@ class Product extends Model
     use LogsActivity;
 
     protected $fillable = ['name', 'price', 'description'];
-    
-    // OPSIONAL: Tentukan field yang di-log (default: semua)
+
+    // OPTIONAL: Define fields to be logged (default: all)
     protected static array $logAttributes = ['name', 'price'];
-    
-    // OPSIONAL: Field yang TIDAK di-log (default: password, remember_token, timestamps)
+
+    // OPTIONAL: Fields NOT to be logged (default: password, remember_token, timestamps)
     protected static array $logExcept = ['internal_notes'];
 }
 ```
 
-**Hasil:** Setiap kali `Product` dibuat, diupdate, atau dihapus, sistem akan otomatis mencatat:
-- Siapa yang melakukan
-- Kapan dilakukan
-- Data sebelum dan sesudah perubahan
-- IP Address dan User Agent
+**Result:** Every time a `Product` is created, updated, or deleted, the system will automatically record:
 
-### 2. Logging Manual (Non-CRUD)
+-   Who performed the action
+-   When it was performed
+-   Data before and after the change
+-   IP Address and User Agent
 
-Untuk aksi yang tidak ter-cover oleh trait CRUD, gunakan `ActivityLogService`:
+### 2. Manual Logging (Non-CRUD)
+
+For actions not covered by the CRUD trait, use `ActivityLogService`:
 
 ```php
 <?php
@@ -102,13 +101,13 @@ class ReportController extends Controller
 
     public function export()
     {
-        // ... proses export ...
+        // ... export process ...
 
-        // Log aktivitas export
+        // Log export activity
         $this->activityLogService->log(
             action: 'exported',
-            description: 'User mengeksport laporan penjualan',
-            subject: null, // atau Model tertentu
+            description: 'User exported sales report',
+            subject: null, // or specific Model
             properties: [
                 'format' => 'xlsx',
                 'date_range' => '2024-01-01 - 2024-12-31'
@@ -120,45 +119,46 @@ class ReportController extends Controller
 }
 ```
 
-### 3. Logging Custom dari Model Instance
+### 3. Custom Logging from Model Instance
 
-Jika Model sudah menggunakan trait, bisa juga log custom:
+If the Model already uses the trait, you can also log custom activities:
 
 ```php
 $product = Product::find(1);
 
 $product->logCustomActivity(
     action: 'viewed',
-    description: 'User melihat detail produk',
+    description: 'User viewed product details',
     properties: ['referrer' => request()->headers->get('referer')]
 );
 ```
 
 ---
 
-## 🔍 Mengakses Log
+## 🔍 Accessing Logs
 
 ### Via Web UI
 
-Akses halaman: `/activity-log`
+Access the page: `/activity-log`
 
-Fitur:
-- Filter berdasarkan aksi, user, tanggal
-- Lihat detail perubahan data (before/after)
-- Pagination
+Features:
+
+-   Filter by action, user, date
+-   View data change details (before/after)
+-   Pagination
 
 ### Via API
 
 ```javascript
 // Get paginated logs
-fetch('/activity-log/data?per_page=15&action=created')
-    .then(res => res.json())
-    .then(data => console.log(data));
+fetch("/activity-log/data?per_page=15&action=created")
+    .then((res) => res.json())
+    .then((data) => console.log(data));
 
 // Get statistics
-fetch('/activity-log/statistics?days=30')
-    .then(res => res.json())
-    .then(data => console.log(data));
+fetch("/activity-log/statistics?days=30")
+    .then((res) => res.json())
+    .then((data) => console.log(data));
 ```
 
 ### Via Code (Query)
@@ -167,7 +167,7 @@ fetch('/activity-log/statistics?days=30')
 use App\Models\ActivityLog;
 use App\Services\ActivityLogService;
 
-// Query langsung
+// Direct query
 $recentLogs = ActivityLog::with('user')
     ->action('created')
     ->forModel(Product::class)
@@ -179,21 +179,21 @@ $recentLogs = ActivityLog::with('user')
 // Via Service
 $service = app(ActivityLogService::class);
 
-// Get logs untuk user tertentu
+// Get logs for specific user
 $userLogs = $service->getByUser($userId, limit: 10);
 
-// Get logs untuk model tertentu
+// Get logs for specific subject
 $productLogs = $service->getBySubject($product, limit: 10);
 
-// Get statistik
+// Get statistics
 $stats = $service->getStatistics(days: 30);
 ```
 
 ---
 
-## 🔧 Konfigurasi
+## 🔧 Configuration
 
-### Mengubah Field Default yang Di-ignore
+### Changing Default Ignored Fields
 
 Edit `app/Traits/LogsActivity.php`:
 
@@ -201,31 +201,31 @@ Edit `app/Traits/LogsActivity.php`:
 protected static function getLogExceptAttributes(): array
 {
     $defaults = ['password', 'remember_token', 'updated_at', 'created_at'];
-    // Tambahkan field global yang tidak perlu di-log
-    
+    // Add global fields that should not be logged
+
     if (property_exists(static::class, 'logExcept')) {
         return array_merge($defaults, static::$logExcept);
     }
-    
+
     return $defaults;
 }
 ```
 
 ### Custom Description
 
-Override method di Model:
+Override the method in the Model:
 
 ```php
 class Product extends Model
 {
     use LogsActivity;
-    
+
     protected static function getLogDescription(string $action, Model $model): string
     {
         return match ($action) {
-            'created' => "Produk baru '{$model->name}' ditambahkan dengan harga Rp " . number_format($model->price),
-            'updated' => "Produk '{$model->name}' diperbarui",
-            'deleted' => "Produk '{$model->name}' dihapus dari sistem",
+            'created' => "New product '{$model->name}' added with price " . number_format($model->price),
+            'updated' => "Product '{$model->name}' updated",
+            'deleted' => "Product '{$model->name}' removed from the system",
             default => parent::getLogDescription($action, $model),
         };
     }
@@ -238,14 +238,14 @@ class Product extends Model
 
 ### Cleanup Old Logs
 
-Untuk membersihkan log lama (misalnya > 90 hari):
+To clean up old logs (e.g., > 90 days):
 
 ```php
 // Via Service
 $service = app(ActivityLogService::class);
 $deletedCount = $service->cleanup(daysToKeep: 90);
 
-// Atau buat scheduled command
+// Or create a scheduled command
 // app/Console/Kernel.php
 $schedule->call(function () {
     app(ActivityLogService::class)->cleanup(90);
@@ -254,25 +254,25 @@ $schedule->call(function () {
 
 ---
 
-## 📊 Tipe Aksi (Action Types)
+## 📊 Action Types
 
-| Action | Deskripsi | Trigger |
-|--------|-----------|---------|
-| `created` | Data baru dibuat | Model::created event |
-| `updated` | Data diperbarui | Model::updated event |
-| `deleted` | Data dihapus | Model::deleted event |
-| `login` | User login | AuthController::login() |
-| `logout` | User logout | AuthController::logout() |
-| `viewed` | Data dilihat | Manual log |
-| `exported` | Data diekspor | Manual log |
-| `imported` | Data diimpor | Manual log |
-| (custom) | Aksi custom | Manual log |
+| Action     | Description      | Trigger                  |
+| ---------- | ---------------- | ------------------------ |
+| `created`  | New data created | Model::created event     |
+| `updated`  | Data updated     | Model::updated event     |
+| `deleted`  | Data deleted     | Model::deleted event     |
+| `login`    | User logged in   | AuthController::login()  |
+| `logout`   | User logged out  | AuthController::logout() |
+| `viewed`   | Data viewed      | Manual log               |
+| `exported` | Data exported    | Manual log               |
+| `imported` | Data imported    | Manual log               |
+| (custom)   | Custom action    | Manual log               |
 
 ---
 
 ## ✅ Best Practices
 
-1. **Jangan log data sensitif** - Gunakan `$logExcept` untuk field seperti password, token, dll
-2. **Batasi log attributes** - Gunakan `$logAttributes` jika hanya perlu track field tertentu
-3. **Cleanup reguler** - Set scheduled task untuk hapus log lama agar database tidak membengkak
-4. **Index columns** - Pastikan kolom yang sering di-filter sudah di-index (sudah ada di migration)
+1. **Don't log sensitive data** - Use `$logExcept` for fields like password, tokens, etc.
+2. **Limit log attributes** - Use `$logAttributes` if you only need to track specific fields.
+3. **Regular Cleanup** - Set a scheduled task to delete old logs so your database doesn't bloat.
+4. **Index columns** - Ensure columns that are often filtered are indexed (already in migration).

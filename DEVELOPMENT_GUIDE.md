@@ -1,27 +1,27 @@
-# 🛠 Panduan Pengembangan Fitur (Development Guide)
+# 🛠 Feature Development Guide
 
-Panduan ini menjelaskan langkah-langkah detail untuk menambahkan fitur baru ke dalam **Base Laravel Template** ini, mengikuti standar arsitektur _Service-Repository Pattern_ yang telah diimplementasikan.
+This guide explains the detailed steps for adding new features to this **Base Laravel Template**, following the implemented _Service-Repository Pattern_ architecture.
 
 ---
 
-## 🚀 1. Menggunakan Command Generator
+## 🚀 1. Using the Generator Command
 
-Kami telah menyediakan custom command untuk mempercepat pembuatan boilerplate fitur baru:
+We have provided a custom command to speed up the creation of new feature boilerplates:
 
 ```bash
-php artisan make:feature NamaFitur
+php artisan make:feature FeatureName
 ```
 
-**Hasil dari perintah ini:**
+**Output of this command:**
 
--   `app/Models/NamaFitur.php`
--   `database/migrations/xxxx_create_nama_fitur_table.php`
--   `app/Interfaces/Repositories/NamaFiturRepositoryInterface.php`
--   `app/Repositories/NamaFiturRepository.php` (Binding otomatis di AppServiceProvider)
--   `app/Services/NamaFiturService.php`
--   `app/Http/Controllers/NamaFiturController.php`
--   `app/Http/Requests/NamaFiturRequest.php`
--   `resources/views/pages/nama-fitur/` (Folder view kosong)
+-   `app/Models/FeatureName.php`
+-   `database/migrations/xxxx_create_feature_name_table.php`
+-   `app/Interfaces/Repositories/FeatureNameRepositoryInterface.php`
+-   `app/Repositories/FeatureNameRepository.php` (Auto-binding in AppServiceProvider)
+-   `app/Services/FeatureNameService.php`
+-   `app/Http/Controllers/FeatureNameController.php`
+-   `app/Http/Requests/FeatureNameRequest.php`
+-   `resources/views/pages/feature-name/` (Empty view folder)
 
 ---
 
@@ -29,7 +29,7 @@ php artisan make:feature NamaFitur
 
 ### Step A: Migration
 
-Buka file migration yang baru dibuat, tentukan field tabel Anda:
+Open the newly created migration file and define your table fields:
 
 ```php
 public function up(): void {
@@ -43,15 +43,15 @@ public function up(): void {
 }
 ```
 
-Lalu jalankan: `php artisan migrate`
+Then run: `php artisan migrate`
 
 ### Step B: Model Setup
 
-Tambahkan trait `LogsActivity` untuk audit otomatis dan tentukan `$fillable` & `$casts`:
+Add the `LogsActivity` trait for automatic auditing and define `$fillable` & `$casts`:
 
 ```php
 class Product extends Model {
-    use LogsActivity; // Aktifkan Audit Trail otomatis
+    use LogsActivity; // Enable automatic Audit Trail
 
     protected $fillable = ['name', 'price', 'is_active'];
     protected $casts = ['is_active' => 'boolean'];
@@ -60,18 +60,18 @@ class Product extends Model {
 
 ---
 
-## 📂 3. Implementasi Logic (Service-Repository)
+## 📂 3. Logic Implementation (Service-Repository)
 
 ### Repository
 
-Gunakan untuk query database. Jika hanya CRUD standar, Anda tidak perlu mengubah apa pun karena sudah extend `BaseRepository`.
+Use this for database queries. If you only need standard CRUD, you don't need to change anything as it already extends `BaseRepository`.
 
 ### Service
 
-Tempat meletakkan Business Logic. Jangan letakkan logika berat di Controller.
+This is where you put your Business Logic. Avoid putting heavy logic in the Controller.
 
 ```php
-// Contoh memproses data sebelum simpan
+// Example: processing data before saving
 public function create(array $data) {
     $data['slug'] = Str::slug($data['name']);
     return parent::create($data);
@@ -84,7 +84,7 @@ public function create(array $data) {
 
 ### Update Route
 
-Daftarkan resource di `routes/web.php` (atau `api.php`):
+Register the resource in `routes/web.php` (or `api.php`):
 
 ```php
 Route::middleware(['auth'])->group(function () {
@@ -95,7 +95,7 @@ Route::middleware(['auth'])->group(function () {
 
 ### Controller Implementation
 
-Terima request, panggil service, arahkan view:
+Accept the request, call the service, and direct the view:
 
 ```php
 public function store(ProductsRequest $request) {
@@ -103,7 +103,7 @@ public function store(ProductsRequest $request) {
     $this->service->create($data);
 
     return redirect()->route('products.index')
-        ->with('success', 'Produk berhasil ditambahkan!');
+        ->with('success', 'Product added successfully!');
 }
 ```
 
@@ -111,56 +111,61 @@ public function store(ProductsRequest $request) {
 
 ## 🎨 5. Frontend & UI Tools
 
-### Notifikasi (SweetAlert2 & Toastr)
+### Notifications (SweetAlert2 & Toastr)
 
-Sistem sudah memiliki `AlertHandler` global.
+The system already has a global `AlertHandler`.
 
-**A. Sukses (Toastr):**
-Otomatis muncul jika Anda mengirim `->with('success', '...')` dari controller.
+**A. Success (Toastr):**
+Automatically appears if you send `->with('success', '...')` from the controller.
 
-**B. Konfirmasi Hapus (SweetAlert2):**
-Gunakan selector `.delete-record` di view Anda:
+**B. Delete Confirmation (SweetAlert2):**
+Use the `.delete-record` selector in your view:
 
 ```javascript
 $(".delete-record").on("click", function () {
-    window.AlertHandler.confirm("Hapus?", "Yakin?", "Ya, Hapus!", () => {
-        // Jalankan AJAX delete disini
-    });
+    window.AlertHandler.confirm(
+        "Delete?",
+        "Are you sure?",
+        "Yes, Delete!",
+        () => {
+            // Execute AJAX delete here
+        },
+    );
 });
 ```
 
-### Upload File
+### File Upload
 
-Gunakan `FileUploadService` di Controller:
+Use `FileUploadService` in the Controller:
 
 ```php
 if ($request->hasFile('cover')) {
-    $media = $this->fileUploadService->upload($request->file('cover'), 'folder-tujuan');
+    $media = $this->fileUploadService->upload($request->file('cover'), 'target-folder');
     $data['cover'] = $media->path;
 }
 ```
 
 ---
 
-## ☰ 6. Integrasi Sidebar Menu
+## ☰ 6. Sidebar Menu Integration
 
-Agar menu muncul di sidebar dan memiliki sistem permission:
+To make the menu appear in the sidebar with the permission system:
 
-1. Buka `database/seeders/RoleAndMenuSeeder.php`.
-2. Tambahkan array menu ke dalam variabel `$menus`:
+1. Open `database/seeders/RoleAndMenuSeeder.php`.
+2. Add the menu array to the `$menus` variable:
     ```php
-    ['name' => 'Katalog Produk', 'slug' => 'products.index', 'path' => '/products', 'icon' => 'ri-shopping-bag-line', 'order_no' => 5],
+    ['name' => 'Product Catalog', 'slug' => 'products.index', 'path' => '/products', 'icon' => 'ri-shopping-bag-line', 'order_no' => 5],
     ```
-3. Jalankan: `php artisan db:seed --class=RoleAndMenuSeeder`.
-4. Dashboard akan otomatis merender menu tersebut berdasarkan hak akses role user.
+3. Run: `php artisan db:seed --class=RoleAndMenuSeeder`.
+4. The dashboard will automatically render the menu based on the user's role access.
 
 ---
 
-## ✅ Checklist Terakhir
+## ✅ Final Checklist
 
--   [ ] Command `make:feature` dijalankan.
--   [ ] Migration diisi & dijalankan.
--   [ ] Model menggunakan `LogsActivity`.
--   [ ] Route terdaftar & dibungkus middleware `check.permission`.
--   [ ] Menambahkan menu di `RoleAndMenuSeeder`.
--   [ ] UI menggunakan Layout Master & AlertHandler.
+-   [ ] `make:feature` command executed.
+-   [ ] Migration defined & migrated.
+-   [ ] Model uses `LogsActivity`.
+-   [ ] Route registered & wrapped in `check.permission` middleware.
+-   [ ] Menu added in `RoleAndMenuSeeder`.
+-   [ ] UI uses Master Layout & AlertHandler.

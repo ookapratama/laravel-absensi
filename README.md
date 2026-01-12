@@ -1,81 +1,106 @@
 # 🚀 Base Laravel - Enterprise Ready Template
 
-Template Laravel modern dengan arsitektur **Service Repository Pattern**, sistem **Audit Trail**, dan **File Management** yang powerful. Dirancang untuk skalabilitas perusahaan dan kemudahan maintenance.
+A modern Laravel starter template designed with **Service Repository Pattern**, **Audit Trail**, and **Powerful File Management**. Optimized for enterprise scalability and developer productivity.
 
 ---
 
-## 🌟 Fitur Unggulan
+## 🌟 Key Features
 
--   🏗️ **Service Repository Pattern** - Arsitektur terstruktur dan testable.
--   🛡️ **Granular Role & Permission** - RBAC (Role Based Access Control) hingga tingkat aksi per menu.
--   🕵️ **Activity Log (Audit Trail)** - Melacak setiap perubahan data otomatis (Before/After).
--   📁 **File Upload Manager** - Upload tersentralisasi dengan auto-resize & optimasi gambar.
--   🎨 **Premium Admin UI** - Menggunakan Sneat Bootstrap 5 Admin Template.
--   🤖 **Custom Code Generator** - Buat modul CRUD lengkap dengan satu perintah.
--   � **API Documentation** - Dokumentasi API interaktif menggunakan Swagger (OpenAPI).
--   �🔔 **Global Alert System** - Terintegrasi dengan SweetAlert2 & Toastr.
-
----
-
-## 📁 Struktur Proyek & Panduan Detail
-
-Untuk penjelasan mendalam mengenai fitur-fitur di atas, silakan baca dokumentasi khusus berikut:
-
-| Dokumentasi                                           | Deskripsi                                          |
-| ----------------------------------------------------- | -------------------------------------------------- |
-| 📘 **[FEATURES_GUIDE.md](FEATURES_GUIDE.md)**         | **PANDUAN LENGKAP** semua fitur dan cara pakainya. |
-| 🛠 **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)**   | **PANDUAN KODING** cara menambah fitur baru.       |
-| 🕵️ **[ACTIVITY_LOG_GUIDE.md](ACTIVITY_LOG_GUIDE.md)** | Detail sistem audit trail & monitoring user.       |
-| 🔔 **[ALERT_SYSTEM_GUIDE.md](ALERT_SYSTEM_GUIDE.md)** | Cara menggunakan SweetAlert & Toastr global.       |
+-   🏗️ **Service Repository Pattern** - Clean, structured, and testable codebase.
+-   🛡️ **Granular Role & Permission** - Robust RBAC (Role Based Access Control) down to per-menu actions (Create, Read, Update, Delete).
+-   🕵️ **Activity Log (Audit Trail)** - Automatically track every data change with Before/After snapshots.
+-   📁 **File Upload Manager** - Centralized file handling with auto-resize, optimization, and DB tracking.
+-   🎨 **Premium Admin UI** - Powered by Sneat Bootstrap 5 Admin Template.
+-   🤖 **Custom Code Generator** - Scaffold complete CRUD modules with a single command.
+-   📖 **API Documentation** - Interactive Swagger (OpenAPI) documentation out of the box.
+-   🔔 **Global Alert System** - Pre-configured SweetAlert2 & Toastr integration.
 
 ---
 
-## 🚀 Instalasi Cepat
+## 📁 Documentation Guide
+
+For in-depth explanations of the features and how to use them, please refer to the following guides:
+
+| Guide                                                 | Description                                           |
+| ----------------------------------------------------- | ----------------------------------------------------- |
+| 📘 **[FEATURES_GUIDE.md](FEATURES_GUIDE.md)**         | **FULL OVERVIEW** of all available features.          |
+| 🛠 **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)**   | **CODING STANDARDS** and how to add new modules.      |
+| 🕵️ **[ACTIVITY_LOG_GUIDE.md](ACTIVITY_LOG_GUIDE.md)** | Detailed audit trail & user monitoring documentation. |
+| 🔔 **[ALERT_SYSTEM_GUIDE.md](ALERT_SYSTEM_GUIDE.md)** | How to use the global SweetAlert & Toastr system.     |
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone & Install
 
 ```bash
-# 1. Clone & Install
-git clone <repo-url>
+git clone https://github.com/ookapratama/base-laravel.git
 cd base-laravel
 composer install && npm install
+```
 
-# 2. Setup Environment
+### 2. Setup Environment
+
+```bash
 cp .env.example .env
 php artisan key:generate
+```
 
-# 3. Setup Database & Assets
+### 3. Setup Database & Assets
+
+```bash
 php artisan migrate:fresh --seed
 npm run build
+```
 
-# 4. Run Project
+### 4. Run the Project
+
+```bash
+# Using the built-in shortcut
 composer dev
 ```
 
 ---
 
-## 💡 Quick Start: Membuat Fitur Baru
+## 💡 Pro Tip: Creating a New Feature
 
-Ingin membuat modul baru (misal: Produk)? Cukup jalankan:
+Want to create a new module (e.g., Product)? Use our custom generator:
 
 ```bash
 php artisan make:feature Product
 ```
 
-Untuk langkah detail setelah menjalankan command di atas (Seeder, Route, UI), silakan lihat: **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)**.
+This scaffolding includes Repository, Service, Controller, Request, and View folder. See **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)** for details.
 
 ---
 
 ## 📦 Tech Stack
 
--   **Core**: Laravel 12.x, PHP 8.2+
+-   **Backend**: Laravel 12.x, PHP 8.2+
 -   **Frontend**: Bootstrap 5, Vite, jQuery (Sneat Template)
 -   **Database**: MySQL / PostgreSQL / SQLite
 -   **API Docs**: Swagger (L5-Swagger)
--   **Processing**: Intervention Image v3
+-   **File Storage**: Intervention Image v3
+
+---
+
+## 💖 Support & Sponsoring
+
+If you find this project useful, please consider supporting its development. Your support helps keep the project active and allows me to create more open-source tools.
+
+-   **GitHub Sponsors**: [Sponsor @ookapratama](https://github.com/sponsors/ookapratama)
+-   **Buy Me a Coffee**: [buymeacoffee.com/ookapratama](https://www.buymeacoffee.com/ookapratama)
+-   **Ko-fi**: [ko-fi.com/ookapratama](https://ko-fi.com/ookapratama)
+
+For Indonesian supporters:
+
+-   **Trakteer**: [trakteer.id/ookapratama](https://trakteer.id/ookapratama)
 
 ---
 
 ## 📄 License
 
-MIT License. Free to use for commercial or personal projects.
+This project is open-sourced software licensed under the [MIT license](LICENSE).
 
-_Developed with ❤️ by Ooka Pratama_
+_Developed with ❤️ by [Ooka Pratama](https://github.com/ookapratama)_

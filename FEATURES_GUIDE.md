@@ -1,10 +1,10 @@
 # 🚀 Base Laravel Feature Guide
 
-Dokumentasi ini menjelaskan fitur-fitur utama yang tersedia dalam template ini dan bagaimana cara menggunakannya untuk mempercepat pengembangan aplikasi Anda.
+This documentation explains the main features available in this template and how to use them to speed up your application development.
 
 ---
 
-## 📚 Daftar Fitur
+## 📚 Feature List
 
 1. [Service Repository Pattern](#1-service-repository-pattern)
 2. [Activity Log System (Audit Trail)](#2-activity-log-system)
@@ -19,30 +19,30 @@ Dokumentasi ini menjelaskan fitur-fitur utama yang tersedia dalam template ini d
 
 ## 1. Service Repository Pattern
 
-Pemisahan logika bisnis, akses data, dan presentation layer untuk kode yang lebih bersih dan mudah diuji.
+Separation of business logic, data access, and presentation layer for cleaner and more testable code.
 
--   **Repository**: Hanya berisi query DB (Eloquent).
--   **Service**: Berisi business logic dan aturan aplikasi.
--   **Controller**: Hanya menangani request/response (tipis).
+-   **Repository**: Contains only DB queries (Eloquent).
+-   **Service**: Contains business logic and application rules.
+-   **Controller**: Handles only request/response (thin controller).
 
-**Cara Pakai:**
-Gunakan artisan command untuk membuat boilerplate sekaligus:
+**How to Use:**
+Use the artisan command to create the boilerplate all at once:
 
 ```bash
-php artisan make:feature NamaModule
+php artisan make:feature ModuleName
 ```
 
 ---
 
 ## 2. Activity Log System
 
-Audit trail otomatis untuk memantau siapa yang mengubah apa dan kapan.
+Automatic audit trail to monitor who changed what and when.
 
--   **Auto-Tracking**: Tambahkan trait `LogsActivity` pada Model.
--   **Log Manual**: Gunakan `ActivityLogService` di Controller.
--   **Audit UI**: Akses di `/activity-log` untuk melihat riwayat perubahan data (Before vs After).
+-   **Auto-Tracking**: Add the `LogsActivity` trait to your Model.
+-   **Manual Logging**: Use `ActivityLogService` in your Controller.
+-   **Audit UI**: Access at `/activity-log` to view data change history (Before vs After).
 
-**Contoh di Model:**
+**Example in Model:**
 
 ```php
 use App\Traits\LogsActivity;
@@ -56,13 +56,13 @@ class Product extends Model {
 
 ## 3. File Upload Manager
 
-Manajemen file terpusat dengan dukungan optimasi gambar.
+Centralized file management with support for image optimization.
 
--   **Integrated Storage**: Bisa pindah dari Local ke S3/Cloudinary tanpa ubah kode business logic.
--   **Image Processing**: Auto-resize, crop, dan compress menggunakan Intervention Image.
--   **DB Tracking**: Setiap file yang diupload tercatat di tabel `media`.
+-   **Integrated Storage**: Easily switch from Local to S3/Cloudinary without changing business logic code.
+-   **Image Processing**: Auto-resize, crop, and compress using Intervention Image.
+-   **DB Tracking**: Every uploaded file is recorded in the `media` table.
 
-**Contoh Penggunaan:**
+**Example Usage:**
 
 ```php
 use App\Services\FileUploadService;
@@ -75,7 +75,7 @@ public function store(Request $request, FileUploadService $fileService) {
     ]);
 
     $user->update(['avatar_id' => $media->id]);
-    // Akses URL: $media->url
+    // Access URL: $media->url
 }
 ```
 
@@ -83,13 +83,13 @@ public function store(Request $request, FileUploadService $fileService) {
 
 ## 4. Role & Permission Management
 
-Sistem kontrol akses berbasis peran (RBAC) yang sangat granular.
+A very granular Role-Based Access Control (RBAC) system.
 
--   **Granular Permission**: Bisa mengatur izin per menu untuk aksi: `Create`, `Read`, `Update`, `Delete`.
--   **Middleware**: Gunakan `check.permission:menu-slug` di routes.
--   **Blade Directive**: Gunakan `@can('access', ['menu-slug', 'create'])`.
+-   **Granular Permission**: Set permissions per menu for actions: `Create`, `Read`, `Update`, `Delete`.
+-   **Middleware**: Use `check.permission:menu-slug` in routes.
+-   **Blade Directive**: Use `@can('access', ['menu-slug', 'create'])`.
 
-**Contoh di Routes:**
+**Example in Routes:**
 
 ```php
 Route::resource('product', ProductController::class)
@@ -100,37 +100,37 @@ Route::resource('product', ProductController::class)
 
 ## 5. Standardized API Response
 
-Standarisasi format JSON response untuk memudahkan integrasi dengan Frontend (Vue/React/Mobile).
+Standardized JSON response format to facilitate integration with Frontend (Vue/React/Mobile).
 
-**Contoh di Controller:**
+**Example in Controller:**
 
 ```php
 use App\Helpers\ResponseHelper;
 
-return ResponseHelper::success($data, 'Berhasil mengambil data');
-return ResponseHelper::error('Gagal memproses data', 400);
+return ResponseHelper::success($data, 'Data retrieved successfully');
+return ResponseHelper::error('Failed to process data', 400);
 ```
 
 ---
 
 ## 6. Dynamic Menu System
 
-Menu navigasi di sidebar otomatis muncul berdasarkan hak akses user yang sedang login.
+Sidebar navigation menu automatically appears based on the logged-in user's access rights.
 
--   Konfigurasi melalui database atau JSON file: `resources/menu/verticalMenu.json`.
--   Otomatis menyembunyikan menu jika user tidak memiliki izin `Read`.
+-   Configuration via database or JSON file: `resources/menu/verticalMenu.json`.
+-   Automatically hides the menu if the user does not have `Read` permission.
 
 ---
 
 ## 7. Custom Artisan Generator
 
-Mempercepat pembuatan fitur baru tanpa perlu copy-paste file manual.
+Speed up the creation of new features without manual file copying.
 
 ```bash
 php artisan make:feature Product
 ```
 
-**Perintah ini akan membuatkan:**
+**This command will create:**
 
 -   `app/Interfaces/Repositories/ProductRepositoryInterface.php`
 -   `app/Repositories/ProductRepository.php`
@@ -142,19 +142,19 @@ php artisan make:feature Product
 
 ## 8. API Documentation (Swagger)
 
-Otomatis generate dokumentasi API yang interaktif sehingga memudahkan kolaborasi dengan tim Frontend atau Mobile.
+Automatically generate interactive API documentation to facilitate collaboration with Frontend or Mobile teams.
 
--   **Endpoint**: Akses di `/api/documentation`.
--   **Generator**: Gunakan perintah artisan untuk update dokumentasi setelah menambah tipe @OA annotations.
--   **Sanctum Integration**: Mendukung otentikasi Bearer Token (Sanctum).
+-   **Endpoint**: Access at `/api/documentation`.
+-   **Generator**: Use artisan command to update documentation after adding @OA annotations.
+-   **Sanctum Integration**: Supports Bearer Token authentication (Sanctum).
 
-**Cara Update Dokumentasi:**
+**How to Update Documentation:**
 
 ```bash
 php artisan l5-swagger:generate
 ```
 
-**Contoh Annotasi di Controller:**
+**Example Annotation in Controller:**
 
 ```php
 /**
@@ -169,7 +169,7 @@ php artisan l5-swagger:generate
 
 ---
 
-## 🛠️ Tech Stack Utama
+## 🛠️ Main Tech Stack
 
 -   **Laravel 12.x**
 -   **L5-Swagger** (OpenAPI Documentation)

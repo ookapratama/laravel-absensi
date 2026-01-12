@@ -1,111 +1,120 @@
-# Panduan Sistem Notifikasi & Alert Global
+# Global Notification & Alert System Guide
 
-Sistem ini menyediakan cara standar untuk menampilkan notifikasi menggunakan **SweetAlert2** dan **Toastr**. Sistem ini menangani respon dari interaksi Server-Side (Redirect/Flash Message) maupun Client-Side (AJAX/Axios) secara otomatis.
+This system provides a standardized way to display notifications using **SweetAlert2** and **Toastr**. It automatically handles responses from both Server-Side (Redirect/Flash Message) and Client-Side (AJAX/Axios) interactions.
 
 ---
 
-## 1. Penggunaan di Controller (PHP)
+## 1. Controller Usage (PHP)
 
-### A. Untuk Request Standar (Form Submit & Redirect)
-Gunakan `with()` standar Laravel. Sistem akan mendeteksi session `success` atau `error` dan menampilkan alert yang sesuai secara otomatis.
+### A. For Standard Requests (Form Submit & Redirect)
+
+Use standard Laravel `with()`. The system will detect the `success` or `error` session and display the corresponding alert automatically.
 
 ```php
-// Sukses (Menampilkan SweetAlert Success)
-return redirect()->route('users.index')->with('success', 'Data pengguna berhasil disimpan.');
+// Success (Displays SweetAlert Success)
+return redirect()->route('users.index')->with('success', 'User data saved successfully.');
 
-// Gagal (Menampilkan SweetAlert Error)
-return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data.');
+// Failure (Displays SweetAlert Error)
+return redirect()->back()->with('error', 'An error occurred while saving data.');
 
-// Validasi
-// Laravel otomatis mengirim errors ke session. Sistem akan menangkapnya dan menampilkan detail error.
+// Validation
+// Laravel automatically sends errors to the session. The system captures them and displays error details.
 $request->validate([...]);
 ```
 
-### B. Untuk Request AJAX / API
-Gunakan `App\Helpers\ResponseHelper` untuk mengembalikan format JSON yang standar. Frontend akan otomatis parsing response ini.
+### B. For AJAX / API Requests
+
+Use `App\Helpers\ResponseHelper` to return a standardized JSON format. The frontend will automatically parse this response.
 
 ```php
 use App\Helpers\ResponseHelper;
 
-// Sukses
-return ResponseHelper::success($data, 'Berhasil menghapus data');
+// Success
+return ResponseHelper::success($data, 'Data deleted successfully');
 
-// Gagal (Custom Error)
-return ResponseHelper::error('Gagal memproses data', 500);
+// Failure (Custom Error)
+return ResponseHelper::error('Failed to process data', 500);
 
-// Gagal (Validasi Manual - jarang dipakai jika pakai FormRequest)
+// Failure (Manual Validation - rarely used if using FormRequest)
 return ResponseHelper::validationError($errors);
 ```
 
 ---
 
-## 2. Penggunaan di Frontend (Javascript)
+## 2. Frontend Usage (Javascript)
 
-Class utility `AlertHandler` sudah didaftarkan secara global sebagai `window.AlertHandler`.
+The `AlertHandler` utility class is registered globally as `window.AlertHandler`.
 
-### A. Menangani Response Axios (AJAX)
-Cukup lempar response dari Axios ke `handle()`. Helper ini akan otomatis menentukan apakah harus menampilkan sukses atau error (termasuk validasi).
+### A. Handling Axios Responses (AJAX)
+
+Simply pass the Axios response to `handle()`. This helper will automatically determine whether to display success or error (including validation lists).
 
 ```javascript
-axios.post('/some-url', payload)
-    .then(response => {
-        // Otomatis menampilkan SweetAlert Sukses
+axios
+    .post("/some-url", payload)
+    .then((response) => {
+        // Automatically displays Success SweetAlert
         window.AlertHandler.handle(response);
-        
-        // Opsional: Reload halaman jika sukses
+
+        // Optional: Reload page if successful
         if (response.data.success) {
             location.reload();
         }
     })
-    .catch(error => {
-        // Otomatis menampilkan SweetAlert Error (termasuk list validasi jika ada)
+    .catch((error) => {
+        // Automatically displays Error SweetAlert (including validation list if any)
         window.AlertHandler.handle(error.response);
     });
 ```
 
-### B. Konfirmasi Delete (atau Aksi Destruktif)
-Gunakan method `confirm()` untuk menampilkan dialog konfirmasi standar.
+### B. Delete Confirmation (or Destructive Actions)
+
+Use the `confirm()` method to display a standard confirmation dialog.
 
 ```javascript
 window.AlertHandler.confirm(
-    'Apakah Anda yakin?',           // Judul
-    'Data yang dihapus tidak bisa dikembalikan!', // Pesan
-    'Ya, Hapus!',                   // Teks Tombol Konfirmasi
-    () => {                         // Callback jika dikonfirmasi
-        // Lakukan aksi delete di sini (misal panggil AJAX)
+    'Are you sure?',                // Title
+    'Deleted data cannot be recovered!', // Message
+    'Yes, Delete!',                 // Confirm Button Text
+    () => {                         // Callback if confirmed
+        // Perform delete action here (e.g., call AJAX)
         axios.delete(url)...
     }
 );
 ```
 
-### C. Menampilkan Alert Manual
-Anda bisa memanggil alert kapan saja tanpa request server.
+### C. Manual Alerts
+
+You can trigger alerts at any time without a server request.
 
 ```javascript
-// Tampilkan SweetAlert Success
-window.AlertHandler.showSuccess('Operasi berhasil!');
+// Show Success SweetAlert
+window.AlertHandler.showSuccess("Operation successful!");
 
-// Tampilkan Toastr Success (Notifikasi kecil di pojok)
-// Parameter kedua 'true' mengaktifkan mode Toast
-window.AlertHandler.showSuccess('Data disimpan', true);
+// Show Success Toastr (small notification in the corner)
+// Second parameter 'true' enables Toast mode
+window.AlertHandler.showSuccess("Data saved", true);
 
-// Tampilkan Error
-window.AlertHandler.showError('Terjadi kesalahan fatal');
+// Show Error
+window.AlertHandler.showError("A fatal error has occurred");
 ```
 
 ---
 
-## 3. Struktur Standar
+## 3. Standard Structure
 
 ### Response Helper (`App\Helpers\ResponseHelper.php`)
-Pastikan semua respon JSON API menggunakan helper ini agar formatnya konsisten:
+
+Ensure all API JSON responses use this helper for consistent formatting:
+
 ```json
 {
     "success": true,
-    "message": "Pesan sukses",
+    "message": "Success message",
     "data": { ... }
 }
 ```
 
 ### Alert Handler (`resources/js/utils/alert-handler.js`)
-File ini mengatur konfigurasi dasar SweetAlert dan Toastr. Jika ingin mengubah warna tombol, durasi animasi, atau posisi toast, edit file ini.
+
+This file manages the basic configuration of SweetAlert and Toastr. Edit this file to change button colors, animation duration, or toast position.
