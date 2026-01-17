@@ -85,18 +85,6 @@ This scaffolding includes Repository, Service, Controller, Request, and View fol
 
 ---
 
-## 💖 Support & Sponsoring
-
-If you find this project useful, please consider supporting its development. Your support helps keep the project active and allows me to create more open-source tools.
-
--   **GitHub Sponsors**: [Sponsor @ookapratama](https://github.com/sponsors/ookapratama)
--   **Buy Me a Coffee**: [buymeacoffee.com/ookapratama](https://www.buymeacoffee.com/ookapratama)
-
-For Indonesian supporters:
-
--   **Trakteer**: [trakteer.id/ookapratama](https://trakteer.id/ookapratama)
-
----
 
 ## 📄 License
 
