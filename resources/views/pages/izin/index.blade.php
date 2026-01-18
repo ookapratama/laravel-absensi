@@ -123,8 +123,9 @@
                            setTimeout(() => window.location.reload(), 1500);
                         }
                      })
-                     .catch(() => {
-                        window.AlertHandler.error('Terjadi kesalahan');
+                     .catch(err => {
+                        console.error(err);
+                        window.AlertHandler.showError('Terjadi kesalahan');
                      });
                }
             );

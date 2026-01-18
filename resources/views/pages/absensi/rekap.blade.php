@@ -140,7 +140,7 @@
          const tahun = document.querySelector('select[name="tahun"]').value;
 
          // For now, show alert - you can implement actual export later
-         window.AlertHandler.info('Fitur export Excel akan segera tersedia');
+         window.AlertHandler.showSuccess('Fitur export Excel akan segera tersedia', true);
       }
    </script>
 @endsection

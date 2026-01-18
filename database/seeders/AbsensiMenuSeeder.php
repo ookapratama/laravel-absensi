@@ -12,7 +12,6 @@ class AbsensiMenuSeeder extends Seeder
     {
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        // 1. Core Header / Parents
         $menus = [
             // Dashboard
             [
@@ -24,32 +23,6 @@ class AbsensiMenuSeeder extends Seeder
                 'order_no' => 1
             ],
             
-            // User Management (Existing or updated)
-            [
-                'slug' => 'user-management',
-                'name' => 'User Management',
-                'icon' => 'ri-user-settings-line',
-                'path' => null,
-                'parent_slug' => null,
-                'order_no' => 50
-            ],
-            [
-                'slug' => 'user.index',
-                'name' => 'Users',
-                'icon' => 'ri-user-line',
-                'path' => '/user',
-                'parent_slug' => 'user-management',
-                'order_no' => 1
-            ],
-            [
-                'slug' => 'role.index',
-                'name' => 'Roles',
-                'icon' => 'ri-shield-user-line',
-                'path' => '/role',
-                'parent_slug' => 'user-management',
-                'order_no' => 2
-            ],
-            
             // Data Master (Group)
             [
                 'slug' => 'data-master',
@@ -57,7 +30,7 @@ class AbsensiMenuSeeder extends Seeder
                 'icon' => 'ri-database-2-line',
                 'path' => null,
                 'parent_slug' => null,
-                'order_no' => 10
+                'order_no' => 2
             ],
             [
                 'slug' => 'divisi.index',
@@ -99,7 +72,7 @@ class AbsensiMenuSeeder extends Seeder
                 'icon' => 'ri-fingerprint-line',
                 'path' => null,
                 'parent_slug' => null,
-                'order_no' => 20
+                'order_no' => 3
             ],
             [
                 'slug' => 'absensi.index',
@@ -141,7 +114,7 @@ class AbsensiMenuSeeder extends Seeder
                 'icon' => 'ri-calendar-check-line',
                 'path' => null,
                 'parent_slug' => null,
-                'order_no' => 30
+                'order_no' => 4
             ],
             [
                 'slug' => 'izin.create',
@@ -167,9 +140,61 @@ class AbsensiMenuSeeder extends Seeder
                 'parent_slug' => 'izin-menu',
                 'order_no' => 3
             ],
+
+            // User Management (Group)
+            [
+                'slug' => 'user-management',
+                'name' => 'User Management',
+                'icon' => 'ri-user-settings-line',
+                'path' => null,
+                'parent_slug' => null,
+                'order_no' => 5
+            ],
+            [
+                'slug' => 'user.index',
+                'name' => 'Users',
+                'icon' => 'ri-user-line',
+                'path' => '/user',
+                'parent_slug' => 'user-management',
+                'order_no' => 1
+            ],
+            [
+                'slug' => 'role.index',
+                'name' => 'Roles',
+                'icon' => 'ri-shield-user-line',
+                'path' => '/role',
+                'parent_slug' => 'user-management',
+                'order_no' => 2
+            ],
+            [
+                'slug' => 'menu.index',
+                'name' => 'Menus',
+                'icon' => 'ri-menu-search-line',
+                'path' => '/menu',
+                'parent_slug' => 'user-management',
+                'order_no' => 3
+            ],
+            [
+                'slug' => 'permission.index',
+                'name' => 'Permissions',
+                'icon' => 'ri-lock-password-line',
+                'path' => '/permission',
+                'parent_slug' => 'user-management',
+                'order_no' => 4
+            ],
+
+            // System
+            [
+                'slug' => 'activity-log.index',
+                'name' => 'Activity Log',
+                'icon' => 'ri-history-line',
+                'path' => '/activity-log',
+                'parent_slug' => null,
+                'order_no' => 6
+            ],
         ];
 
-        // First pass: Create or update all menus without parent_id (or with parent_id = null first)
+        // First pass: Create or update all menus
         foreach ($menus as $m) {
             Menu::updateOrCreate(
                 ['slug' => $m['slug']],
@@ -195,13 +220,8 @@ class AbsensiMenuSeeder extends Seeder
             }
         }
 
-        // Clean up redundant slugs that might exist from previous sessions
-        Menu::whereNotIn('slug', array_column($menus, 'slug'))
-            ->whereIn('slug', ['master-menu', 'user-mgmt']) // targeted cleanup
-            ->delete();
-
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         
-        $this->command->info('✅ Struktur Menu Absensi & Core berhasil diperbaiki dan disinkronkan!');
+        $this->command->info('✅ Struktur Menu Absensi & Core berhasil disinkronkan!');
     }
 }

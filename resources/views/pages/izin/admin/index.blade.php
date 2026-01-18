@@ -212,7 +212,7 @@
             const catatan = document.getElementById('reject-catatan').value;
 
             if (catatan.length < 10) {
-               window.AlertHandler.error('Alasan penolakan minimal 10 karakter');
+               window.AlertHandler.showError('Alasan penolakan minimal 10 karakter');
                return;
             }
 

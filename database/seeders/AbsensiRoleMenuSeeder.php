@@ -14,29 +14,7 @@ class AbsensiRoleMenuSeeder extends Seeder
         // Get primary roles
         $superAdmin = Role::where('slug', 'super-admin')->first();
         $adminRole = Role::where('slug', 'admin')->first();
-        $pegawaiRole = Role::where('slug', 'pegawai')->first();
-
-        if (!$superAdmin) {
-            $superAdmin = Role::create(['name' => 'Super Admin', 'slug' => 'super-admin']);
-        }
-        if (!$adminRole) {
-            $adminRole = Role::create(['name' => 'Admin System', 'slug' => 'admin']);
-        }
-        if (!$pegawaiRole) {
-            $pegawaiRole = Role::create(['name' => 'Pegawai', 'slug' => 'pegawai']);
-        }
-
-        // Slugs for each role
-        $adminSlugs = [
-            'data-master', 'divisi.index', 'kantor.index', 'pegawai.index', 'jenis-izin.index',
-            'absensi-menu', 'absensi.index', 'absensi.history', 'absensi.dashboard', 'absensi.rekap',
-            'izin-menu', 'izin.create', 'izin.index', 'izin.admin'
-        ];
-
-        $pegawaiSlugs = [
-            'absensi-menu', 'absensi.index', 'absensi.history',
-            'izin-menu', 'izin.create', 'izin.index'
-        ];
+        $userRole = Role::where('slug', 'user')->first();
 
         // 1. Super Admin gets EVERYTHING
         $allMenus = Menu::all();
@@ -47,10 +25,18 @@ class AbsensiRoleMenuSeeder extends Seeder
             );
         }
 
-        // 2. Admin access
+        // 2. Admin access (Almost everything except core user management)
+        $adminSlugs = [
+            'dashboard',
+            'data-master', 'divisi.index', 'kantor.index', 'pegawai.index', 'jenis-izin.index',
+            'absensi-menu', 'absensi.index', 'absensi.history', 'absensi.dashboard', 'absensi.rekap',
+            'izin-menu', 'izin.create', 'izin.index', 'izin.admin',
+            'activity-log.index'
+        ];
+
         foreach ($adminSlugs as $slug) {
             $menu = Menu::where('slug', $slug)->first();
-            if ($menu) {
+            if ($menu && $adminRole) {
                 DB::table('role_menu')->updateOrInsert(
                     ['role_id' => $adminRole->id, 'menu_id' => $menu->id],
                     ['can_create' => true, 'can_read' => true, 'can_update' => true, 'can_delete' => true]
@@ -58,17 +44,23 @@ class AbsensiRoleMenuSeeder extends Seeder
             }
         }
 
-        // 3. Pegawai access
-        foreach ($pegawaiSlugs as $slug) {
+        // 3. Regular User (Pegawai) access
+        $userSlugs = [
+            'dashboard',
+            'absensi-menu', 'absensi.index', 'absensi.history',
+            'izin-menu', 'izin.create', 'izin.index'
+        ];
+
+        foreach ($userSlugs as $slug) {
             $menu = Menu::where('slug', $slug)->first();
-            if ($menu) {
+            if ($menu && $userRole) {
                 DB::table('role_menu')->updateOrInsert(
-                    ['role_id' => $pegawaiRole->id, 'menu_id' => $menu->id],
+                    ['role_id' => $userRole->id, 'menu_id' => $menu->id],
                     ['can_create' => true, 'can_read' => true, 'can_update' => true, 'can_delete' => false]
                 );
             }
         }
 
-        $this->command->info('✅ Role permissions for Absensi successfully updated!');
+        $this->command->info('✅ Role permissions for Absensi successfully updated and synchronized!');
     }
 }
