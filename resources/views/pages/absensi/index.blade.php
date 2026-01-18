@@ -109,29 +109,85 @@
          font-size: 1rem;
       }
 
-      .btn-capture {
-         width: 70px;
-         height: 70px;
-         border-radius: 50%;
-         border: 4px solid white;
-         background: rgba(255, 255, 255, 0.3);
+      .pulse-animation {
+         animation: pulse-border 2s infinite;
+      }
+
+      @keyframes pulse-border {
+         0% {
+            box-shadow: 0 0 0 0 rgba(115, 103, 240, 0.7), 0 4px 15px rgba(0, 0, 0, 0.2);
+         }
+
+         70% {
+            box-shadow: 0 0 0 15px rgba(115, 103, 240, 0), 0 4px 15px rgba(0, 0, 0, 0.2);
+         }
+
+         100% {
+            box-shadow: 0 0 0 0 rgba(115, 103, 240, 0), 0 4px 15px rgba(0, 0, 0, 0.2);
+         }
+      }
+
+      .btn-capture-wrapper {
          display: flex;
          align-items: center;
          justify-content: center;
+         transition: transform 0.2s;
          cursor: pointer;
-         transition: all 0.3s;
-      }
-
-      .btn-capture:hover {
-         background: rgba(255, 255, 255, 0.5);
-         transform: scale(1.1);
-      }
-
-      .btn-capture .inner {
-         width: 50px;
-         height: 50px;
+         border: none;
+         background: none;
+         padding: 0;
          border-radius: 50%;
-         background: white;
+         outline: none !important;
+         /* Responsive size */
+         width: 80px;
+         height: 80px;
+      }
+
+      @media (max-width: 576px) {
+         .btn-capture-wrapper {
+            width: 70px;
+            height: 70px;
+         }
+
+         .btn-capture-wrapper .inner-circle i {
+            font-size: 1.2rem !important;
+         }
+
+         .btn-capture-wrapper .inner-circle small {
+            font-size: 0.5rem !important;
+         }
+      }
+
+      .btn-capture-wrapper:hover {
+         transform: scale(1.05);
+      }
+
+      .btn-capture-wrapper:active {
+         transform: scale(0.95);
+      }
+
+      .outer-circle {
+         background-color: white;
+         border-radius: 50%;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+         width: 100%;
+         height: 100%;
+         padding: 4px;
+         border: 4px solid #7367f0;
+      }
+
+      .inner-circle {
+         border-radius: 50%;
+         width: 100%;
+         height: 100%;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         justify-content: center;
+         color: #7367f0;
       }
    </style>
 @endsection
@@ -202,10 +258,15 @@
                      </button>
 
                      <div class="d-none" id="capture-controls">
-                        <button type="button" class="btn-capture mx-auto" id="btn-capture">
-                           <div class="inner">Tekan</div>
+                        <button type="button" class="btn-capture-wrapper pulse-animation mx-auto" id="btn-capture">
+                           <div class="outer-circle">
+                              <div class="inner-circle">
+                                 <i class="ri-camera-fill ri-xl mb-1"></i>
+                                 <small style="font-weight: 800; line-height: 1;">TEKAN</small>
+                              </div>
+                           </div>
                         </button>
-                        <p class="text-muted mt-2 mb-0">Tekan untuk ambil foto</p>
+                        <p class="text-muted mt-3 mb-0">Tekan tombol untuk ambil foto</p>
                      </div>
                   </div>
 
