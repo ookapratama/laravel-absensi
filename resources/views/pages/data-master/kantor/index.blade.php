@@ -44,10 +44,10 @@
                         </td>
                         <td>
                            <small class="text-muted">
-                              {{ $item->latitude }}, {{ $item->longitude }}
+                              {{ $item->titik_lokasi }}
                            </small>
-                           <a href="https://maps.google.com/?q={{ $item->latitude }},{{ $item->longitude }}"
-                              target="_blank" class="ms-1" title="Lihat di Maps">
+                           <a href="https://maps.google.com/?q={{ $item->titik_lokasi }}" target="_blank" class="ms-1"
+                              title="Lihat di Maps">
                               <i class="ri-map-pin-line text-primary"></i>
                            </a>
                         </td>

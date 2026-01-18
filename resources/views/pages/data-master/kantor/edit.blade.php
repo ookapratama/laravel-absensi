@@ -51,21 +51,13 @@
                      </div>
 
                      <div class="row">
-                        <div class="col-md-4 mb-3">
-                           <label class="form-label" for="latitude">Latitude <span class="text-danger">*</span></label>
-                           <input type="number" step="any"
-                              class="form-control @error('latitude') is-invalid @enderror" id="latitude" name="latitude"
-                              value="{{ old('latitude', $data->latitude) }}" required>
-                           @error('latitude')
-                              <div class="invalid-feedback">{{ $message }}</div>
-                           @enderror
-                        </div>
-                        <div class="col-md-4 mb-3">
-                           <label class="form-label" for="longitude">Longitude <span class="text-danger">*</span></label>
-                           <input type="number" step="any"
-                              class="form-control @error('longitude') is-invalid @enderror" id="longitude" name="longitude"
-                              value="{{ old('longitude', $data->longitude) }}" required>
-                           @error('longitude')
+                        <div class="col-md-8 mb-3">
+                           <label class="form-label" for="titik_lokasi">Titik Lokasi (Google Maps) <span
+                                 class="text-danger">*</span></label>
+                           <input type="text" class="form-control @error('titik_lokasi') is-invalid @enderror"
+                              id="titik_lokasi" name="titik_lokasi" value="{{ old('titik_lokasi', $data->titik_lokasi) }}"
+                              placeholder="-6.2088, 106.8456" required>
+                           @error('titik_lokasi')
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
                         </div>
@@ -81,7 +73,7 @@
                      </div>
 
                      <div class="mb-3">
-                        <a href="https://maps.google.com/?q={{ $data->latitude }},{{ $data->longitude }}" target="_blank"
+                        <a href="https://maps.google.com/?q={{ $data->titik_lokasi }}" target="_blank"
                            class="btn btn-outline-info btn-sm">
                            <i class="ri-map-pin-line me-1"></i>Lihat di Google Maps
                         </a>

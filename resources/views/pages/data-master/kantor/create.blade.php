@@ -51,23 +51,16 @@
                      </div>
 
                      <div class="row">
-                        <div class="col-md-4 mb-3">
-                           <label class="form-label" for="latitude">Latitude <span class="text-danger">*</span></label>
-                           <input type="number" step="any"
-                              class="form-control @error('latitude') is-invalid @enderror" id="latitude" name="latitude"
-                              value="{{ old('latitude') }}" placeholder="-6.2088" required>
-                           @error('latitude')
+                        <div class="col-md-8 mb-3">
+                           <label class="form-label" for="titik_lokasi">Titik Lokasi (Google Maps) <span
+                                 class="text-danger">*</span></label>
+                           <input type="text" class="form-control @error('titik_lokasi') is-invalid @enderror"
+                              id="titik_lokasi" name="titik_lokasi" value="{{ old('titik_lokasi') }}"
+                              placeholder="-6.2088, 106.8456" required>
+                           @error('titik_lokasi')
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
-                        </div>
-                        <div class="col-md-4 mb-3">
-                           <label class="form-label" for="longitude">Longitude <span class="text-danger">*</span></label>
-                           <input type="number" step="any"
-                              class="form-control @error('longitude') is-invalid @enderror" id="longitude" name="longitude"
-                              value="{{ old('longitude') }}" placeholder="106.8456" required>
-                           @error('longitude')
-                              <div class="invalid-feedback">{{ $message }}</div>
-                           @enderror
+                           <small class="text-muted">Langsung paste dari Google Maps atau klik tombol ambil lokasi</small>
                         </div>
                         <div class="col-md-4 mb-3">
                            <label class="form-label" for="radius_meter">Radius (meter)</label>
@@ -77,7 +70,6 @@
                            @error('radius_meter')
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
-                           <small class="text-muted">Radius untuk validasi absensi (10 - 5000 meter)</small>
                         </div>
                      </div>
 
@@ -116,8 +108,9 @@
 
             navigator.geolocation.getCurrentPosition(
                (position) => {
-                  document.getElementById('latitude').value = position.coords.latitude.toFixed(8);
-                  document.getElementById('longitude').value = position.coords.longitude.toFixed(8);
+                  const lat = position.coords.latitude.toFixed(8);
+                  const lng = position.coords.longitude.toFixed(8);
+                  document.getElementById('titik_lokasi').value = `${lat}, ${lng}`;
                   this.innerHTML = '<i class="ri-check-line me-1"></i>Lokasi Diambil';
                   setTimeout(() => {
                      this.innerHTML = '<i class="ri-map-pin-line me-1"></i>Ambil Lokasi Saya';

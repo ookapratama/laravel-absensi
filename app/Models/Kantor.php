@@ -15,18 +15,35 @@ class Kantor extends Model
         'nama',
         'kode',
         'alamat',
-        'latitude',
-        'longitude',
+        'titik_lokasi',
         'radius_meter',
         'is_aktif',
     ];
 
     protected $casts = [
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8',
         'radius_meter' => 'integer',
         'is_aktif' => 'boolean',
     ];
+
+    /**
+     * Get latitude from titik_lokasi
+     */
+    public function getLatitudeAttribute()
+    {
+        if (!$this->titik_lokasi) return null;
+        $parts = explode(',', $this->titik_lokasi);
+        return trim($parts[0] ?? null);
+    }
+
+    /**
+     * Get longitude from titik_lokasi
+     */
+    public function getLongitudeAttribute()
+    {
+        if (!$this->titik_lokasi) return null;
+        $parts = explode(',', $this->titik_lokasi);
+        return trim($parts[1] ?? null);
+    }
 
     /**
      * Pegawai yang berkantor di sini (kantor utama)
