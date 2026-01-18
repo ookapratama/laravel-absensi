@@ -34,14 +34,23 @@ class RoleAndMenuSeeder extends Seeder
         // 2. Menus
         $menus = [
             ['name' => 'Dashboard', 'slug' => 'dashboard', 'path' => '/', 'icon' => 'ri-home-smile-line', 'order_no' => 1],
-            ['name' => 'User Management', 'slug' => 'user-management', 'path' => null, 'icon' => 'ri-user-settings-line', 'order_no' => 2],
+
+            // Data Master
+            ['name' => 'Data Master', 'slug' => 'data-master', 'path' => null, 'icon' => 'ri-database-2-line', 'order_no' => 2],
+            ['name' => 'Divisi', 'slug' => 'divisi.index', 'path' => '/divisi', 'icon' => 'ri-organization-chart', 'order_no' => 1],
+            ['name' => 'Kantor', 'slug' => 'kantor.index', 'path' => '/kantor', 'icon' => 'ri-building-line', 'order_no' => 2],
+            ['name' => 'Pegawai', 'slug' => 'pegawai.index', 'path' => '/pegawai', 'icon' => 'ri-building-line', 'order_no' => 3],
+
+            
+            // User Management 
+            ['name' => 'User Management', 'slug' => 'user-management', 'path' => null, 'icon' => 'ri-user-settings-line', 'order_no' => 4],
             ['parent' => 'User Management', 'name' => 'Users', 'slug' => 'user.index', 'path' => '/user', 'icon' => 'ri-user-line', 'order_no' => 1],
             ['parent' => 'User Management', 'name' => 'Roles', 'slug' => 'role.index', 'path' => '/role', 'icon' => 'ri-shield-user-line', 'order_no' => 2],
             ['parent' => 'User Management', 'name' => 'Menus', 'slug' => 'menu.index', 'path' => '/menu', 'icon' => 'ri-menu-search-line', 'order_no' => 3],
             ['parent' => 'User Management', 'name' => 'Permissions', 'slug' => 'permission.index', 'path' => '/permission', 'icon' => 'ri-lock-password-line', 'order_no' => 4],
-            ['name' => 'Katalog Produk', 'slug' => 'products.index', 'path' => '/products', 'icon' => 'ri-shopping-bag-3-line', 'order_no' => 3],
-            ['name' => 'Activity Log', 'slug' => 'activity-log.index', 'path' => '/activity-log', 'icon' => 'ri-history-line', 'order_no' => 4],
-            ['name' => 'API Docs', 'slug' => 'api-docs', 'path' => '/api/documentation', 'icon' => 'ri-book-open-line', 'order_no' => 5],
+            // ['name' => 'Katalog Produk', 'slug' => 'products.index', 'path' => '/products', 'icon' => 'ri-shopping-bag-3-line', 'order_no' => 3],
+            ['name' => 'Activity Log', 'slug' => 'activity-log.index', 'path' => '/activity-log', 'icon' => 'ri-history-line', 'order_no' => 5],
+            // ['name' => 'API Docs', 'slug' => 'api-docs', 'path' => '/api/documentation', 'icon' => 'ri-book-open-line', 'order_no' => 5],
         ];
 
         $menuIdMap = [];
