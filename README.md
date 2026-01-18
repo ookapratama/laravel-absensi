@@ -1,32 +1,51 @@
-# 🚀 Base Laravel - Enterprise Ready Template
+# 🏢 Sistem Absensi & Management Pegawai (SAMS)
 
-A modern Laravel starter template designed with **Service Repository Pattern**, **Audit Trail**, and **Powerful File Management**. Optimized for enterprise scalability and developer productivity.
+A modern, enterprise-grade Attendance and Employee Management System built with **Laravel 12**, featuring **Geofencing**, **Photo Capture**, and **Granular Role-Based Access Control**.
+
+This system is optimized for company-wide scalability using the **Service Repository Pattern** and includes a robust **Audit Trail** for compliance and monitoring.
 
 ---
 
 ## 🌟 Key Features
 
--   🏗️ **Service Repository Pattern** - Clean, structured, and testable codebase.
--   🛡️ **Granular Role & Permission** - Robust RBAC (Role Based Access Control) down to per-menu actions (Create, Read, Update, Delete).
--   🕵️ **Activity Log (Audit Trail)** - Automatically track every data change with Before/After snapshots.
--   📁 **File Upload Manager** - Centralized file handling with auto-resize, optimization, and DB tracking.
--   🎨 **Premium Admin UI** - Powered by Sneat Bootstrap 5 Admin Template.
--   🤖 **Custom Code Generator** - Scaffold complete CRUD modules with a single command.
--   📖 **API Documentation** - Interactive Swagger (OpenAPI) documentation out of the box.
--   🔔 **Global Alert System** - Pre-configured SweetAlert2 & Toastr integration.
+### 📍 Attendance & Geolocation
+
+-   **Smart Attendance** - Clock-in and clock-out with real-time location tracking.
+-   **Geofencing Validation** - Restrict attendance only within designated office/project areas.
+-   **Photo Capture** - Mandatory selfie capture during attendance to prevent "fake" clock-ins.
+-   **Attendance History** - Personal and administrative logs of all attendance activities.
+
+### 📝 Leave & Permit Management (E-Izin)
+
+-   **Digital Submissions** - Submit permits (Sick, Leave, Personal) with file attachments.
+-   **Approval Workflow** - Multi-level approval system for HR and Managers.
+-   **Status Tracking** - Real-time notifications and status updates for employees.
+
+### 👥 Human Resource Management
+
+-   **Pegawai Management** - Complete employee profiles and records.
+-   **Divisi & Kantor** - Manage organizational structure and multiple office locations.
+-   **Master Data** - Easy management of leave types and company settings.
+
+### 🛡️ Enterprise Core (Built-in)
+
+-   **Service Repository Pattern** - Clean, modular, and maintainable codebase.
+-   **Granular RBAC** - Role-Based Access Control down to specific menu actions (CRUD).
+-   **Activity Log (Audit Trail)** - Automatically track "Who, What, When" for every data change.
+-   **Global Alert System** - Integrated SweetAlert2 & Toastr for seamless UX.
 
 ---
 
 ## 📁 Documentation Guide
 
-For in-depth explanations of the features and how to use them, please refer to the following guides:
+Detailed guides for developers and system administrators:
 
 | Guide                                                 | Description                                           |
 | ----------------------------------------------------- | ----------------------------------------------------- |
-| 📘 **[FEATURES_GUIDE.md](FEATURES_GUIDE.md)**         | **FULL OVERVIEW** of all available features.          |
-| 🛠 **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)**   | **CODING STANDARDS** and how to add new modules.      |
+| 📘 **[FEATURES_GUIDE.md](FEATURES_GUIDE.md)**         | **FULL OVERVIEW** of all technical modules.           |
+| 🛠 **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)**   | **CODING STANDARDS** and how to expand the system.    |
 | 🕵️ **[ACTIVITY_LOG_GUIDE.md](ACTIVITY_LOG_GUIDE.md)** | Detailed audit trail & user monitoring documentation. |
-| 🔔 **[ALERT_SYSTEM_GUIDE.md](ALERT_SYSTEM_GUIDE.md)** | How to use the global SweetAlert & Toastr system.     |
+| 🔔 **[ALERT_SYSTEM_GUIDE.md](ALERT_SYSTEM_GUIDE.md)** | How to use the global notification system.            |
 
 ---
 
@@ -35,8 +54,8 @@ For in-depth explanations of the features and how to use them, please refer to t
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/ookapratama/base-laravel.git
-cd base-laravel
+git clone https://github.com/ookapratama/web-absensi.git
+cd web-absensi
 composer install && npm install
 ```
 
@@ -57,21 +76,27 @@ npm run build
 ### 4. Run the Project
 
 ```bash
-# Using the built-in shortcut
 composer dev
+# or
+php artisan serve
 ```
 
 ---
 
-## 💡 Pro Tip: Creating a New Feature
+## 💡 Scalability: Expanding Beyond Attendance
 
-Want to create a new module (e.g., Product)? Use our custom generator:
+This project is built on a highly modular foundation. You can easily add more features like:
+
+-   **POS (Point of Sale)**
+-   **Inventory Management**
+-   **Payroll System**
+-   **Employee Performance KPI**
+
+To create a new module (e.g., POS), simply use the generator:
 
 ```bash
-php artisan make:feature Product
+php artisan make:feature POS
 ```
-
-This scaffolding includes Repository, Service, Controller, Request, and View folder. See **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)** for details.
 
 ---
 
@@ -79,15 +104,14 @@ This scaffolding includes Repository, Service, Controller, Request, and View fol
 
 -   **Backend**: Laravel 12.x, PHP 8.2+
 -   **Frontend**: Bootstrap 5, Vite, jQuery (Sneat Template)
--   **Database**: MySQL / PostgreSQL / SQLite
+-   **Database**: MySQL / PostgreSQL
+-   **Image Processing**: Intervention Image v3
 -   **API Docs**: Swagger (L5-Swagger)
--   **File Storage**: Intervention Image v3
 
 ---
 
-
 ## 📄 License
 
-This project is open-sourced software licensed under the [MIT license](LICENSE).
+This project is licensed under the [MIT license](LICENSE).
 
 _Developed with ❤️ by [Ooka Pratama](https://github.com/ookapratama)_
