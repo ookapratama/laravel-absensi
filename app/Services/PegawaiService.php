@@ -17,12 +17,12 @@ class PegawaiService extends BaseService
         return $this->repository->getAktif();
     }
 
-    public function getByUserId(int $userId)
+    public function getByUserId($userId)
     {
         return $this->repository->getByUserId($userId);
     }
 
-    public function getWithRelations(int $id)
+    public function getWithRelations($id)
     {
         return $this->repository->getWithRelations($id);
     }
@@ -30,7 +30,7 @@ class PegawaiService extends BaseService
     /**
      * Assign lokasi absensi untuk pegawai
      */
-    public function assignLokasiAbsen(int $pegawaiId, array $kantorIds)
+    public function assignLokasiAbsen($pegawaiId, array $kantorIds)
     {
         // Hapus semua lokasi lama
         LokasiAbsenPegawai::where('pegawai_id', $pegawaiId)->delete();
@@ -50,7 +50,7 @@ class PegawaiService extends BaseService
     /**
      * Toggle status lokasi absensi
      */
-    public function toggleLokasiAbsen(int $pegawaiId, int $kantorId)
+    public function toggleLokasiAbsen($pegawaiId, $kantorId)
     {
         $lokasi = LokasiAbsenPegawai::where('pegawai_id', $pegawaiId)
             ->where('kantor_id', $kantorId)

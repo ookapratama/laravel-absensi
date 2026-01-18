@@ -30,26 +30,26 @@ class MenuController extends Controller
         return redirect()->route('menu.index')->with('success', 'Menu berhasil ditambahkan');
     }
 
-    public function show(int $id)
+    public function show($id)
     {
         $menu = $this->service->find($id);
         return view('pages.menu.show', compact('menu'));
     }
 
-    public function edit(int $id)
+    public function edit($id)
     {
         $menu = $this->service->find($id);
         $parentMenus = $this->service->all();
         return view('pages.menu.edit', compact('menu', 'parentMenus'));
     }
 
-    public function update(MenuRequest $request, int $id)
+    public function update(MenuRequest $request, $id)
     {
         $this->service->update($id, $request->validated());
         return redirect()->route('menu.index')->with('success', 'Menu berhasil diperbarui');
     }
 
-    public function destroy(int $id)
+    public function destroy($id)
     {
         $this->service->delete($id);
         return redirect()->route('menu.index')->with('success', 'Menu berhasil dihapus');

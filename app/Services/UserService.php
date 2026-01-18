@@ -29,7 +29,7 @@ class UserService extends BaseService
         }
     }
 
-    public function update(int $id, array $data)
+    public function update($id, array $data)
     {
         try {
             // business logic: standardizing name

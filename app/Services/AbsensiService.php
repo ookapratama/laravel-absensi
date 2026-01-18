@@ -24,7 +24,7 @@ class AbsensiService extends BaseService
     /**
      * Get absensi by pegawai dan tanggal
      */
-    public function getByPegawaiTanggal(int $pegawaiId, string $tanggal)
+    public function getByPegawaiTanggal($pegawaiId, string $tanggal)
     {
         return $this->repository->getByPegawaiTanggal($pegawaiId, $tanggal);
     }
@@ -32,7 +32,7 @@ class AbsensiService extends BaseService
     /**
      * Get absensi by pegawai dan bulan
      */
-    public function getByPegawaiBulan(int $pegawaiId, int $bulan, int $tahun)
+    public function getByPegawaiBulan($pegawaiId, $bulan, $tahun)
     {
         return $this->repository->getByPegawaiBulan($pegawaiId, $bulan, $tahun);
     }
@@ -163,7 +163,7 @@ class AbsensiService extends BaseService
     /**
      * Validasi lokasi pegawai
      */
-    public function validateLocation(Pegawai $pegawai, float $latitude, float $longitude): array
+    public function validateLocation(Pegawai $pegawai, $latitude, $longitude): array
     {
         // Get lokasi yang diizinkan untuk pegawai
         $lokasiDiizinkan = $pegawai->lokasiAbsenAktif()->get();

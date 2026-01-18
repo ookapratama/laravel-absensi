@@ -22,12 +22,12 @@ class PegawaiRepository extends BaseRepository implements PegawaiRepositoryInter
         return $this->model->aktif()->with(['user', 'divisi', 'kantor'])->get();
     }
 
-    public function getByUserId(int $userId)
+    public function getByUserId($userId)
     {
         return $this->model->where('user_id', $userId)->first();
     }
 
-    public function getWithRelations(int $id)
+    public function getWithRelations($id)
     {
         return $this->model->with(['user', 'divisi', 'kantor', 'lokasiAbsen'])->findOrFail($id);
     }

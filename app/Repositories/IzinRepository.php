@@ -19,7 +19,7 @@ class IzinRepository extends BaseRepository implements IzinRepositoryInterface
             ->get();
     }
 
-    public function getByPegawai(int $pegawaiId)
+    public function getByPegawai($pegawaiId)
     {
         return $this->model->where('pegawai_id', $pegawaiId)
             ->with(['jenisIzin', 'approver'])
@@ -46,7 +46,7 @@ class IzinRepository extends BaseRepository implements IzinRepositoryInterface
     /**
      * Check apakah ada izin yang overlap dengan tanggal yang diajukan
      */
-    public function checkOverlap(int $pegawaiId, string $tglMulai, string $tglSelesai, ?int $excludeId = null)
+    public function checkOverlap($pegawaiId, string $tglMulai, string $tglSelesai, $excludeId = null)
     {
         $query = $this->model->where('pegawai_id', $pegawaiId)
             ->where('status_approval', '!=', Izin::STATUS_REJECTED)

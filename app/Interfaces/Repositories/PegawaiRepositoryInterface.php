@@ -5,6 +5,6 @@ namespace App\Interfaces\Repositories;
 interface PegawaiRepositoryInterface extends BaseRepositoryInterface
 {
     public function getAktif();
-    public function getByUserId(int $userId);
-    public function getWithRelations(int $id);
+    public function getByUserId($userId);
+    public function getWithRelations($id);
 }

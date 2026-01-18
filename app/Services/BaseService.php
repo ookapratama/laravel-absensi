@@ -24,7 +24,7 @@ abstract class BaseService
     /**
      * Find record by ID
      */
-    public function find(int $id)
+    public function find($id)
     {
         return $this->repository->find($id);
     }
@@ -40,7 +40,7 @@ abstract class BaseService
     /**
      * Update record by ID
      */
-    public function update(int $id, array $data)
+    public function update($id, array $data)
     {
         return $this->repository->update($id, $data);
     }
@@ -48,7 +48,7 @@ abstract class BaseService
     /**
      * Delete record by ID
      */
-    public function delete(int $id)
+    public function delete($id)
     {
         return $this->repository->delete($id);
     }

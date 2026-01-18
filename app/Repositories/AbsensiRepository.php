@@ -18,14 +18,14 @@ class AbsensiRepository extends BaseRepository implements AbsensiRepositoryInter
         return $this->model->with('pegawai')->orderBy('tanggal', 'desc')->get();
     }
 
-    public function getByPegawaiTanggal(int $pegawaiId, string $tanggal)
+    public function getByPegawaiTanggal($pegawaiId, string $tanggal)
     {
         return $this->model->where('pegawai_id', $pegawaiId)
             ->whereDate('tanggal', $tanggal)
             ->first();
     }
 
-    public function getByPegawaiBulan(int $pegawaiId, int $bulan, int $tahun)
+    public function getByPegawaiBulan($pegawaiId, $bulan, $tahun)
     {
         return $this->model->where('pegawai_id', $pegawaiId)
             ->whereMonth('tanggal', $bulan)

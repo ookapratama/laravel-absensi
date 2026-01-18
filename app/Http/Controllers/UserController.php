@@ -46,7 +46,7 @@ class UserController extends Controller
     /**
      * Display the specified user
      */
-    public function show(int $id)
+    public function show($id)
     {
         $user = $this->service->find($id);
         return view('pages.user.show', compact('user'));
@@ -55,7 +55,7 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified user
      */
-    public function edit(int $id)
+    public function edit($id)
     {
         $user = $this->service->find($id);
         $roles = $this->roleRepository->all();
@@ -65,7 +65,7 @@ class UserController extends Controller
     /**
      * Update the specified user
      */
-    public function update(UserRequest $request, int $id)
+    public function update(UserRequest $request, $id)
     {
         $data = $request->validated();
         $this->service->update($id, $data);
@@ -77,7 +77,7 @@ class UserController extends Controller
     /**
      * Remove the specified user
      */
-    public function destroy(int $id)
+    public function destroy($id)
     {
         $this->service->delete($id);
 

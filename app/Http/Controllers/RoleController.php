@@ -29,25 +29,25 @@ class RoleController extends Controller
         return redirect()->route('role.index')->with('success', 'Role berhasil ditambahkan');
     }
 
-    public function show(int $id)
+    public function show($id)
     {
         $role = $this->service->find($id);
         return view('pages.role.show', compact('role'));
     }
 
-    public function edit(int $id)
+    public function edit($id)
     {
         $role = $this->service->find($id);
         return view('pages.role.edit', compact('role'));
     }
 
-    public function update(RoleRequest $request, int $id)
+    public function update(RoleRequest $request, $id)
     {
         $this->service->update($id, $request->validated());
         return redirect()->route('role.index')->with('success', 'Role berhasil diperbarui');
     }
 
-    public function destroy(int $id)
+    public function destroy($id)
     {
         try {
             $this->service->delete($id);

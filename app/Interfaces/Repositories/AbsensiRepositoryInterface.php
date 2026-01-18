@@ -4,8 +4,8 @@ namespace App\Interfaces\Repositories;
 
 interface AbsensiRepositoryInterface extends BaseRepositoryInterface
 {
-    public function getByPegawaiTanggal(int $pegawaiId, string $tanggal);
-    public function getByPegawaiBulan(int $pegawaiId, int $bulan, int $tahun);
+    public function getByPegawaiTanggal($pegawaiId, string $tanggal);
+    public function getByPegawaiBulan($pegawaiId, $bulan, $tahun);
     public function getAbsensiHariIni();
     public function getBelumAbsenHariIni();
 }

@@ -24,7 +24,7 @@ class IzinService extends BaseService
     /**
      * Get izin by pegawai
      */
-    public function getByPegawai(int $pegawaiId)
+    public function getByPegawai($pegawaiId)
     {
         return $this->repository->getByPegawai($pegawaiId);
     }
@@ -48,7 +48,7 @@ class IzinService extends BaseService
     /**
      * Ajukan izin baru
      */
-    public function ajukanIzin(int $pegawaiId, array $data)
+    public function ajukanIzin($pegawaiId, array $data)
     {
         // Validate tanggal
         $tglMulai = Carbon::parse($data['tgl_mulai']);
@@ -98,7 +98,7 @@ class IzinService extends BaseService
     /**
      * Approve izin
      */
-    public function approveIzin(int $izinId, ?string $catatan = null)
+    public function approveIzin($izinId, ?string $catatan = null)
     {
         return DB::transaction(function () use ($izinId, $catatan) {
             $izin = $this->find($izinId);
@@ -125,7 +125,7 @@ class IzinService extends BaseService
     /**
      * Reject izin
      */
-    public function rejectIzin(int $izinId, string $catatan)
+    public function rejectIzin($izinId, string $catatan)
     {
         $izin = $this->find($izinId);
 
@@ -188,7 +188,7 @@ class IzinService extends BaseService
     /**
      * Cancel izin (hanya untuk izin pending)
      */
-    public function cancelIzin(int $izinId, int $pegawaiId)
+    public function cancelIzin($izinId, $pegawaiId)
     {
         $izin = $this->find($izinId);
 

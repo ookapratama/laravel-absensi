@@ -69,7 +69,7 @@ class ActivityLogService
     /**
      * Ambil semua log dengan pagination
      */
-    public function getPaginated(int $perPage = 15, array $filters = []): LengthAwarePaginator
+    public function getPaginated($perPage = 15, array $filters = []): LengthAwarePaginator
     {
         $query = ActivityLog::with('user')
             ->latest();
@@ -108,7 +108,7 @@ class ActivityLogService
     /**
      * Ambil log untuk user tertentu
      */
-    public function getByUser(int $userId, int $limit = 10)
+    public function getByUser($userId, $limit = 10)
     {
         return ActivityLog::where('user_id', $userId)
             ->latest()
@@ -119,7 +119,7 @@ class ActivityLogService
     /**
      * Ambil log untuk model tertentu
      */
-    public function getBySubject(Model $model, int $limit = 10)
+    public function getBySubject(Model $model, $limit = 10)
     {
         return ActivityLog::where('subject_type', get_class($model))
             ->where('subject_id', $model->getKey())
@@ -142,7 +142,7 @@ class ActivityLogService
     /**
      * Get activity statistics
      */
-    public function getStatistics(int $days = 30): array
+    public function getStatistics($days = 30): array
     {
         $startDate = now()->subDays($days);
 
@@ -170,7 +170,7 @@ class ActivityLogService
     /**
      * Cleanup old logs
      */
-    public function cleanup(int $daysToKeep = 90): int
+    public function cleanup($daysToKeep = 90): int
     {
         return ActivityLog::where('created_at', '<', now()->subDays($daysToKeep))
             ->delete();
