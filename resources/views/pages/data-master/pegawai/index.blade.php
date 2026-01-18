@@ -35,7 +35,7 @@
                <tbody>
                   @forelse($data as $index => $item)
                      <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $data->firstItem() + $index }}</td>
                         <td>
                            <div class="avatar avatar-sm">
                               <img src="{{ $item->foto_url }}" alt="{{ $item->nama_lengkap }}" class="rounded-circle">
@@ -82,6 +82,11 @@
                </tbody>
             </table>
          </div>
+         @if ($data->hasPages())
+            <div class="card-footer border-top py-3">
+               {{ $data->links() }}
+            </div>
+         @endif
       </div>
    </div>
 @endsection

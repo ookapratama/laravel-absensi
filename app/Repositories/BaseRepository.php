@@ -48,5 +48,10 @@ abstract class BaseRepository implements BaseRepositoryInterface
     return $this->find($id)->delete();
   }
 
+  public function paginate($perPage = 10)
+  {
+    return $this->model->paginate($perPage);
+  }
+
   
 }

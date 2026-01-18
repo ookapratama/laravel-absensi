@@ -31,4 +31,18 @@ class PegawaiRepository extends BaseRepository implements PegawaiRepositoryInter
     {
         return $this->model->with(['user', 'divisi', 'kantor', 'lokasiAbsen'])->findOrFail($id);
     }
+
+    public function paginate($perPage = 10)
+    {
+        return $this->model->with(['user', 'divisi', 'kantor'])->paginate($perPage);
+    }
+
+    public function rekapPaginate($bulan, $tahun, $perPage = 10)
+    {
+        return $this->model->aktif()
+            ->with(['divisi', 'absensis' => function ($q) use ($bulan, $tahun) {
+                $q->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
+            }])
+            ->paginate($perPage);
+    }
 }

@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->timestamps();
         });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreignId('role_id')->nullable()->after('id')->constrained('roles');
+        });
     }
 
     /**
@@ -24,6 +28,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['role_id']);
+            $table->dropColumn('role_id');
+        });
         Schema::dropIfExists('roles');
     }
 };

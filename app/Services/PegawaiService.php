@@ -63,4 +63,9 @@ class PegawaiService extends BaseService
 
         return null;
     }
+
+    public function rekapPaginate($bulan, $tahun, $perPage = 10)
+    {
+        return $this->repository->rekapPaginate($bulan, $tahun, $perPage);
+    }
 }

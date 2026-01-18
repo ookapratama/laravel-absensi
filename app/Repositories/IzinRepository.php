@@ -65,4 +65,21 @@ class IzinRepository extends BaseRepository implements IzinRepositoryInterface
 
         return $query->exists();
     }
+
+    public function paginate($perPage = 10)
+    {
+        return $this->model->with(['pegawai', 'jenisIzin', 'approver'])
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+    }
+
+    public function getStatistik()
+    {
+        return [
+            'pending' => $this->model->where('status_approval', Izin::STATUS_PENDING)->count(),
+            'approved' => $this->model->where('status_approval', Izin::STATUS_APPROVED)->count(),
+            'rejected' => $this->model->where('status_approval', Izin::STATUS_REJECTED)->count(),
+            'total' => $this->model->count(),
+        ];
+    }
 }

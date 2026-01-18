@@ -10,7 +10,7 @@
          </h4>
          <div class="d-flex gap-2">
             <a href="{{ route('izin.admin.pending') }}" class="btn btn-warning">
-               <i class="ri-time-line me-1"></i>Pending ({{ $pending->count() }})
+               <i class="ri-time-line me-1"></i>Pending ({{ $statistik['pending'] }})
             </a>
          </div>
       </div>
@@ -20,7 +20,7 @@
          <div class="col-md-4">
             <div class="card bg-warning text-white">
                <div class="card-body">
-                  <h3 class="mb-0">{{ $pending->count() }}</h3>
+                  <h3 class="mb-0 text-white">{{ $statistik['pending'] }}</h3>
                   <span>Menunggu Persetujuan</span>
                </div>
             </div>
@@ -28,7 +28,7 @@
          <div class="col-md-4">
             <div class="card bg-success text-white">
                <div class="card-body">
-                  <h3 class="mb-0">{{ $data->where('status_approval', 'Approved')->count() }}</h3>
+                  <h3 class="mb-0 text-white">{{ $statistik['approved'] }}</h3>
                   <span>Disetujui</span>
                </div>
             </div>
@@ -36,7 +36,7 @@
          <div class="col-md-4">
             <div class="card bg-danger text-white">
                <div class="card-body">
-                  <h3 class="mb-0">{{ $data->where('status_approval', 'Rejected')->count() }}</h3>
+                  <h3 class="mb-0 text-white">{{ $statistik['rejected'] }}</h3>
                   <span>Ditolak</span>
                </div>
             </div>
@@ -64,7 +64,7 @@
                <tbody>
                   @forelse($data as $index => $izin)
                      <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $data->firstItem() + $index }}</td>
                         <td>
                            <div class="d-flex align-items-center">
                               <div class="avatar avatar-sm me-2">
@@ -122,6 +122,11 @@
                </tbody>
             </table>
          </div>
+         @if ($data->hasPages())
+            <div class="card-footer border-top py-3">
+               {{ $data->links() }}
+            </div>
+         @endif
       </div>
    </div>
 

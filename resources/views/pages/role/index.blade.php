@@ -3,57 +3,67 @@
 @section('title', 'Manajemen Role')
 
 @section('content')
-<div class="container-xxl flex-grow-1 container-p-y">
-  @if(session('success'))
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    {{ session('success') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  @endif
+   <div class="container-xxl flex-grow-1 container-p-y">
+      @if (session('success'))
+         <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+         </div>
+      @endif
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0">
-      <span class="text-muted fw-light">Manajemen /</span> Role
-    </h4>
-    <a href="{{ route('role.create') }}" class="btn btn-primary">
-      <i class="ri-add-line me-1"></i> Tambah Role
-    </a>
-  </div>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+         <h4 class="fw-bold mb-0">
+            <span class="text-muted fw-light">Manajemen /</span> Role
+         </h4>
+         <a href="{{ route('role.create') }}" class="btn btn-primary">
+            <i class="ri-add-line me-1"></i> Tambah Role
+         </a>
+      </div>
 
-  <div class="card">
-    <div class="table-responsive">
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nama Role</th>
-            <th>Slug</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach($roles as $index => $role)
-          <tr>
-            <td>{{ $index + 1 }}</td>
-            <td><strong>{{ $role->name }}</strong></td>
-            <td><code>{{ $role->slug }}</code></td>
-            <td>
-              <a href="{{ route('role.edit', $role->id) }}" class="btn btn-sm btn-outline-primary">
-                <i class="ri-pencil-line"></i>
-              </a>
-              <button type="button" class="btn btn-sm btn-outline-danger delete-record" data-action="{{ route('role.destroy', $role->id) }}">
-                <i class="ri-delete-bin-line"></i>
-              </button>
-            </td>
-          </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+      <div class="card">
+         <div class="table-responsive">
+            <table class="table table-hover">
+               <thead>
+                  <tr>
+                     <th>#</th>
+                     <th>Nama Role</th>
+                     <th>Slug</th>
+                     <th>Aksi</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  @forelse($roles as $index => $role)
+                     <tr>
+                        <td>{{ $roles->firstItem() + $index }}</td>
+                        <td><strong>{{ $role->name }}</strong></td>
+                        <td><code>{{ $role->slug }}</code></td>
+                        <td>
+                           <a href="{{ route('role.edit', $role->id) }}" class="btn btn-sm btn-outline-primary">
+                              <i class="ri-pencil-line"></i>
+                           </a>
+                           <button type="button" class="btn btn-sm btn-outline-danger delete-record"
+                              data-action="{{ route('role.destroy', $role->id) }}">
+                              <i class="ri-delete-bin-line"></i>
+                           </button>
+                        </td>
+                     </tr>
+                  @empty
+                     <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">Belum ada role</td>
+                     </tr>
+                  @endforelse
+               </tbody>
+            </table>
+         </div>
+         @if ($roles->hasPages())
+            <div class="card-footer border-top py-3">
+               {{ $roles->links() }}
+            </div>
+         @endif
+      </div>
+   </div>
 @endsection
 
 @section('page-script')
-@vite(['resources/assets/js/app-role-index.js'])
+   @vite(['resources/assets/js/app-role-index.js'])
 @endsection

@@ -34,7 +34,7 @@
                <tbody>
                   @forelse($data as $index => $item)
                      <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $data->firstItem() + $index }}</td>
                         <td><code>{{ $item->kode ?? '-' }}</code></td>
                         <td><strong>{{ $item->nama }}</strong></td>
                         <td>
@@ -80,6 +80,11 @@
                </tbody>
             </table>
          </div>
+         @if ($data->hasPages())
+            <div class="card-footer border-top py-3">
+               {{ $data->links() }}
+            </div>
+         @endif
       </div>
    </div>
 @endsection

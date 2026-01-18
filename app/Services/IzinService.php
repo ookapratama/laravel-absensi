@@ -202,4 +202,9 @@ class IzinService extends BaseService
 
         return $this->delete($izinId);
     }
+
+    public function getStatistik()
+    {
+        return $this->repository->getStatistik();
+    }
 }

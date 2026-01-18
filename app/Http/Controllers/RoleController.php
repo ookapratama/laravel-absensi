@@ -14,7 +14,7 @@ class RoleController extends Controller
 
     public function index()
     {
-        $roles = $this->service->all();
+        $roles = $this->service->paginate();
         return view('pages.role.index', compact('roles'));
     }
 

@@ -173,7 +173,7 @@ class AbsensiController extends Controller
         $bulan = $request->get('bulan', now()->month);
         $tahun = $request->get('tahun', now()->year);
 
-        $data = $this->service->all();
+        $data = $this->pegawaiService->rekapPaginate($bulan, $tahun);
 
         return view('pages.absensi.rekap', compact('data', 'bulan', 'tahun'));
     }

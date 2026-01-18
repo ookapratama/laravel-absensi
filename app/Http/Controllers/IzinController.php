@@ -122,10 +122,10 @@ class IzinController extends Controller
      */
     public function adminIndex()
     {
-        $data = $this->service->all();
-        $pending = $this->service->getPending();
+        $data = $this->service->paginate();
+        $statistik = $this->service->getStatistik();
 
-        return view('pages.izin.admin.index', compact('data', 'pending'));
+        return view('pages.izin.admin.index', compact('data', 'statistik'));
     }
 
     /**

@@ -17,7 +17,7 @@ class JenisIzinController extends Controller
      */
     public function index()
     {
-        $data = $this->service->all();
+        $data = $this->service->paginate();
         return view('pages.data-master.jenis-izin.index', compact('data'));
     }
 

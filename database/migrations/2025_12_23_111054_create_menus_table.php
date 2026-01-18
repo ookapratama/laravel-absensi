@@ -22,6 +22,17 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
+
+        Schema::create('role_menu', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
+            $table->foreignId('menu_id')->constrained('menus')->onDelete('cascade');
+            $table->boolean('can_create')->default(false);
+            $table->boolean('can_read')->default(true);
+            $table->boolean('can_update')->default(false);
+            $table->boolean('can_delete')->default(false);
+            $table->timestamps();
+        });
     }
 
     /**
@@ -29,6 +40,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('role_menu');
         Schema::dropIfExists('menus');
     }
 };

@@ -16,7 +16,7 @@ class LocationHelper
      * @param float $lon2 Longitude titik 2
      * @return float Jarak dalam meter
      */
-    public static function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
+    public static function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
         $earthRadius = 6371000; // Radius bumi dalam meter
 
@@ -45,12 +45,12 @@ class LocationHelper
      * @return bool
      */
     public static function isWithinRadius(
-        float $userLat, 
-        float $userLon, 
-        float $targetLat, 
-        float $targetLon, 
-        int $radiusMeter
-    ): bool {
+        $userLat, 
+        $userLon, 
+        $targetLat, 
+        $targetLon, 
+        $radiusMeter
+    ) {
         $distance = self::calculateDistance($userLat, $userLon, $targetLat, $targetLon);
         return $distance <= $radiusMeter;
     }
@@ -63,7 +63,7 @@ class LocationHelper
      * @param array $locations Array of ['latitude', 'longitude', 'radius_meter', ...]
      * @return array|null ['location' => ..., 'distance' => ..., 'is_within_radius' => ...]
      */
-    public static function getNearestLocation(float $userLat, float $userLon, array $locations): ?array
+    public static function getNearestLocation($userLat, $userLon, array $locations)
     {
         if (empty($locations)) {
             return null;
@@ -99,7 +99,7 @@ class LocationHelper
      * @param float $meters Jarak dalam meter
      * @return string
      */
-    public static function formatDistance(float $meters): string
+    public static function formatDistance($meters)
     {
         if ($meters < 1000) {
             return round($meters) . ' m';

@@ -52,4 +52,12 @@ abstract class BaseService
     {
         return $this->repository->delete($id);
     }
+
+    /**
+     * Get paginated records
+     */
+    public function paginate($perPage = 10)
+    {
+        return $this->repository->paginate($perPage);
+    }
 }

@@ -68,8 +68,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('role_menu')->delete();
         DB::table('menus')->delete();
         DB::table('roles')->where('slug', 'super-admin')->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 };

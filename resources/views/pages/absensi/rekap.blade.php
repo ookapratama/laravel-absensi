@@ -77,9 +77,7 @@
                      $hariKerja = \Carbon\Carbon::create($tahun, $bulan, 1)->daysInMonth;
                      // Simple calculation - you may want to exclude weekends
                   @endphp
-                  @forelse(\App\Models\Pegawai::aktif()->with(['divisi', 'absensis' => function($q) use ($bulan, $tahun) {
-                           $q->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
-                       }])->get() as $index => $pegawai)
+                  @forelse($data as $index => $pegawai)
                      @php
                         $absensis = $pegawai->absensis;
                         $hadir = $absensis->where('status', 'Hadir')->count();
@@ -90,7 +88,7 @@
                         $persentase = $hariKerja > 0 ? round((($hadir + $terlambat) / $hariKerja) * 100, 1) : 0;
                      @endphp
                      <tr>
-                        <td class="text-center">{{ $index + 1 }}</td>
+                        <td class="text-center">{{ $data->firstItem() + $index }}</td>
                         <td>
                            <div class="d-flex align-items-center">
                               <div class="avatar avatar-sm me-2">
@@ -126,6 +124,11 @@
                </tbody>
             </table>
          </div>
+         @if ($data->hasPages())
+            <div class="card-footer border-top py-3 text-center">
+               {{ $data->links() }}
+            </div>
+         @endif
       </div>
    </div>
 @endsection

@@ -25,7 +25,7 @@ class PegawaiController extends Controller
      */
     public function index()
     {
-        $data = $this->service->all();
+        $data = $this->service->paginate();
         return view('pages.data-master.pegawai.index', compact('data'));
     }
 

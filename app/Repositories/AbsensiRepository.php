@@ -51,4 +51,10 @@ class AbsensiRepository extends BaseRepository implements AbsensiRepositoryInter
             ->with(['divisi', 'kantor'])
             ->get();
     }
+    public function paginate($perPage = 10)
+    {
+        return $this->model->with('pegawai')
+            ->orderBy('tanggal', 'desc')
+            ->paginate($perPage);
+    }
 }
