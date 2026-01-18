@@ -11,15 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip jika tabel sudah ada
+        if (Schema::hasTable('pegawais')) {
+            return;
+        }
+
         Schema::create('pegawais', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('divisi_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('nama_lengkap');
-            $table->string('nik');
-            $table->string('foto');
+            $table->string('nik')->nullable();
+            $table->string('foto')->nullable();
             $table->enum('gender', ['L', 'P']);
-            $table->string('no_telp');
+            $table->string('no_telp')->nullable();
             $table->timestamps();
         });
     }

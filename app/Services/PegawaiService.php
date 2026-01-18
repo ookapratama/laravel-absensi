@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\LokasiAbsenPegawai;
+use App\Repositories\PegawaiRepository;
+
+class PegawaiService extends BaseService
+{
+    public function __construct(PegawaiRepository $repository)
+    {
+        parent::__construct($repository);
+    }
+
+    public function getAktif()
+    {
+        return $this->repository->getAktif();
+    }
+
+    public function getByUserId(int $userId)
+    {
+        return $this->repository->getByUserId($userId);
+    }
+
+    public function getWithRelations(int $id)
+    {
+        return $this->repository->getWithRelations($id);
+    }
+
+    /**
+     * Assign lokasi absensi untuk pegawai
+     */
+    public function assignLokasiAbsen(int $pegawaiId, array $kantorIds)
+    {
+        // Hapus semua lokasi lama
+        LokasiAbsenPegawai::where('pegawai_id', $pegawaiId)->delete();
+
+        // Insert lokasi baru
+        foreach ($kantorIds as $kantorId) {
+            LokasiAbsenPegawai::create([
+                'pegawai_id' => $pegawaiId,
+                'kantor_id' => $kantorId,
+                'is_aktif' => true,
+            ]);
+        }
+
+        return true;
+    }
+
+    /**
+     * Toggle status lokasi absensi
+     */
+    public function toggleLokasiAbsen(int $pegawaiId, int $kantorId)
+    {
+        $lokasi = LokasiAbsenPegawai::where('pegawai_id', $pegawaiId)
+            ->where('kantor_id', $kantorId)
+            ->first();
+
+        if ($lokasi) {
+            $lokasi->update(['is_aktif' => !$lokasi->is_aktif]);
+            return $lokasi;
+        }
+
+        return null;
+    }
+}

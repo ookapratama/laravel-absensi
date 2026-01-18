@@ -63,4 +63,9 @@ class User extends Authenticatable
 
         return (bool) $menu->pivot->{"can_{$action}"};
     }
+
+    public function pegawai()
+    {
+        return $this->hasOne(Pegawai::class);
+    }
 }

@@ -1,33 +1,32 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Manajemen Pegawai')
+@section('title', 'Manajemen Jenis Izin')
 
 @section('content')
    <div class="container-xxl flex-grow-1 container-p-y">
       <div class="d-flex justify-content-between align-items-center mb-4">
          <h4 class="fw-bold mb-0">
-            <span class="text-muted fw-light">Data Master /</span> Pegawai
+            <span class="text-muted fw-light">Data Master /</span> Jenis Izin
          </h4>
-         <a href="{{ route('pegawai.create') }}" class="btn btn-primary">
-            <i class="ri-add-line me-1"></i>Tambah Pegawai
+         <a href="{{ route('jenis-izin.create') }}" class="btn btn-primary">
+            <i class="ri-add-line me-1"></i>Tambah Jenis Izin
          </a>
       </div>
 
       <div class="card">
          <div class="card-header border-bottom">
-            <h5 class="card-title mb-0">Daftar Pegawai</h5>
+            <h5 class="card-title mb-0">Daftar Jenis Izin</h5>
          </div>
          <div class="table-responsive">
             <table class="table table-hover">
                <thead>
                   <tr>
                      <th>#</th>
-                     <th>Foto</th>
-                     <th>NIP</th>
-                     <th>Nama Lengkap</th>
-                     <th>Divisi</th>
-                     <th>Kantor</th>
-                     <th>Jabatan</th>
+                     <th>Kode</th>
+                     <th>Nama</th>
+                     <th>Butuh Surat</th>
+                     <th>Max Hari</th>
+                     <th>Keterangan</th>
                      <th>Status</th>
                      <th class="text-center">Aksi</th>
                   </tr>
@@ -36,21 +35,23 @@
                   @forelse($data as $index => $item)
                      <tr>
                         <td>{{ $index + 1 }}</td>
+                        <td><code>{{ $item->kode ?? '-' }}</code></td>
+                        <td><strong>{{ $item->nama }}</strong></td>
                         <td>
-                           <div class="avatar avatar-sm">
-                              <img src="{{ $item->foto_url }}" alt="{{ $item->nama_lengkap }}" class="rounded-circle">
-                           </div>
+                           @if ($item->butuh_surat)
+                              <span class="badge bg-warning">Ya</span>
+                           @else
+                              <span class="badge bg-secondary">Tidak</span>
+                           @endif
                         </td>
-                        <td><code>{{ $item->nip ?? '-' }}</code></td>
+                        <td>{{ $item->max_hari ? $item->max_hari . ' hari' : 'Tidak terbatas' }}</td>
                         <td>
-                           <strong>{{ $item->nama_lengkap }}</strong>
-                           <br><small class="text-muted">{{ $item->user->email ?? '-' }}</small>
+                           <span class="d-inline-block text-truncate" style="max-width: 200px;">
+                              {{ $item->keterangan ?? '-' }}
+                           </span>
                         </td>
-                        <td>{{ $item->divisi->nama ?? '-' }}</td>
-                        <td>{{ $item->kantor->nama ?? '-' }}</td>
-                        <td>{{ $item->jabatan ?? '-' }}</td>
                         <td>
-                           @if ($item->status_aktif)
+                           @if ($item->is_aktif)
                               <span class="badge bg-success">Aktif</span>
                            @else
                               <span class="badge bg-secondary">Non-Aktif</span>
@@ -58,14 +59,11 @@
                         </td>
                         <td class="text-center">
                            <div class="d-flex justify-content-center gap-2">
-                              <a href="{{ route('pegawai.show', $item->id) }}" class="btn btn-sm btn-outline-info">
-                                 <i class="ri-eye-line"></i>
-                              </a>
-                              <a href="{{ route('pegawai.edit', $item->id) }}" class="btn btn-sm btn-outline-primary">
+                              <a href="{{ route('jenis-izin.edit', $item->id) }}" class="btn btn-sm btn-outline-primary">
                                  <i class="ri-pencil-line"></i>
                               </a>
                               <button type="button" class="btn btn-sm btn-outline-danger delete-record"
-                                 data-id="{{ $item->id }}" data-name="{{ $item->nama_lengkap }}">
+                                 data-id="{{ $item->id }}" data-name="{{ $item->nama }}">
                                  <i class="ri-delete-bin-line"></i>
                               </button>
                            </div>
@@ -73,9 +71,9 @@
                      </tr>
                   @empty
                      <tr>
-                        <td colspan="9" class="text-center py-5 text-muted">
-                           <i class="ri-user-line ri-3x mb-2"></i>
-                           <p class="mb-0">Belum ada data pegawai</p>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                           <i class="ri-file-list-3-line ri-3x mb-2"></i>
+                           <p class="mb-0">Belum ada data jenis izin</p>
                         </td>
                      </tr>
                   @endforelse
@@ -94,11 +92,11 @@
             const name = this.dataset.name;
 
             window.AlertHandler.confirm(
-               'Hapus Pegawai?',
-               `Apakah Anda yakin ingin menghapus pegawai "${name}"?`,
+               'Hapus Jenis Izin?',
+               `Apakah Anda yakin ingin menghapus jenis izin "${name}"?`,
                'Ya, Hapus!',
                function() {
-                  fetch(`{{ url('pegawai') }}/${id}`, {
+                  fetch(`{{ url('jenis-izin') }}/${id}`, {
                         method: 'DELETE',
                         headers: {
                            'X-CSRF-TOKEN': '{{ csrf_token() }}',

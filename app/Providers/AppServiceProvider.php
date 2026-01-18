@@ -29,6 +29,32 @@ class AppServiceProvider extends ServiceProvider
             \App\Interfaces\Repositories\ProductsRepositoryInterface::class,
             \App\Repositories\ProductsRepository::class
         );
+
+        // Absensi System Repositories
+        $this->app->bind(
+            \App\Interfaces\Repositories\DivisiRepositoryInterface::class,
+            \App\Repositories\DivisiRepository::class
+        );
+        $this->app->bind(
+            \App\Interfaces\Repositories\KantorRepositoryInterface::class,
+            \App\Repositories\KantorRepository::class
+        );
+        $this->app->bind(
+            \App\Interfaces\Repositories\JenisIzinRepositoryInterface::class,
+            \App\Repositories\JenisIzinRepository::class
+        );
+        $this->app->bind(
+            \App\Interfaces\Repositories\PegawaiRepositoryInterface::class,
+            \App\Repositories\PegawaiRepository::class
+        );
+        $this->app->bind(
+            \App\Interfaces\Repositories\AbsensiRepositoryInterface::class,
+            \App\Repositories\AbsensiRepository::class
+        );
+        $this->app->bind(
+            \App\Interfaces\Repositories\IzinRepositoryInterface::class,
+            \App\Repositories\IzinRepository::class
+        );
     }
 
     /**

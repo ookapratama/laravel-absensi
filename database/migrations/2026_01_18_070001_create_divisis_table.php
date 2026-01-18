@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip jika tabel sudah ada
+        if (Schema::hasTable('divisis')) {
+            return;
+        }
+
         Schema::create('divisis', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
