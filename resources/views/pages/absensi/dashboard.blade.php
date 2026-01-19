@@ -192,7 +192,9 @@
                            @if ($absen->jam_masuk)
                               {{ $absen->jam_masuk->format('H:i:s') }}
                               @if ($absen->foto_masuk)
-                                 <a href="{{ $absen->foto_masuk_url }}" target="_blank" class="ms-1">
+                                 <a href="javascript:void(0);"
+                                    onclick="previewFoto('{{ $absen->foto_masuk_url }}', 'Foto Masuk - {{ $absen->pegawai->nama_lengkap }}')"
+                                    class="ms-1">
                                     <i class="ri-image-line text-primary"></i>
                                  </a>
                               @endif
@@ -204,7 +206,9 @@
                            @if ($absen->jam_pulang)
                               {{ $absen->jam_pulang->format('H:i:s') }}
                               @if ($absen->foto_pulang)
-                                 <a href="{{ $absen->foto_pulang_url }}" target="_blank" class="ms-1">
+                                 <a href="javascript:void(0);"
+                                    onclick="previewFoto('{{ $absen->foto_pulang_url }}', 'Foto Pulang - {{ $absen->pegawai->nama_lengkap }}')"
+                                    class="ms-1">
                                     <i class="ri-image-line text-primary"></i>
                                  </a>
                               @endif
@@ -233,6 +237,51 @@
          </div>
       </div>
    </div>
+
+   <!-- Modal Preview Foto (Premium Style) -->
+   <div class="modal fade animate__animated animate__fadeIn" id="modalPreviewFoto" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+         <div class="modal-content bg-transparent shadow-none border-0">
+            <div class="modal-header border-0 p-0 mb-3 justify-content-end">
+               <button type="button" class="btn btn-icon btn-light rounded-circle shadow-lg" data-bs-dismiss="modal"
+                  aria-label="Close" style="width: 40px; height: 40px;">
+                  <i class="ri-close-line ri-xl text-dark"></i>
+               </button>
+            </div>
+            <div class="modal-body p-0 text-center">
+               <div class="position-relative overflow-hidden rounded-4 shadow-2xl">
+                  <!-- Header Label (Glassmorphism) -->
+                  <div id="modal-photo-title"
+                     class="position-absolute top-0 start-50 translate-middle-x mt-3 px-4 py-2 rounded-pill shadow-lg"
+                     style="z-index: 10; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); color: white; font-weight: 600; letter-spacing: 0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                  </div>
+
+                  <img src="" id="foto-preview" class="img-fluid w-100 shadow-lg"
+                     style="max-height: 85vh; object-fit: contain; background: #000; border-radius: 12px;">
+
+                  <!-- Quality Badge -->
+                  <div
+                     class="position-absolute bottom-0 end-0 mb-3 me-3 px-2 py-1 bg-dark bg-opacity-50 text-white rounded small"
+                     style="font-size: 10px;">
+                     <i class="ri-shield-check-line me-1"></i>Verified Attendance Photo
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <style>
+      .modal-backdrop.show {
+         backdrop-filter: blur(8px);
+         -webkit-backdrop-filter: blur(8px);
+         background-color: rgba(0, 0, 0, 0.6);
+      }
+
+      .shadow-2xl {
+         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+   </style>
 @endsection
 
 @section('page-script')
@@ -240,5 +289,12 @@
       document.getElementById('filter-tanggal').addEventListener('change', function() {
          window.location.href = '{{ route('absensi.dashboard') }}?tanggal=' + this.value;
       });
+
+      function previewFoto(url, title) {
+         const modal = new bootstrap.Modal(document.getElementById('modalPreviewFoto'));
+         document.getElementById('foto-preview').src = url;
+         document.getElementById('modal-photo-title').textContent = title;
+         modal.show();
+      }
    </script>
 @endsection
