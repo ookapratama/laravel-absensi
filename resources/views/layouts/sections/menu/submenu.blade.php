@@ -16,19 +16,24 @@
                 (isset($submenu->children) && count($submenu->children) > 0);
 
             $isActive = false;
-            if ($currentRouteName === $submenu->slug) {
-                $isActive = true;
-            } elseif (
-                isset($submenu->path) &&
-                ($submenu->path !== '/' && request()->is(ltrim($submenu->path, '/') . '*'))
-            ) {
+
+            // First priority: exact route name match
+            if (isset($submenu->slug) && $currentRouteName === $submenu->slug) {
                 $isActive = true;
             }
-
-            // Special case: if slug is 'something.index', also match 'something.*'
-            if (!$isActive && isset($submenu->slug) && str_ends_with($submenu->slug, '.index')) {
+            // Second priority: route prefix match for .index routes
+            elseif (isset($submenu->slug) && str_ends_with($submenu->slug, '.index')) {
                 $prefix = substr($submenu->slug, 0, -6);
-                if (request()->routeIs($prefix . '.*')) {
+                if (str_starts_with($currentRouteName, $prefix . '.')) {
+                    $isActive = true;
+                }
+            }
+            // Third priority: path matching
+            elseif (isset($submenu->path) && $submenu->path !== '/') {
+                $path = ltrim($submenu->path, '/');
+                $currentPath = request()->path();
+
+                if ($currentPath === $path || str_starts_with($currentPath, $path . '/')) {
                     $isActive = true;
                 }
             }
@@ -37,22 +42,24 @@
                 $activeClass = 'active';
             }
 
-            if ($hasSubChildren) {
+            // Check if any sub-child is active
+            if ($hasSubChildren && !$isActive) {
                 $subChildren = $submenu->submenu ?? $submenu->children;
                 foreach ($subChildren as $subChild) {
                     $subChildActive = false;
-                    if ($currentRouteName === $subChild->slug) {
-                        $subChildActive = true;
-                    } elseif (
-                        isset($subChild->path) &&
-                        ($subChild->path !== '/' && request()->is(ltrim($subChild->path, '/') . '*'))
-                    ) {
-                        $subChildActive = true;
-                    }
 
-                    if (!$subChildActive && isset($subChild->slug) && str_ends_with($subChild->slug, '.index')) {
+                    if (isset($subChild->slug) && $currentRouteName === $subChild->slug) {
+                        $subChildActive = true;
+                    } elseif (isset($subChild->slug) && str_ends_with($subChild->slug, '.index')) {
                         $prefix = substr($subChild->slug, 0, -6);
-                        if (request()->routeIs($prefix . '.*')) {
+                        if (str_starts_with($currentRouteName, $prefix . '.')) {
+                            $subChildActive = true;
+                        }
+                    } elseif (isset($subChild->path) && $subChild->path !== '/') {
+                        $path = ltrim($subChild->path, '/');
+                        $currentPath = request()->path();
+
+                        if ($currentPath === $path || str_starts_with($currentPath, $path . '/')) {
                             $subChildActive = true;
                         }
                     }

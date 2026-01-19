@@ -10,7 +10,7 @@ class IzinRequest extends BaseRequest
             'jenis_izin_id' => 'required|exists:jenis_izins,id',
             'tgl_mulai' => 'required|date|after_or_equal:today',
             'tgl_selesai' => 'required|date|after_or_equal:tgl_mulai',
-            'alasan' => 'required|string|min:10',
+            'alasan' => 'nullable|string',
             'file_surat' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ];
     }
@@ -24,8 +24,7 @@ class IzinRequest extends BaseRequest
             'tgl_mulai.after_or_equal' => 'Tanggal mulai minimal hari ini.',
             'tgl_selesai.required' => 'Tanggal selesai wajib diisi.',
             'tgl_selesai.after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
-            'alasan.required' => 'Alasan wajib diisi.',
-            'alasan.min' => 'Alasan minimal 10 karakter.',
+
             'file_surat.mimes' => 'File surat harus berupa PDF atau gambar.',
             'file_surat.max' => 'Ukuran file maksimal 5MB.',
         ];

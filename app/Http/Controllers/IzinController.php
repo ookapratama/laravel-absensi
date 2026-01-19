@@ -67,6 +67,8 @@ class IzinController extends Controller
             $data = $request->validated();
             $data['file_surat'] = $request->file('file_surat');
 
+            $data['alasan'] = $request->alasan ?? '-';
+
             $this->service->ajukanIzin($pegawai->id, $data);
 
             return redirect()->route('izin.index')

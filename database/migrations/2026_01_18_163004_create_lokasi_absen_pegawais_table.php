@@ -52,7 +52,7 @@ return new class extends Migration
             $table->foreignId('jenis_izin_id')->constrained('jenis_izins');
             $table->date('tgl_mulai');
             $table->date('tgl_selesai');
-            $table->text('alasan');
+            $table->text('alasan')->nullable();
             $table->string('file_surat')->nullable();
             $table->enum('status_approval', ['Pending', 'Approved', 'Rejected'])->default('Pending');
             $table->foreignId('approved_by')->nullable()->constrained('users');

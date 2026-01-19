@@ -46,33 +46,33 @@
       </div>
 
       <!-- Stats -->
-      <div class="row mb-4">
+      <div class="row mb-4 g-3">
          @php
             $hadir = $data->where('status', 'Hadir')->count();
             $terlambat = $data->where('status', 'Terlambat')->count();
             $izin = $data->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count();
          @endphp
-         <div class="col-md-4">
-            <div class="card bg-success text-white">
+         <div class="col-md-4 col-sm-6">
+            <div class="card bg-label-success">
                <div class="card-body">
-                  <h3 class="mb-0">{{ $hadir }}</h3>
-                  <span>Hadir Tepat Waktu</span>
+                  <h3 class="mb-0 text-success">{{ $hadir }}</h3>
+                  <span class="text-success">Hadir Tepat Waktu</span>
                </div>
             </div>
          </div>
-         <div class="col-md-4">
-            <div class="card bg-warning text-white">
+         <div class="col-md-4 col-sm-6">
+            <div class="card bg-label-warning">
                <div class="card-body">
-                  <h3 class="mb-0">{{ $terlambat }}</h3>
-                  <span>Terlambat</span>
+                  <h3 class="mb-0 text-warning">{{ $terlambat }}</h3>
+                  <span class="text-warning">Terlambat</span>
                </div>
             </div>
          </div>
-         <div class="col-md-4">
-            <div class="card bg-info text-white">
+         <div class="col-md-4 col-sm-12">
+            <div class="card bg-label-info">
                <div class="card-body">
-                  <h3 class="mb-0">{{ $izin }}</h3>
-                  <span>Izin/Cuti/Sakit</span>
+                  <h3 class="mb-0 text-info">{{ $izin }}</h3>
+                  <span class="text-info">Izin/Cuti/Sakit</span>
                </div>
             </div>
          </div>
@@ -80,12 +80,14 @@
 
       <!-- Table -->
       <div class="card">
-         <div class="card-header">
+         <div class="card-header border-bottom">
             <h5 class="mb-0">
                Riwayat {{ \Carbon\Carbon::create()->month($bulan)->locale('id')->isoFormat('MMMM') }} {{ $tahun }}
             </h5>
          </div>
-         <div class="table-responsive">
+
+         <!-- Table View (Desktop & Large Tablets) -->
+         <div class="table-responsive d-none d-lg-block">
             <table class="table table-hover">
                <thead>
                   <tr>
@@ -151,6 +153,85 @@
                </tbody>
             </table>
          </div>
+
+         <!-- Card View (Mobile & Mini Tablets) -->
+         <div class="d-block d-lg-none p-3">
+            @forelse($data as $absen)
+               <div class="card mb-3 shadow-sm">
+                  <div class="card-body p-3">
+                     <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                           <strong
+                              class="text-primary d-block mb-1">{{ $absen->tanggal->locale('id')->isoFormat('ddd, D MMM Y') }}</strong>
+                        </div>
+                        <span
+                           class="badge bg-{{ $absen->status === 'Hadir' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
+                           {{ $absen->status }}
+                        </span>
+                     </div>
+
+                     <div class="row g-3 mb-2">
+                        <div class="col-6">
+                           <small class="text-muted d-block mb-1"><i class="ri-login-circle-line me-1"></i>Jam
+                              Masuk</small>
+                           <div class="d-flex align-items-center">
+                              @if ($absen->jam_masuk)
+                                 <span class="me-2 fw-semibold">{{ $absen->jam_masuk->format('H:i:s') }}</span>
+                                 @if ($absen->foto_masuk)
+                                    <a href="javascript:void(0);"
+                                       onclick="previewFoto('{{ $absen->foto_masuk_url }}', 'Foto Masuk')"
+                                       class="text-primary">
+                                       <i class="ri-image-line"></i>
+                                    </a>
+                                 @endif
+                              @else
+                                 <span class="text-muted">-</span>
+                              @endif
+                           </div>
+                        </div>
+                        <div class="col-6">
+                           <small class="text-muted d-block mb-1"><i class="ri-logout-circle-line me-1"></i>Jam
+                              Pulang</small>
+                           <div class="d-flex align-items-center">
+                              @if ($absen->jam_pulang)
+                                 <span class="me-2 fw-semibold">{{ $absen->jam_pulang->format('H:i:s') }}</span>
+                                 @if ($absen->foto_pulang)
+                                    <a href="javascript:void(0);"
+                                       onclick="previewFoto('{{ $absen->foto_pulang_url }}', 'Foto Pulang')"
+                                       class="text-primary">
+                                       <i class="ri-image-line"></i>
+                                    </a>
+                                 @endif
+                              @else
+                                 <span class="text-muted">-</span>
+                              @endif
+                           </div>
+                        </div>
+                     </div>
+
+                     @if ($absen->lokasi_masuk)
+                        <div class="mb-2 pb-2 border-bottom">
+                           <small class="text-muted d-block mb-1"><i class="ri-map-pin-line me-1"></i>Lokasi</small>
+                           <span class="d-block small text-truncate"
+                              style="max-width: 100%;">{{ $absen->lokasi_masuk }}</span>
+                        </div>
+                     @endif
+
+                     @if ($absen->keterangan)
+                        <div class="mt-2">
+                           <small class="text-muted d-block mb-1"><i class="ri-file-text-line me-1"></i>Keterangan</small>
+                           <p class="mb-0 small">{{ $absen->keterangan }}</p>
+                        </div>
+                     @endif
+                  </div>
+               </div>
+            @empty
+               <div class="text-center py-5 text-muted">
+                  <i class="ri-calendar-line ri-3x mb-3 d-block"></i>
+                  <p class="mb-0">Belum ada data absensi bulan ini</p>
+               </div>
+            @endforelse
+         </div>
       </div>
    </div>
    </div>
@@ -168,7 +249,8 @@
                   <div id="modal-photo-title"
                      class="position-absolute top-0 start-50 translate-middle-x bg-dark bg-opacity-50 text-white px-3 py-1 rounded-bottom small"
                      style="z-index: 10;"></div>
-                  <img src="" id="foto-preview" class="img-fluid rounded-3 shadow-lg border border-3 border-white"
+                  <img src="" id="foto-preview"
+                     class="img-fluid rounded-3 shadow-lg border border-3 border-white"
                      style="max-height: 85vh; border-radius: 15px !important;">
                </div>
             </div>

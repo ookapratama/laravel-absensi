@@ -75,19 +75,18 @@
                      </div>
 
                      <div class="mb-3">
-                        <label class="form-label" for="alasan">Alasan <span class="text-danger">*</span></label>
+                        <label class="form-label" for="alasan">Alasan <small
+                              class="text-muted">(Opsional)</small></label>
                         <textarea class="form-control @error('alasan') is-invalid @enderror" id="alasan" name="alasan" rows="4"
-                           placeholder="Jelaskan alasan pengajuan izin Anda..." required>{{ old('alasan') }}</textarea>
+                           placeholder="Jelaskan alasan pengajuan izin Anda...">{{ old('alasan') }}</textarea>
                         @error('alasan')
                            <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted">Minimal 10 karakter</small>
                      </div>
 
                      <div class="mb-4" id="file-surat-container">
                         <label class="form-label" for="file_surat">
-                           Surat Pendukung
-                           <span class="text-danger d-none" id="surat-required">*</span>
+                           Surat Pendukung <small class="text-muted">(Opsional)</small>
                         </label>
                         <input type="file" class="form-control @error('file_surat') is-invalid @enderror"
                            id="file_surat" name="file_surat" accept=".pdf,.jpg,.jpeg,.png">
@@ -120,8 +119,6 @@
    <script>
       document.addEventListener('DOMContentLoaded', function() {
          const jenisSelect = document.getElementById('jenis_izin_id');
-         const suratRequired = document.getElementById('surat-required');
-         const fileSurat = document.getElementById('file_surat');
          const infoAlert = document.getElementById('info-alert');
          const infoText = document.getElementById('info-text');
          const tglMulai = document.getElementById('tgl_mulai');
@@ -129,17 +126,7 @@
 
          jenisSelect.addEventListener('change', function() {
             const selected = this.options[this.selectedIndex];
-            const butuhSurat = selected.dataset.butuhSurat === '1';
             const maxHari = selected.dataset.maxHari;
-
-            // Handle surat requirement
-            if (butuhSurat) {
-               suratRequired.classList.remove('d-none');
-               fileSurat.setAttribute('required', 'required');
-            } else {
-               suratRequired.classList.add('d-none');
-               fileSurat.removeAttribute('required');
-            }
 
             // Show info about max hari
             if (maxHari) {

@@ -57,48 +57,69 @@
                // Determine if active based on route name or path
                $isActive = false;
 
-               if ($currentRouteName === $menu->slug) {
-                   $isActive = true;
-               } elseif (isset($menu->path) && ($menu->path !== '/' && request()->is(ltrim($menu->path, '/') . '*'))) {
-                   $isActive = true;
-               } elseif (isset($menu->path) && $menu->path === '/' && request()->is('/')) {
+               // First priority: exact route name match
+               if (isset($menu->slug) && $currentRouteName === $menu->slug) {
                    $isActive = true;
                }
-
-               // Special case: if slug is 'something.index', also match 'something.*'
-               if (!$isActive && isset($menu->slug) && str_ends_with($menu->slug, '.index')) {
-                   $prefix = substr($menu->slug, 0, -6);
-                   if (request()->routeIs($prefix . '.*')) {
+               // Second priority: route prefix match for .index routes
+               elseif (isset($menu->slug) && str_ends_with($menu->slug, '.index')) {
+                   $prefix = substr($menu->slug, 0, -6); // Remove '.index'
+                   if (str_starts_with($currentRouteName, $prefix . '.')) {
                        $isActive = true;
                    }
                }
+               // Third priority: path matching (only if no slug or route match)
+               elseif (isset($menu->path) && $menu->path !== '/') {
+                   $path = ltrim($menu->path, '/');
+                   $currentPath = request()->path();
 
-               if ($isActive) {
-                   $activeClass = 'active';
-               }
+                   // Exact path match
+                   if ($currentPath === $path) {
+                       $isActive = true;
+                   }
+                   // Path prefix match - but ensure it's a complete segment
+    elseif (str_starts_with($currentPath, $path . '/')) {
+        $isActive = true;
+    }
+}
+// Home route special case
+elseif (isset($menu->path) && $menu->path === '/' && request()->is('/')) {
+    $isActive = true;
+}
 
-               if ($hasChildren) {
-                   $children = $menu->submenu ?? $menu->children;
-                   foreach ($children as $child) {
-                       $childActive = false;
-                       if ($currentRouteName === $child->slug) {
-                           $childActive = true;
-                       } elseif (
-                           isset($child->path) &&
-                           ($child->path !== '/' && request()->is(ltrim($child->path, '/') . '*'))
-                       ) {
-                           $childActive = true;
-                       }
+if ($isActive) {
+    $activeClass = 'active';
+}
 
-                       if (!$childActive && isset($child->slug) && str_ends_with($child->slug, '.index')) {
-                           $prefix = substr($child->slug, 0, -6);
-                           if (request()->routeIs($prefix . '.*')) {
-                               $childActive = true;
-                           }
-                       }
+// Check if any child is active (for parent menu items)
+if ($hasChildren && !$isActive) {
+    $children = $menu->submenu ?? $menu->children;
+    foreach ($children as $child) {
+        $childActive = false;
 
-                       if ($childActive) {
-                           $activeClass = 'active open';
+        // Exact route match
+        if (isset($child->slug) && $currentRouteName === $child->slug) {
+            $childActive = true;
+        }
+        // Route prefix match for .index routes
+        elseif (isset($child->slug) && str_ends_with($child->slug, '.index')) {
+            $prefix = substr($child->slug, 0, -6);
+            if (str_starts_with($currentRouteName, $prefix . '.')) {
+                $childActive = true;
+            }
+        }
+        // Path matching
+        elseif (isset($child->path) && $child->path !== '/') {
+            $path = ltrim($child->path, '/');
+            $currentPath = request()->path();
+
+            if ($currentPath === $path || str_starts_with($currentPath, $path . '/')) {
+                $childActive = true;
+            }
+        }
+
+        if ($childActive) {
+            $activeClass = 'active open';
                            break;
                        }
                    }
