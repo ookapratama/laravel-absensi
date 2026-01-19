@@ -30,6 +30,7 @@ class AuthController extends Controller
             // Log aktivitas login
             $this->activityLogService->logLogin();
             
+            // Redirect ke dashboard (dashboard akan menampilkan konten sesuai role)
             return redirect()->intended('/');
         }
 
