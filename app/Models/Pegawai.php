@@ -98,7 +98,7 @@ class Pegawai extends Model
         if ($this->foto) {
             return Storage::url($this->foto);
         }
-        return asset('assets/img/avatars/default.png');
+        return asset('assets/img/avatars/' . ($this->gender == 'P' ? '8.png' : '1.png'));
     }
 
     /**

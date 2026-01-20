@@ -68,4 +68,15 @@ class User extends Authenticatable
     {
         return $this->hasOne(Pegawai::class);
     }
+
+    /**
+     * Get the user's profile photo URL.
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        if ($this->pegawai) {
+            return $this->pegawai->foto_url;
+        }
+        return asset('assets/img/avatars/1.png');
+    }
 }
