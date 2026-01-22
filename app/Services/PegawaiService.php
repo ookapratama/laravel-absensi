@@ -12,6 +12,11 @@ class PegawaiService extends BaseService
         parent::__construct($repository);
     }
 
+    public function getAllPegawai($filters = [])
+    {
+        return $this->repository->paginate($filters, 10);
+    }
+
     public function getAktif()
     {
         return $this->repository->getAktif();

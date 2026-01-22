@@ -11,6 +11,7 @@ class AbsensiMenuSeeder extends Seeder
     public function run(): void
     {
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Menu::where('slug', 'divisi.parent')->delete();
 
         $menus = [
             // Dashboard
@@ -34,11 +35,19 @@ class AbsensiMenuSeeder extends Seeder
             ],
             [
                 'slug' => 'divisi.index',
-                'name' => 'Divisi',
+                'name' => 'Data Divisi',
                 'icon' => 'ri-community-line',
                 'path' => '/divisi',
                 'parent_slug' => 'data-master',
                 'order_no' => 1
+            ],
+            [
+                'slug' => 'shift.index',
+                'name' => 'Shift Kerja',
+                'icon' => 'ri-time-line',
+                'path' => '/shift',
+                'parent_slug' => 'data-master',
+                'order_no' => 2
             ],
             [
                 'slug' => 'kantor.index',
@@ -46,7 +55,7 @@ class AbsensiMenuSeeder extends Seeder
                 'icon' => 'ri-building-line',
                 'path' => '/kantor',
                 'parent_slug' => 'data-master',
-                'order_no' => 2
+                'order_no' => 3
             ],
             [
                 'slug' => 'pegawai.index',
@@ -54,7 +63,7 @@ class AbsensiMenuSeeder extends Seeder
                 'icon' => 'ri-user-star-line',
                 'path' => '/pegawai',
                 'parent_slug' => 'data-master',
-                'order_no' => 3
+                'order_no' => 4
             ],
             [
                 'slug' => 'jenis-izin.index',
@@ -62,7 +71,7 @@ class AbsensiMenuSeeder extends Seeder
                 'icon' => 'ri-file-settings-line',
                 'path' => '/jenis-izin',
                 'parent_slug' => 'data-master',
-                'order_no' => 4
+                'order_no' => 5
             ],
             
             // Absensi (Group)

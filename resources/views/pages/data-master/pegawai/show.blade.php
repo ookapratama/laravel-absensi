@@ -71,108 +71,113 @@
                      {{ $data->tgl_masuk ? $data->tgl_masuk->format('d/m/Y') : '-' }}</span>
                </div>
                <div class="card-body">
-                  <div class="row">
-                     <div class="col-sm-6 mb-3">
-                        <div class="p-3 bg-light border-start border-primary border-4 rounded shadow-sm">
-                           <small class="text-muted d-block mb-1">Kantor Utama</small>
-                           <h6 class="mb-0 fw-bold">{{ $data->kantor->nama ?? '-' }}</h6>
-                        </div>
+                  <div class="col-sm-4 mb-3">
+                     <div class="p-3 bg-light border-start border-primary border-4 rounded shadow-sm">
+                        <small class="text-muted d-block mb-1">Kantor Utama</small>
+                        <h6 class="mb-0 fw-bold">{{ $data->kantor->nama ?? '-' }}</h6>
                      </div>
-                     <div class="col-sm-6 mb-3">
-                        <div class="p-3 bg-light border-start border-success border-4 rounded shadow-sm">
-                           <small class="text-muted d-block mb-1">Divisi Pekerjaan</small>
-                           <h6 class="mb-0 fw-bold">{{ $data->divisi->nama ?? '-' }}</h6>
-                        </div>
+                  </div>
+                  <div class="col-sm-4 mb-3">
+                     <div class="p-3 bg-light border-start border-success border-4 rounded shadow-sm">
+                        <small class="text-muted d-block mb-1">Divisi Pekerjaan</small>
+                        <h6 class="mb-0 fw-bold">{{ $data->divisi->nama ?? '-' }}</h6>
                      </div>
-                     <div class="col-12 mt-2">
-                        <div class="alert alert-primary mb-0 py-2 d-flex align-items-center">
-                           <i class="ri-time-line me-2 ri-lg"></i>
-                           <span>
-                              <strong>Jam Kerja:</strong>
-                              @if ($data->divisi)
-                                 {{ $data->divisi->jam_masuk ? $data->divisi->jam_masuk->format('H:i') : '--' }} -
-                                 {{ $data->divisi->jam_pulang ? $data->divisi->jam_pulang->format('H:i') : '--' }}
-                              @else
-                                 Belum diatur
-                              @endif
-                           </span>
-                        </div>
+                  </div>
+                  <div class="col-sm-4 mb-3">
+                     <div class="p-3 bg-light border-start border-info border-4 rounded shadow-sm">
+                        <small class="text-muted d-block mb-1">Shift Kerja</small>
+                        <h6 class="mb-0 fw-bold">{{ $data->shift->nama ?? '-' }}</h6>
+                     </div>
+                  </div>
+                  <div class="col-12 mt-2">
+                     <div class="alert alert-primary mb-0 py-2 d-flex align-items-center">
+                        <i class="ri-time-line me-2 ri-lg"></i>
+                        <span>
+                           @if ($data->shift)
+                              <strong>Jadwal Shift ({{ $data->shift->nama }}):</strong>
+                              {{ $data->shift->jam_masuk->format('H:i') }} -
+                              {{ $data->shift->jam_pulang->format('H:i') }}
+                           @else
+                              <strong>Jam Kerja:</strong> Belum diatur
+                           @endif
+                        </span>
                      </div>
                   </div>
                </div>
             </div>
+         </div>
 
-            <!-- Lokasi Absen -->
-            <div class="card mb-4">
-               <div class="card-header py-3">
-                  <h6 class="mb-0 fw-bold"><i class="ri-map-pin-line me-2"></i>Akses Lokasi Absensi</h6>
-               </div>
-               <div class="table-responsive">
-                  <table class="table table-sm table-hover mb-0">
-                     <thead class="table-light">
-                        <tr>
-                           <th>Nama Area</th>
-                           <th class="text-center">Radius</th>
-                        </tr>
-                     </thead>
-                     <tbody>
-                        @forelse($data->lokasiAbsen as $lokasi)
-                           <tr>
-                              <td>
-                                 <div class="fw-bold">{{ $lokasi->nama }}</div>
-                                 <small class="text-muted">{{ $lokasi->latitude }}, {{ $lokasi->longitude }}</small>
-                              </td>
-                              <td class="text-center align-middle">
-                                 <span class="badge bg-label-info">{{ $lokasi->radius_meter }}m</span>
-                              </td>
-                           </tr>
-                        @empty
-                           <tr>
-                              <td colspan="2" class="text-center py-3 text-muted">Belum ada lokasi khusus yg diatur</td>
-                           </tr>
-                        @endforelse
-                     </tbody>
-                  </table>
-               </div>
+         <!-- Lokasi Absen -->
+         <div class="card mb-4">
+            <div class="card-header py-3">
+               <h6 class="mb-0 fw-bold"><i class="ri-map-pin-line me-2"></i>Akses Lokasi Absensi</h6>
             </div>
+            <div class="table-responsive">
+               <table class="table table-sm table-hover mb-0">
+                  <thead class="table-light">
+                     <tr>
+                        <th>Nama Area</th>
+                        <th class="text-center">Radius</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     @forelse($data->lokasiAbsen as $lokasi)
+                        <tr>
+                           <td>
+                              <div class="fw-bold">{{ $lokasi->nama }}</div>
+                              <small class="text-muted">{{ $lokasi->latitude }}, {{ $lokasi->longitude }}</small>
+                           </td>
+                           <td class="text-center align-middle">
+                              <span class="badge bg-label-info">{{ $lokasi->radius_meter }}m</span>
+                           </td>
+                        </tr>
+                     @empty
+                        <tr>
+                           <td colspan="2" class="text-center py-3 text-muted">Belum ada lokasi khusus yg diatur</td>
+                        </tr>
+                     @endforelse
+                  </tbody>
+               </table>
+            </div>
+         </div>
 
-            <!-- Statistik -->
-            <div class="card border-0 shadow-none bg-primary bg-opacity-10">
-               <div class="card-body">
-                  @php
-                     $absensi = $data
-                         ->absensis()
-                         ->whereMonth('tanggal', date('m'))
-                         ->whereYear('tanggal', date('Y'))
-                         ->get();
-                     $hadir = $absensi->where('status', 'Hadir')->count();
-                     $terlambat = $absensi->where('status', 'Terlambat')->count();
-                     $izin = $absensi->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count();
-                  @endphp
-                  <h6 class="fw-bold text-primary mb-3">Statistik Kehadiran Bulan Ini</h6>
-                  <div class="row g-3">
-                     <div class="col-4">
-                        <div class="bg-white p-3 rounded text-center shadow-sm">
-                           <h3 class="fw-bold text-success mb-0">{{ $hadir }}</h3>
-                           <small class="text-muted">Hadir</small>
-                        </div>
+         <!-- Statistik -->
+         <div class="card border-0 shadow-none bg-primary bg-opacity-10">
+            <div class="card-body">
+               @php
+                  $absensi = $data
+                      ->absensis()
+                      ->whereMonth('tanggal', date('m'))
+                      ->whereYear('tanggal', date('Y'))
+                      ->get();
+                  $hadir = $absensi->where('status', 'Hadir')->count();
+                  $terlambat = $absensi->where('status', 'Terlambat')->count();
+                  $izin = $absensi->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count();
+               @endphp
+               <h6 class="fw-bold text-primary mb-3">Statistik Kehadiran Bulan Ini</h6>
+               <div class="row g-3">
+                  <div class="col-4">
+                     <div class="bg-white p-3 rounded text-center shadow-sm">
+                        <h3 class="fw-bold text-success mb-0">{{ $hadir }}</h3>
+                        <small class="text-muted">Hadir</small>
                      </div>
-                     <div class="col-4">
-                        <div class="bg-white p-3 rounded text-center shadow-sm">
-                           <h3 class="fw-bold text-warning mb-0">{{ $terlambat }}</h3>
-                           <small class="text-muted">Telat</small>
-                        </div>
+                  </div>
+                  <div class="col-4">
+                     <div class="bg-white p-3 rounded text-center shadow-sm">
+                        <h3 class="fw-bold text-warning mb-0">{{ $terlambat }}</h3>
+                        <small class="text-muted">Telat</small>
                      </div>
-                     <div class="col-4">
-                        <div class="bg-white p-3 rounded text-center shadow-sm">
-                           <h3 class="fw-bold text-info mb-0">{{ $izin }}</h3>
-                           <small class="text-muted">Izin/Cuti</small>
-                        </div>
+                  </div>
+                  <div class="col-4">
+                     <div class="bg-white p-3 rounded text-center shadow-sm">
+                        <h3 class="fw-bold text-info mb-0">{{ $izin }}</h3>
+                        <small class="text-muted">Izin/Cuti</small>
                      </div>
                   </div>
                </div>
             </div>
          </div>
       </div>
+   </div>
    </div>
 @endsection

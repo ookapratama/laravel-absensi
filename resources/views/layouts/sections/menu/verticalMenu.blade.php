@@ -34,6 +34,87 @@
          if (isset($displayMenu->menu)) {
              $displayMenu = $displayMenu->menu;
          }
+
+         if (!function_exists('isMenuActive')) {
+             function isMenuActive($menu, $currentRouteName, $currentPath)
+             {
+                 $hasChildren =
+                     (isset($menu->submenu) && count($menu->submenu) > 0) ||
+                     (isset($menu->children) && count($menu->children) > 0);
+
+                 // Priority 1: Exact Slug Match
+                 if (isset($menu->slug) && $menu->slug && $currentRouteName === $menu->slug) {
+                     return true;
+                 }
+
+                 // Priority 2: Resource/Sub-route Match
+                 if (isset($menu->slug) && $menu->slug) {
+                     // 2.1: Direct sub-route (e.g., 'absensi.history' matches 'absensi.history.detail')
+                     if (str_starts_with($currentRouteName, $menu->slug . '.')) {
+                         return true;
+                     }
+
+                     // 2.2: Standard Resource Siblings (e.g., 'absensi.index' matches 'absensi.edit')
+                     // Refined to avoid overlapping matches when multiple actions (like index and create) are in the menu
+                     $resourceActions = ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy', 'details'];
+                     $actionGroups = [
+                         ['index', 'show', 'edit', 'update', 'destroy', 'details'], // View/Manage Group
+                         ['create', 'store'], // Create Group
+                     ];
+
+                     $menuSlugParts = explode('.', $menu->slug);
+                     $menuAction = end($menuSlugParts);
+
+                     if (in_array($menuAction, $resourceActions)) {
+                         array_pop($menuSlugParts);
+                         $menuBase = implode('.', $menuSlugParts);
+
+                         $currentRouteParts = explode('.', $currentRouteName);
+                         $currentAction = end($currentRouteParts);
+
+                         if (in_array($currentAction, $resourceActions)) {
+                             array_pop($currentRouteParts);
+                             $currentBase = implode('.', $currentRouteParts);
+
+                             if ($menuBase !== '' && $menuBase === $currentBase) {
+                                 // Only match if they belong to the same action group
+                                 foreach ($actionGroups as $group) {
+                                     if (in_array($menuAction, $group) && in_array($currentAction, $group)) {
+                                         return true;
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 }
+
+                 // Priority 3: Path Match
+                 if (isset($menu->path) && $menu->path !== null && $menu->path !== '') {
+                     $path = ltrim($menu->path, '/');
+                     $trimmedCurrentPath = ltrim($currentPath, '/');
+
+                     if ($path !== '') {
+                         if ($trimmedCurrentPath === $path) {
+                             return true;
+                         }
+                     } elseif ($trimmedCurrentPath === '') {
+                         return true;
+                     }
+                 }
+
+                 // Priority 4: Recursive Children Check
+                 if ($hasChildren) {
+                     $children = $menu->submenu ?? $menu->children;
+                     foreach ($children as $child) {
+                         if (isMenuActive($child, $currentRouteName, $currentPath)) {
+                             return true;
+                         }
+                     }
+                 }
+
+                 return false;
+             }
+         }
       @endphp
 
       @foreach ($displayMenu as $menu)
@@ -47,65 +128,15 @@
          @else
             {{-- active menu method --}}
             @php
-               $activeClass = null;
-               $currentRouteName = Route::currentRouteName();
+               $currentRouteName = Route::currentRouteName() ?? '';
+               $currentPath = request()->path();
 
                $hasChildren =
                    (isset($menu->submenu) && count($menu->submenu) > 0) ||
                    (isset($menu->children) && count($menu->children) > 0);
 
-               // Determine if active based on route name or path
-               $isActive = false;
-
-               // First priority: exact route name match
-               if (isset($menu->slug) && $currentRouteName === $menu->slug) {
-                   $isActive = true;
-               }
-               // Second priority: exact path match
-               elseif (isset($menu->path) && $menu->path !== null && $menu->path !== '/') {
-                   $path = ltrim($menu->path, '/');
-                   $currentPath = request()->path();
-
-                   // Only exact path match for leaf nodes (no children)
-                   if (!$hasChildren && $currentPath === $path) {
-                       $isActive = true;
-                   }
-               }
-               // Home route special case
-               elseif (isset($menu->path) && $menu->path === '/' && request()->is('/')) {
-                   $isActive = true;
-               }
-
-               if ($isActive) {
-                   $activeClass = 'active';
-               }
-
-               // Check if any child is active (for parent menu items)
-               if ($hasChildren && !$isActive) {
-                   $children = $menu->submenu ?? $menu->children;
-                   foreach ($children as $child) {
-                       $childActive = false;
-
-                       // Exact route match
-                       if (isset($child->slug) && $currentRouteName === $child->slug) {
-                           $childActive = true;
-                       }
-                       // Exact path match
-                       elseif (isset($child->path) && $child->path !== null && $child->path !== '/') {
-                           $path = ltrim($child->path, '/');
-                           $currentPath = request()->path();
-
-                           if ($currentPath === $path) {
-                               $childActive = true;
-                           }
-                       }
-
-                       if ($childActive) {
-                           $activeClass = 'active open';
-                           break;
-                       }
-                   }
-               }
+               $isActive = isMenuActive($menu, $currentRouteName, $currentPath);
+               $activeClass = $isActive ? ($hasChildren ? 'active open' : 'active') : '';
             @endphp
 
             {{-- main menu --}}

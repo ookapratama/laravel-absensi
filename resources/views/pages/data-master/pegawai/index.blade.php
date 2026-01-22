@@ -13,6 +13,31 @@
          </a>
       </div>
 
+      <div class="card mb-4">
+         <div class="card-body">
+            <form action="{{ route('pegawai.index') }}" method="GET" class="row g-3">
+               <div class="col-md-4">
+                  <label class="form-label">Filter Divisi</label>
+                  <select name="divisi_id" class="form-select" onchange="this.form.submit()">
+                     <option value="">Semua Divisi</option>
+                     @foreach ($divisis as $divisi)
+                        <option value="{{ $divisi->id }}" {{ request('divisi_id') == $divisi->id ? 'selected' : '' }}>
+                           {{ $divisi->nama }}
+                        </option>
+                     @endforeach
+                  </select>
+               </div>
+               <div class="col-md-4 d-flex align-items-end">
+                  @if (request('divisi_id'))
+                     <a href="{{ route('pegawai.index') }}" class="btn btn-label-secondary">
+                        <i class="ri-refresh-line me-1"></i>Reset Filter
+                     </a>
+                  @endif
+               </div>
+            </form>
+         </div>
+      </div>
+
       <div class="card">
          <div class="card-header border-bottom">
             <h5 class="card-title mb-0">Daftar Pegawai</h5>
@@ -26,6 +51,7 @@
                      <th>NIP</th>
                      <th>Nama Lengkap</th>
                      <th>Divisi</th>
+                     <th>Shift</th>
                      <th>Kantor</th>
                      <th>Jabatan</th>
                      <th>Status</th>
@@ -47,6 +73,15 @@
                            <br><small class="text-muted">{{ $item->user->email ?? '-' }}</small>
                         </td>
                         <td>{{ $item->divisi->nama ?? '-' }}</td>
+                        <td>
+                           @if ($item->shift)
+                              <strong>{{ $item->shift->nama }}</strong>
+                              <br><small class="text-muted">{{ $item->shift->jam_masuk->format('H:i') }} -
+                                 {{ $item->shift->jam_pulang->format('H:i') }}</small>
+                           @else
+                              -
+                           @endif
+                        </td>
                         <td>{{ $item->kantor->nama ?? '-' }}</td>
                         <td>{{ $item->jabatan ?? '-' }}</td>
                         <td>
@@ -82,11 +117,14 @@
                </tbody>
             </table>
          </div>
-         @if ($data->hasPages())
-            <div class="card-footer border-top py-3">
-               {{ $data->links() }}
+         <div class="card-footer border-top d-flex justify-content-between align-items-center py-3">
+            <div class="text-muted small">
+               Showing {{ $data->firstItem() ?? 0 }} to {{ $data->lastItem() ?? 0 }} of {{ $data->total() }} entries
             </div>
-         @endif
+            <div class="pagination-container">
+               {{ $data->appends(request()->query())->links() }}
+            </div>
+         </div>
       </div>
    </div>
 @endsection

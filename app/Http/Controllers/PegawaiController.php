@@ -23,10 +23,12 @@ class PegawaiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        $data = $this->service->paginate();
-        return view('pages.data-master.pegawai.index', compact('data'));
+        $filters = $request->only(['divisi_id']);
+        $data = $this->service->getAllPegawai($filters);
+        $divisis = $this->divisiService->getAktif();
+        return view('pages.data-master.pegawai.index', compact('data', 'divisis'));
     }
 
     /**

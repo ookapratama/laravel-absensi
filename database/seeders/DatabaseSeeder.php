@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             RoleAndMenuSeeder::class,
             UserSeeder::class,
             AbsensiMasterSeeder::class,
+            ShiftSeeder::class,
             AbsensiMenuSeeder::class,
             AbsensiRoleMenuSeeder::class,
         ]);

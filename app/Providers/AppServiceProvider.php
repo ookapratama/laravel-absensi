@@ -7,6 +7,7 @@ use App\Interfaces\Repositories\UserRepositoryInterface;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -55,6 +56,10 @@ class AppServiceProvider extends ServiceProvider
             \App\Interfaces\Repositories\IzinRepositoryInterface::class,
             \App\Repositories\IzinRepository::class
         );
+        $this->app->bind(
+            \App\Interfaces\Repositories\ShiftRepositoryInterface::class,
+            \App\Repositories\ShiftRepository::class
+        );
     }
 
     /**
@@ -62,6 +67,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::useBootstrapFive();
+
         // Define Gates for authorization
         \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
             if ($user->role && $user->role->slug === 'super-admin') {
@@ -96,7 +103,11 @@ class AppServiceProvider extends ServiceProvider
                     ->with(['children' => function($q) use ($role) {
                         $q->whereHas('roles', function($rq) use ($role) {
                             $rq->where('roles.id', $role->id)->where('can_read', true);
-                        })->orderBy('order_no');
+                        })->with(['children' => function($sq) use ($role) {
+                            $sq->whereHas('roles', function($srq) use ($role) {
+                                $srq->where('roles.id', $role->id)->where('can_read', true);
+                            })->orderBy('order_no');
+                        }])->orderBy('order_no');
                     }])
                     ->orderBy('order_no')
                     ->get();

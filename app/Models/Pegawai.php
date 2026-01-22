@@ -15,6 +15,7 @@ class Pegawai extends Model
     protected $fillable = [
         'user_id',
         'divisi_id',
+        'shift_id',
         'kantor_id',
         'nip',
         'nama_lengkap',
@@ -46,6 +47,14 @@ class Pegawai extends Model
     public function divisi()
     {
         return $this->belongsTo(Divisi::class);
+    }
+
+    /**
+     * Shift pegawai
+     */
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class);
     }
 
     /**

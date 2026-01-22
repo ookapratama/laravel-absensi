@@ -25,7 +25,7 @@ class DashboardController extends Controller
             return view('pages.dashboard.dashboard');
         }
 
-        // User biasa (pegawai) langsung ke halaman absensi
+        // User biasa (pegawai) melihat dashboard khusus user
         $pegawai = $this->pegawaiService->getByUserId($user->id);
         
         if (!$pegawai) {
@@ -34,12 +34,17 @@ class DashboardController extends Controller
         }
 
         $absensiHariIni = $pegawai->absensiHariIni();
-        $historyAbsensi = $this->absensiService->getByPegawaiBulan(
-            $pegawai->id,
-            now()->month,
-            now()->year
-        );
+        $bulan = now()->month;
+        $tahun = now()->year;
 
-        return view('pages.absensi.index', compact('pegawai', 'absensiHariIni', 'historyAbsensi'));
+        $historyAbsensi = $this->absensiService->getByPegawaiBulan($pegawai->id, $bulan, $tahun);
+        $statistik = $this->absensiService->getStatistikPegawai($pegawai->id, $bulan, $tahun);
+
+        return view('pages.dashboard.user', compact(
+            'pegawai', 
+            'absensiHariIni', 
+            'historyAbsensi', 
+            'statistik'
+        ));
     }
 }

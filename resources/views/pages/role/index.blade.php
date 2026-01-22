@@ -55,11 +55,14 @@
                </tbody>
             </table>
          </div>
-         @if ($roles->hasPages())
-            <div class="card-footer border-top py-3">
-               {{ $roles->links() }}
+         <div class="card-footer border-top d-flex justify-content-between align-items-center py-3">
+            <div class="text-muted small">
+               Showing {{ $roles->firstItem() ?? 0 }} to {{ $roles->lastItem() ?? 0 }} of {{ $roles->total() }} entries
             </div>
-         @endif
+            <div class="pagination-container">
+               {{ $roles->appends(request()->query())->links() }}
+            </div>
+         </div>
       </div>
    </div>
 @endsection

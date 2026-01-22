@@ -9,56 +9,15 @@
          @php
             $activeClass = null;
             $active = ($configData['layout'] ?? 'vertical') === 'vertical' ? 'active open' : 'active';
-            $currentRouteName = Route::currentRouteName();
+            $currentRouteName = Route::currentRouteName() ?? '';
+            $currentPath = request()->path();
 
             $hasSubChildren =
                 (isset($submenu->submenu) && count($submenu->submenu) > 0) ||
                 (isset($submenu->children) && count($submenu->children) > 0);
 
-            $isActive = false;
-
-            // First priority: exact route name match
-            if (isset($submenu->slug) && $currentRouteName === $submenu->slug) {
-                $isActive = true;
-            }
-            // Second priority: exact path match
-            elseif (isset($submenu->path) && $submenu->path !== null && $submenu->path !== '/') {
-                $path = ltrim($submenu->path, '/');
-                $currentPath = request()->path();
-
-                // Only exact path match for leaf nodes (no children)
-                if (!$hasSubChildren && $currentPath === $path) {
-                    $isActive = true;
-                }
-            }
-
-            if ($isActive) {
-                $activeClass = 'active';
-            }
-
-            // Check if any sub-child is active
-            if ($hasSubChildren && !$isActive) {
-                $subChildren = $submenu->submenu ?? $submenu->children;
-                foreach ($subChildren as $subChild) {
-                    $subChildActive = false;
-
-                    if (isset($subChild->slug) && $currentRouteName === $subChild->slug) {
-                        $subChildActive = true;
-                    } elseif (isset($subChild->path) && $subChild->path !== null && $subChild->path !== '/') {
-                        $path = ltrim($subChild->path, '/');
-                        $currentPath = request()->path();
-
-                        if ($currentPath === $path) {
-                            $subChildActive = true;
-                        }
-                    }
-
-                    if ($subChildActive) {
-                        $activeClass = $active;
-                        break;
-                    }
-                }
-            }
+            $isActive = isMenuActive($submenu, $currentRouteName, $currentPath);
+            $activeClass = $isActive ? ($hasSubChildren ? $active : 'active') : '';
          @endphp
 
          <li class="menu-item {{ $activeClass }}">

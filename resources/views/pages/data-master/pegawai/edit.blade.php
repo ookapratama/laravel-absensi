@@ -88,10 +88,10 @@
                      </div>
 
                      <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                            <label class="form-label" for="divisi_id">Divisi <span class="text-danger">*</span></label>
                            <select class="form-select @error('divisi_id') is-invalid @enderror" id="divisi_id"
-                              name="divisi_id" required>
+                              name="divisi_id" required onchange="loadShifts(this.value)">
                               <option value="">-- Pilih Divisi --</option>
                               @foreach ($divisis as $divisi)
                                  <option value="{{ $divisi->id }}"
@@ -104,7 +104,17 @@
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
+                           <label class="form-label" for="shift_id">Shift <span class="text-danger">*</span></label>
+                           <select class="form-select @error('shift_id') is-invalid @enderror" id="shift_id"
+                              name="shift_id" required>
+                              <option value="">-- Pilih Shift --</option>
+                           </select>
+                           @error('shift_id')
+                              <div class="invalid-feedback">{{ $message }}</div>
+                           @enderror
+                        </div>
+                        <div class="col-md-3 mb-3">
                            <label class="form-label" for="kantor_id">Kantor Utama</label>
                            <select class="form-select @error('kantor_id') is-invalid @enderror" id="kantor_id"
                               name="kantor_id">
@@ -120,10 +130,10 @@
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                            <label class="form-label" for="jabatan">Jabatan</label>
-                           <input type="text" class="form-control @error('jabatan') is-invalid @enderror" id="jabatan"
-                              name="jabatan" value="{{ old('jabatan', $data->jabatan) }}">
+                           <input type="text" class="form-control @error('jabatan') is-invalid @enderror"
+                              id="jabatan" name="jabatan" value="{{ old('jabatan', $data->jabatan) }}">
                            @error('jabatan')
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
@@ -142,8 +152,8 @@
                         </div>
                         <div class="col-md-8 mb-3">
                            <label class="form-label" for="foto">Foto</label>
-                           <input type="file" class="form-control @error('foto') is-invalid @enderror" id="foto"
-                              name="foto" accept="image/*">
+                           <input type="file" class="form-control @error('foto') is-invalid @enderror"
+                              id="foto" name="foto" accept="image/*">
                            @error('foto')
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
@@ -205,4 +215,42 @@
          </div>
       </div>
    </div>
+@section('page-script')
+   <script>
+      function loadShifts(divisiId, selectedShiftId = null) {
+         const shiftSelect = document.getElementById('shift_id');
+         shiftSelect.innerHTML = '<option value="">-- Loading --</option>';
+
+         if (!divisiId) {
+            shiftSelect.innerHTML = '<option value="">-- Pilih Divisi Terlebih Dahulu --</option>';
+            return;
+         }
+
+         fetch(`{{ url('api/shifts/by-divisi') }}/${divisiId}`)
+            .then(response => response.json())
+            .then(data => {
+               shiftSelect.innerHTML = '<option value="">-- Pilih Shift --</option>';
+               data.forEach(shift => {
+                  const option = document.createElement('option');
+                  option.value = shift.id;
+                  option.textContent = `${shift.nama} (${shift.jam_masuk} - ${shift.jam_pulang})`;
+                  if (selectedShiftId == shift.id) {
+                     option.selected = true;
+                  }
+                  shiftSelect.appendChild(option);
+               });
+
+               if (data.length === 0) {
+                  shiftSelect.innerHTML = '<option value="">-- Tidak ada shift di divisi ini --</option>';
+               }
+            })
+            .catch(error => {
+               console.error('Error loading shifts:', error);
+               shiftSelect.innerHTML = '<option value="">-- Gagal memuat shift --</option>';
+            });
+      }
+
+      // Initial load
+      loadShifts("{{ $data->divisi_id }}", "{{ old('shift_id', $data->shift_id) }}");
+   </script>
 @endsection

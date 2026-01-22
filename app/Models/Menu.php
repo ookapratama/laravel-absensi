@@ -30,4 +30,9 @@ class Menu extends Model
     {
         return $this->hasMany(Menu::class, 'parent_id')->orderBy('order_no');
     }
+
+    public function allChildren()
+    {
+        return $this->children()->with('allChildren');
+    }
 }

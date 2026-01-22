@@ -82,11 +82,14 @@
                </tbody>
             </table>
          </div>
-         @if ($data->hasPages())
-            <div class="card-footer border-top py-3">
-               {{ $data->links() }}
+         <div class="card-footer border-top d-flex justify-content-between align-items-center py-3">
+            <div class="text-muted small">
+               Showing {{ $data->firstItem() ?? 0 }} to {{ $data->lastItem() ?? 0 }} of {{ $data->total() }} entries
             </div>
-         @endif
+            <div class="pagination-container">
+               {{ $data->appends(request()->query())->links() }}
+            </div>
+         </div>
       </div>
    </div>
 @endsection

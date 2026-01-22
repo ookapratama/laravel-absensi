@@ -24,8 +24,6 @@
                      <th>#</th>
                      <th>Kode</th>
                      <th>Nama Divisi</th>
-                     <th>Jam Masuk</th>
-                     <th>Jam Pulang</th>
                      <th>Toleransi</th>
                      <th>Status</th>
                      <th class="text-center">Aksi</th>
@@ -37,8 +35,6 @@
                         <td>{{ $data->firstItem() + $index }}</td>
                         <td><code>{{ $item->kode ?? '-' }}</code></td>
                         <td><strong>{{ $item->nama }}</strong></td>
-                        <td>{{ $item->jam_masuk ? $item->jam_masuk->format('H:i') : '-' }}</td>
-                        <td>{{ $item->jam_pulang ? $item->jam_pulang->format('H:i') : '-' }}</td>
                         <td>{{ $item->toleransi_terlambat ?? 0 }} menit</td>
                         <td>
                            @if ($item->is_aktif)
@@ -70,11 +66,14 @@
                </tbody>
             </table>
          </div>
-         @if ($data->hasPages())
-            <div class="card-footer border-top py-3">
-               {{ $data->links() }}
+         <div class="card-footer border-top d-flex justify-content-between align-items-center py-3">
+            <div class="text-muted small">
+               Showing {{ $data->firstItem() ?? 0 }} to {{ $data->lastItem() ?? 0 }} of {{ $data->total() }} entries
             </div>
-         @endif
+            <div class="pagination-container">
+               {{ $data->appends(request()->query())->links() }}
+            </div>
+         </div>
       </div>
    </div>
 @endsection

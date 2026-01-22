@@ -75,6 +75,49 @@ class AbsensiService extends BaseService
             throw new \Exception($validasiLokasi['message']);
         }
 
+        // Validasi Waktu Shift
+        $shift = $pegawai->shift;
+        
+        if (!$shift) {
+            throw new \Exception("Anda belum ditempatkan pada shift kerja. Silakan hubungi admin.");
+        }
+
+        if (!$shift->is_aktif) {
+            throw new \Exception("Shift kerja Anda sedang dinonaktifkan. Silakan hubungi admin.");
+        }
+
+        $now = now();
+        $currentTime = Carbon::parse($now->format('H:i:s'));
+        
+        $jamMasuk = Carbon::parse($shift->jam_masuk->format('H:i:s'));
+        $jamPulang = Carbon::parse($shift->jam_pulang->format('H:i:s'));
+        
+        // Batas awal absen masuk: 2 jam sebelum jam_masuk
+        $batasAwal = $jamMasuk->copy()->subHours(2);
+        // Batas akhir absen masuk: Jam Pulang shift
+        $batasAkhir = $jamPulang->copy();
+        
+        // Handle shift cross-day (misal masuk 22:00 pulang 06:00)
+        $isCrossDay = $jamPulang->lt($jamMasuk);
+        
+        $isValid = false;
+        if (!$isCrossDay) {
+            $isValid = $currentTime->between($batasAwal, $batasAkhir);
+        } else {
+            // Jika shift malam, misal 22:00 - 06:00
+            // Batas awal 20:00. 
+            // Antara 20:00 - 23:59 ATAU 00:00 - 06:00
+            $isValid = $currentTime->gte($batasAwal) || $currentTime->lte($batasAkhir);
+        }
+
+        if (!$isValid) {
+            $msg = "Bukan waktu absen untuk shift Anda ({$shift->nama}: {$shift->jam_masuk->format('H:i')} - {$shift->jam_pulang->format('H:i')}).";
+            if ($currentTime->lt($batasAwal)) {
+                $msg .= " Absen masuk dibuka mulai pukul " . $batasAwal->format('H:i') . ".";
+            }
+            throw new \Exception($msg);
+        }
+
         // Determine status (Hadir/Terlambat)
         $status = $this->determineStatus($pegawai, now());
 
@@ -222,14 +265,20 @@ class AbsensiService extends BaseService
      */
     protected function determineStatus(Pegawai $pegawai, Carbon $waktuAbsen): string
     {
+        $shift = $pegawai->shift;
         $divisi = $pegawai->divisi;
 
-        if (!$divisi || !$divisi->jam_masuk) {
+        // Jika tidak punya shift, atau shift tidak punya jam masuk, anggap Hadir
+        if (!$shift || !$shift->jam_masuk) {
             return 'Hadir';
         }
 
-        $jamMasuk = Carbon::parse($divisi->jam_masuk->format('H:i:s'));
-        $jamMasukDenganToleransi = $jamMasuk->copy()->addMinutes($divisi->toleransi_terlambat ?? 0);
+        // Ambil jam masuk dari shift
+        $jamMasuk = Carbon::parse($shift->jam_masuk->format('H:i:s'));
+        
+        // Toleransi tetap dari divisi
+        $toleransi = $divisi->toleransi_terlambat ?? 0;
+        $jamMasukDenganToleransi = $jamMasuk->copy()->addMinutes($toleransi);
 
         $waktuAbsenTime = Carbon::parse($waktuAbsen->format('H:i:s'));
 
@@ -280,6 +329,21 @@ class AbsensiService extends BaseService
             'hadir' => $absensis->where('status', 'Hadir')->count(),
             'terlambat' => $absensis->where('status', 'Terlambat')->count(),
             'izin' => $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count(),
+        ];
+    }
+    /**
+     * Get statistik absensi untuk satu pegawai dalam satu bulan
+     */
+    public function getStatistikPegawai($pegawaiId, $bulan, $tahun)
+    {
+        $absensis = $this->repository->getByPegawaiBulan($pegawaiId, $bulan, $tahun);
+
+        return [
+            'hadir' => $absensis->where('status', 'Hadir')->count(),
+            'terlambat' => $absensis->where('status', 'Terlambat')->count(),
+            'izin' => $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count(),
+            'alfa' => 0, // Bisa dikembangkan dengan membandingkan hari kerja vs jumlah absen
+            'total_hari_kerja' => $absensis->count(),
         ];
     }
 }

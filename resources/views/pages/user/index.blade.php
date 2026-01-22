@@ -132,11 +132,15 @@
                   </tbody>
                </table>
             </div>
-            @if ($users->hasPages())
-               <div class="card-footer border-top py-3">
-                  {{ $users->links() }}
+            <div class="card-footer border-top d-flex justify-content-between align-items-center py-3 px-0">
+               <div class="text-muted small">
+                  Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} of {{ $users->total() }}
+                  entries
                </div>
-            @endif
+               <div class="pagination-container">
+                  {{ $users->appends(request()->query())->links() }}
+               </div>
+            </div>
          </div>
       </div>
    </div>

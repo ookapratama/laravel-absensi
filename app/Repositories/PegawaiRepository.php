@@ -14,33 +14,39 @@ class PegawaiRepository extends BaseRepository implements PegawaiRepositoryInter
 
     public function all()
     {
-        return $this->model->with(['user', 'divisi', 'kantor'])->get();
+        return $this->model->with(['user', 'divisi', 'shift', 'kantor'])->get();
     }
 
     public function getAktif()
     {
-        return $this->model->aktif()->with(['user', 'divisi', 'kantor'])->get();
+        return $this->model->aktif()->with(['user', 'divisi', 'shift', 'kantor'])->get();
     }
 
     public function getByUserId($userId)
     {
-        return $this->model->where('user_id', $userId)->first();
+        return $this->model->where('user_id', $userId)->with(['divisi', 'shift', 'kantor'])->first();
     }
 
     public function getWithRelations($id)
     {
-        return $this->model->with(['user', 'divisi', 'kantor', 'lokasiAbsen'])->findOrFail($id);
+        return $this->model->with(['user', 'divisi', 'shift', 'kantor', 'lokasiAbsen'])->findOrFail($id);
     }
 
-    public function paginate($perPage = 10)
+    public function paginate($filters = [], $perPage = 10)
     {
-        return $this->model->with(['user', 'divisi', 'kantor'])->paginate($perPage);
+        $query = $this->model->with(['user', 'divisi', 'shift', 'kantor']);
+
+        if (!empty($filters['divisi_id'])) {
+            $query->where('divisi_id', $filters['divisi_id']);
+        }
+
+        return $query->latest()->paginate($perPage);
     }
 
     public function rekapPaginate($bulan, $tahun, $perPage = 10)
     {
         return $this->model->aktif()
-            ->with(['divisi', 'absensis' => function ($q) use ($bulan, $tahun) {
+            ->with(['divisi', 'shift', 'absensis' => function ($q) use ($bulan, $tahun) {
                 $q->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
             }])
             ->paginate($perPage);

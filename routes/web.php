@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DivisiController;
+use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\KantorController;
 use App\Http\Controllers\JenisIzinController;
 use App\Http\Controllers\PegawaiController;
@@ -42,6 +43,10 @@ Route::middleware(['auth'])->group(function () {
     // ============== DATA MASTER ==============
     // Divisi
     Route::resource('divisi', DivisiController::class)->middleware('check.permission:divisi.index');
+
+    // Shift
+    Route::resource('shift', ShiftController::class)->middleware('check.permission:shift.index');
+    Route::get('api/shifts/by-divisi/{divisi}', [ShiftController::class, 'getByDivisi'])->name('shift.by-divisi');
 
     // Kantor
     Route::resource('kantor', KantorController::class)->middleware('check.permission:kantor.index');

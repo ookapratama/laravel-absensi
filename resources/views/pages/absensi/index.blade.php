@@ -296,19 +296,25 @@
                      </div>
                   </div>
 
-                  @if ($pegawai->divisi)
+                  @if ($pegawai->shift)
                      <div class="alert alert-light mt-4 mb-0">
                         <div class="d-flex justify-content-between">
-                           <span><i class="ri-time-line me-1"></i>Jam Kerja Divisi:</span>
-                           <strong>{{ $pegawai->divisi->jam_masuk ? $pegawai->divisi->jam_masuk->format('H:i') : '-' }} -
-                              {{ $pegawai->divisi->jam_pulang ? $pegawai->divisi->jam_pulang->format('H:i') : '-' }}</strong>
+                           <span><i class="ri-time-line me-1"></i>Shift Anda:
+                              <strong>{{ $pegawai->shift->nama }}</strong></span>
+                           <strong>{{ $pegawai->shift->jam_masuk->format('H:i') }} -
+                              {{ $pegawai->shift->jam_pulang->format('H:i') }}</strong>
                         </div>
-                        @if ($pegawai->divisi->toleransi_terlambat > 0)
+                        @if ($pegawai->divisi && $pegawai->divisi->toleransi_terlambat > 0)
                            <div class="d-flex justify-content-between mt-1">
                               <span><i class="ri-timer-line me-1"></i>Toleransi:</span>
                               <strong>{{ $pegawai->divisi->toleransi_terlambat }} menit</strong>
                            </div>
                         @endif
+                     </div>
+                  @elseif($pegawai->divisi)
+                     <div class="alert alert-warning mt-4 mb-0">
+                        <i class="ri-error-warning-line me-1"></i> Anda belum ditempatkan ke shift apapun. Silakan hubungi
+                        admin.
                      </div>
                   @endif
                </div>

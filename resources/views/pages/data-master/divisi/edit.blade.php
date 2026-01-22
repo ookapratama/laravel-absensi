@@ -43,28 +43,8 @@
                      </div>
 
                      <div class="row">
-                        <div class="col-md-4 mb-3">
-                           <label class="form-label" for="jam_masuk">Jam Masuk <span class="text-danger">*</span></label>
-                           <input type="time" class="form-control @error('jam_masuk') is-invalid @enderror"
-                              id="jam_masuk" name="jam_masuk"
-                              value="{{ old('jam_masuk', $data->jam_masuk ? $data->jam_masuk->format('H:i') : '') }}"
-                              required>
-                           @error('jam_masuk')
-                              <div class="invalid-feedback">{{ $message }}</div>
-                           @enderror
-                        </div>
-                        <div class="col-md-4 mb-3">
-                           <label class="form-label" for="jam_pulang">Jam Pulang <span class="text-danger">*</span></label>
-                           <input type="time" class="form-control @error('jam_pulang') is-invalid @enderror"
-                              id="jam_pulang" name="jam_pulang"
-                              value="{{ old('jam_pulang', $data->jam_pulang ? $data->jam_pulang->format('H:i') : '') }}"
-                              required>
-                           @error('jam_pulang')
-                              <div class="invalid-feedback">{{ $message }}</div>
-                           @enderror
-                        </div>
-                        <div class="col-md-4 mb-3">
-                           <label class="form-label" for="toleransi_terlambat">Toleransi (menit)</label>
+                        <div class="col-md-6 mb-3">
+                           <label class="form-label" for="toleransi_terlambat">Toleransi Terlambat (menit)</label>
                            <input type="number" class="form-control @error('toleransi_terlambat') is-invalid @enderror"
                               id="toleransi_terlambat" name="toleransi_terlambat"
                               value="{{ old('toleransi_terlambat', $data->toleransi_terlambat) }}" min="0"

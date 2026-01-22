@@ -28,7 +28,7 @@ class AbsensiRoleMenuSeeder extends Seeder
         // 2. Admin access (Almost everything except core user management)
         $adminSlugs = [
             'dashboard',
-            'data-master', 'divisi.index', 'kantor.index', 'pegawai.index', 'jenis-izin.index',
+            'data-master', 'divisi.index', 'shift.index', 'kantor.index', 'pegawai.index', 'jenis-izin.index',
             'absensi-menu', 'absensi.index', 'absensi.history', 'absensi.dashboard', 'absensi.rekap',
             'izin-menu', 'izin.create', 'izin.index', 'izin.admin',
             'activity-log.index'
