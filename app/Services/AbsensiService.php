@@ -40,17 +40,17 @@ class AbsensiService extends BaseService
     /**
      * Get list pegawai yang belum absen hari ini
      */
-    public function getBelumAbsenHariIni()
+    public function getBelumAbsenHariIni($tanggal = null)
     {
-        return $this->repository->getBelumAbsenHariIni();
+        return $this->repository->getBelumAbsenHariIni($tanggal);
     }
 
     /**
      * Get absensi hari ini
      */
-    public function getAbsensiHariIni()
+    public function getAbsensiHariIni($tanggal = null)
     {
-        return $this->repository->getAbsensiHariIni();
+        return $this->repository->getAbsensiHariIni($tanggal);
     }
 
     /**
@@ -406,8 +406,8 @@ class AbsensiService extends BaseService
 
         return [
             'total_pegawai' => $totalPegawai,
-            'sudah_absen' => $absensis->whereNotNull('jam_masuk')->count(),
-            'belum_absen' => $totalPegawai - $absensis->whereNotNull('jam_masuk')->count(),
+            'sudah_absen' => $absensis->whereNotNull('jam_masuk')->unique('pegawai_id')->count(),
+            'belum_absen' => $totalPegawai - $absensis->whereNotNull('jam_masuk')->unique('pegawai_id')->count(),
             'hadir' => $absensis->where('status', 'Hadir')->count(),
             'terlambat' => $absensis->where('status', 'Terlambat')->count(),
             'izin' => $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count(),

@@ -34,16 +34,18 @@ class AbsensiRepository extends BaseRepository implements AbsensiRepositoryInter
             ->get();
     }
 
-    public function getAbsensiHariIni()
+    public function getAbsensiHariIni($tanggal = null)
     {
-        return $this->model->with('pegawai')
-            ->whereDate('tanggal', today())
+        $tanggal = $tanggal ?: today()->toDateString();
+        return $this->model->with(['pegawai', 'shift'])
+            ->whereDate('tanggal', $tanggal)
             ->get();
     }
 
-    public function getBelumAbsenHariIni()
+    public function getBelumAbsenHariIni($tanggal = null)
     {
-        $sudahAbsen = $this->model->whereDate('tanggal', today())
+        $tanggal = $tanggal ?: today()->toDateString();
+        $sudahAbsen = $this->model->whereDate('tanggal', $tanggal)
             ->pluck('pegawai_id');
 
         return Pegawai::aktif()

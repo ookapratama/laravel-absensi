@@ -128,4 +128,26 @@ class Absensi extends Model
     {
         return !is_null($this->jam_pulang);
     }
+
+    /**
+     * Hitung durasi kerja
+     */
+    public function getDurasiKerjaAttribute()
+    {
+        if (!$this->jam_masuk || !$this->jam_pulang) {
+            return null;
+        }
+
+        $masuk = \Carbon\Carbon::parse($this->tanggal->format('Y-m-d') . ' ' . $this->jam_masuk->format('H:i:s'));
+        $pulang = \Carbon\Carbon::parse($this->tanggal->format('Y-m-d') . ' ' . $this->jam_pulang->format('H:i:s'));
+
+        if ($pulang->lt($masuk)) {
+            $pulang->addDay();
+        }
+
+        $hours = $masuk->diffInHours($pulang);
+        $minutes = $masuk->diffInMinutes($pulang) % 60;
+
+        return "{$hours} Jam {$minutes} Menit";
+    }
 }

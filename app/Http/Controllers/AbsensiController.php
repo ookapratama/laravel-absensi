@@ -178,8 +178,8 @@ class AbsensiController extends Controller
 
         $statistik = $this->service->getStatistik($tanggal);
         $rekapDivisi = $this->service->getRekapPerDivisi($tanggal);
-        $belumAbsen = $this->service->getBelumAbsenHariIni();
-        $sudahAbsen = $this->service->getAbsensiHariIni();
+        $belumAbsen = $this->service->getBelumAbsenHariIni($tanggal);
+        $sudahAbsen = $this->service->getAbsensiHariIni($tanggal);
 
         return view('pages.absensi.dashboard', compact(
             'statistik',

@@ -165,11 +165,12 @@
                   <tr>
                      <th>#</th>
                      <th>Pegawai</th>
-                     <th>Divisi</th>
-                     <th>Jam Masuk</th>
-                     <th>Jam Pulang</th>
+                     <th>Shift</th>
+                     <th class="text-center">Jam Masuk</th>
+                     <th class="text-center">Jam Pulang</th>
+                     <th class="text-center">Durasi</th>
                      <th>Lokasi</th>
-                     <th>Status</th>
+                     <th class="text-center">Status</th>
                   </tr>
                </thead>
                <tbody>
@@ -187,10 +188,16 @@
                               </div>
                            </div>
                         </td>
-                        <td>{{ $absen->pegawai->divisi->nama ?? '-' }}</td>
                         <td>
+                           @if ($absen->shift)
+                              <span class="badge bg-label-secondary">{{ $absen->shift->nama }}</span>
+                           @else
+                              -
+                           @endif
+                        </td>
+                        <td class="text-center">
                            @if ($absen->jam_masuk)
-                              {{ $absen->jam_masuk->format('H:i:s') }}
+                              <span class="fw-medium">{{ $absen->jam_masuk->format('H:i') }}</span>
                               @if ($absen->foto_masuk)
                                  <a href="javascript:void(0);"
                                     onclick="previewFoto('{{ $absen->foto_masuk_url }}', 'Foto Masuk - {{ $absen->pegawai->nama_lengkap }}')"
@@ -202,9 +209,9 @@
                               <span class="text-muted">-</span>
                            @endif
                         </td>
-                        <td>
+                        <td class="text-center">
                            @if ($absen->jam_pulang)
-                              {{ $absen->jam_pulang->format('H:i:s') }}
+                              <span class="fw-medium">{{ $absen->jam_pulang->format('H:i') }}</span>
                               @if ($absen->foto_pulang)
                                  <a href="javascript:void(0);"
                                     onclick="previewFoto('{{ $absen->foto_pulang_url }}', 'Foto Pulang - {{ $absen->pegawai->nama_lengkap }}')"
@@ -216,8 +223,15 @@
                               <span class="text-muted">-</span>
                            @endif
                         </td>
+                        <td class="text-center">
+                           @if ($absen->durasi_kerja)
+                              <small class="text-muted">{{ $absen->durasi_kerja }}</small>
+                           @else
+                              -
+                           @endif
+                        </td>
                         <td>{{ $absen->lokasi_masuk ?? '-' }}</td>
-                        <td>
+                        <td class="text-center">
                            <span
                               class="badge bg-{{ $absen->status === 'Hadir' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
                               {{ $absen->status }}
@@ -226,7 +240,7 @@
                      </tr>
                   @empty
                      <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">
+                        <td colspan="9" class="text-center py-4 text-muted">
                            <i class="ri-inbox-line ri-3x mb-2"></i>
                            <p class="mb-0">Belum ada data absensi hari ini</p>
                         </td>
