@@ -14,7 +14,7 @@ class PegawaiService extends BaseService
 
     public function getAllPegawai($filters = [])
     {
-        return $this->repository->paginate($filters, 10);
+        return $this->repository->getFiltered($filters);
     }
 
     public function getAktif()
@@ -71,6 +71,6 @@ class PegawaiService extends BaseService
 
     public function rekapPaginate($bulan, $tahun, $perPage = 10)
     {
-        return $this->repository->rekapPaginate($bulan, $tahun, $perPage);
+        return $this->repository->rekapAll($bulan, $tahun);
     }
 }

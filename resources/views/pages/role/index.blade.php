@@ -2,6 +2,14 @@
 
 @section('title', 'Manajemen Role')
 
+@section('vendor-style')
+   @vite(['resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss'])
+@endsection
+
+@section('vendor-script')
+   @vite(['resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js'])
+@endsection
+
 @section('content')
    <div class="container-xxl flex-grow-1 container-p-y">
       @if (session('success'))
@@ -21,8 +29,8 @@
       </div>
 
       <div class="card">
-         <div class="table-responsive">
-            <table class="table table-hover">
+         <div class="card-datatable table-responsive">
+            <table class="datatables-roles table table-hover">
                <thead>
                   <tr>
                      <th>#</th>
@@ -32,9 +40,9 @@
                   </tr>
                </thead>
                <tbody>
-                  @forelse($roles as $index => $role)
+                  @foreach ($roles as $index => $role)
                      <tr>
-                        <td>{{ $roles->firstItem() + $index }}</td>
+                        <td>{{ $index + 1 }}</td>
                         <td><strong>{{ $role->name }}</strong></td>
                         <td><code>{{ $role->slug }}</code></td>
                         <td>
@@ -47,26 +55,40 @@
                            </button>
                         </td>
                      </tr>
-                  @empty
-                     <tr>
-                        <td colspan="4" class="text-center py-4 text-muted">Belum ada role</td>
-                     </tr>
-                  @endforelse
+                  @endforeach
                </tbody>
             </table>
          </div>
-         <div class="card-footer border-top d-flex justify-content-between align-items-center py-3">
-            <div class="text-muted small">
-               Showing {{ $roles->firstItem() ?? 0 }} to {{ $roles->lastItem() ?? 0 }} of {{ $roles->total() }} entries
-            </div>
-            <div class="pagination-container">
-               {{ $roles->appends(request()->query())->links() }}
-            </div>
-         </div>
+
       </div>
    </div>
 @endsection
 
 @section('page-script')
+   <script>
+      window.addEventListener('load', function() {
+         const dt_role = $('.datatables-roles');
+
+         if (dt_role.length) {
+            dt_role.DataTable({
+               displayLength: 10,
+               lengthMenu: [10, 25, 50, 75, 100],
+               language: {
+                  paginate: {
+                     next: '<i class="ri-arrow-right-s-line"></i>',
+                     previous: '<i class="ri-arrow-left-s-line"></i>'
+                  },
+                  search: "",
+                  searchPlaceholder: "Cari Role...",
+                  lengthMenu: "_MENU_",
+                  info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+               },
+               dom: '<"card-header flex-column flex-md-row border-bottom"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"fB>><"row"<"col-sm-12 col-md-6"l>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+               buttons: []
+            });
+            $('div.head-label').html('<h5 class="card-title mb-0">Daftar Role</h5>');
+         }
+      });
+   </script>
    @vite(['resources/assets/js/app-role-index.js'])
 @endsection

@@ -2,6 +2,14 @@
 
 @section('title', 'Manajemen Jenis Izin')
 
+@section('vendor-style')
+   @vite(['resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss'])
+@endsection
+
+@section('vendor-script')
+   @vite(['resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js'])
+@endsection
+
 @section('content')
    <div class="container-xxl flex-grow-1 container-p-y">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -14,11 +22,8 @@
       </div>
 
       <div class="card">
-         <div class="card-header border-bottom">
-            <h5 class="card-title mb-0">Daftar Jenis Izin</h5>
-         </div>
-         <div class="table-responsive">
-            <table class="table table-hover">
+         <div class="card-datatable table-responsive">
+            <table class="datatables-jenis-izin table table-hover">
                <thead>
                   <tr>
                      <th>#</th>
@@ -32,9 +37,9 @@
                   </tr>
                </thead>
                <tbody>
-                  @forelse($data as $index => $item)
+                  @foreach ($data as $index => $item)
                      <tr>
-                        <td>{{ $data->firstItem() + $index }}</td>
+                        <td>{{ $index + 1 }}</td>
                         <td><code>{{ $item->kode ?? '-' }}</code></td>
                         <td><strong>{{ $item->nama }}</strong></td>
                         <td>
@@ -69,54 +74,67 @@
                            </div>
                         </td>
                      </tr>
-                  @empty
-                     <tr>
-                        <td colspan="8" class="text-center py-5 text-muted">
-                           <i class="ri-file-list-3-line ri-3x mb-2"></i>
-                           <p class="mb-0">Belum ada data jenis izin</p>
-                        </td>
-                     </tr>
-                  @endforelse
+                  @endforeach
                </tbody>
             </table>
          </div>
-         @if ($data->hasPages())
-            <div class="card-footer border-top py-3">
-               {{ $data->links() }}
-            </div>
-         @endif
+
       </div>
    </div>
 @endsection
 
 @section('page-script')
    <script>
-      document.querySelectorAll('.delete-record').forEach(btn => {
-         btn.addEventListener('click', function() {
-            const id = this.dataset.id;
-            const name = this.dataset.name;
+      window.addEventListener('load', function() {
+         const dt_jenis_izin = $('.datatables-jenis-izin');
 
-            window.AlertHandler.confirm(
-               'Hapus Jenis Izin?',
-               `Apakah Anda yakin ingin menghapus jenis izin "${name}"?`,
-               'Ya, Hapus!',
-               function() {
-                  fetch(`{{ url('jenis-izin') }}/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                           'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                           'Accept': 'application/json'
-                        }
-                     })
-                     .then(response => response.json())
-                     .then(data => {
-                        window.AlertHandler.handle(data);
-                        if (data.success) {
-                           setTimeout(() => window.location.reload(), 1500);
-                        }
-                     });
-               }
-            );
+         if (dt_jenis_izin.length) {
+            dt_jenis_izin.DataTable({
+               displayLength: 10,
+               lengthMenu: [10, 25, 50, 75, 100],
+               language: {
+                  paginate: {
+                     next: '<i class="ri-arrow-right-s-line"></i>',
+                     previous: '<i class="ri-arrow-left-s-line"></i>'
+                  },
+                  search: "",
+                  searchPlaceholder: "Cari...",
+                  lengthMenu: "_MENU_",
+                  info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+               },
+               dom: '<"card-header flex-column flex-md-row border-bottom"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"fB>><"row"<"col-sm-12 col-md-6"l>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+               buttons: []
+            });
+            $('div.head-label').html('<h5 class="card-title mb-0">Daftar Jenis Izin</h5>');
+         }
+
+         document.querySelectorAll('.delete-record').forEach(btn => {
+            btn.addEventListener('click', function() {
+               const id = this.dataset.id;
+               const name = this.dataset.name;
+
+               window.AlertHandler.confirm(
+                  'Hapus Jenis Izin?',
+                  `Apakah Anda yakin ingin menghapus jenis izin "${name}"?`,
+                  'Ya, Hapus!',
+                  function() {
+                     fetch(`{{ url('jenis-izin') }}/${id}`, {
+                           method: 'DELETE',
+                           headers: {
+                              'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                              'Accept': 'application/json'
+                           }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                           window.AlertHandler.handle(data);
+                           if (data.success) {
+                              setTimeout(() => window.location.reload(), 1500);
+                           }
+                        });
+                  }
+               );
+            });
          });
       });
    </script>

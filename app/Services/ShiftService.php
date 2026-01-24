@@ -14,7 +14,7 @@ class ShiftService extends BaseService
 
     public function getAllShifts($filters = [])
     {
-        return $this->repository->paginateWithRelations($filters, 10);
+        return $this->repository->getAllWithRelations($filters);
     }
 
     public function getAktif()

@@ -300,8 +300,10 @@
 
 @section('page-script')
    <script>
-      document.getElementById('filter-tanggal').addEventListener('change', function() {
-         window.location.href = '{{ route('absensi.dashboard') }}?tanggal=' + this.value;
+      window.addEventListener('load', function() {
+         document.getElementById('filter-tanggal').addEventListener('change', function() {
+            window.location.href = '{{ route('absensi.dashboard') }}?tanggal=' + this.value;
+         });
       });
 
       function previewFoto(url, title) {

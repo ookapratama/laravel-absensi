@@ -2,6 +2,14 @@
 
 @section('title', 'Rekap Absensi')
 
+@section('vendor-style')
+   @vite(['resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.scss', 'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss'])
+@endsection
+
+@section('vendor-script')
+   @vite(['resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js'])
+@endsection
+
 @section('content')
    <div class="container-xxl flex-grow-1 container-p-y">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -22,7 +30,7 @@
                   <select name="bulan" class="form-select">
                      @for ($i = 1; $i <= 12; $i++)
                         <option value="{{ $i }}" {{ $bulan == $i ? 'selected' : '' }}>
-                           {{ \Carbon\Carbon::create()->month($i)->locale('id')->isoFormat('MMMM') }}
+                           {{ \Carbon\Carbon::create()->month((int) $i)->locale('id')->isoFormat('MMMM') }}
                         </option>
                      @endfor
                   </select>
@@ -50,13 +58,8 @@
 
       <!-- Rekap Table -->
       <div class="card">
-         <div class="card-header">
-            <h5 class="mb-0">
-               Rekap {{ \Carbon\Carbon::create()->month($bulan)->locale('id')->isoFormat('MMMM') }} {{ $tahun }}
-            </h5>
-         </div>
-         <div class="table-responsive">
-            <table class="table table-bordered table-hover" id="rekap-table">
+         <div class="card-datatable table-responsive">
+            <table class="datatables-rekap table table-bordered table-hover" id="rekap-table">
                <thead class="table-light">
                   <tr>
                      <th rowspan="2" class="align-middle text-center">#</th>
@@ -77,7 +80,7 @@
                      $hariKerja = \Carbon\Carbon::create($tahun, $bulan, 1)->daysInMonth;
                      // Simple calculation - you may want to exclude weekends
                   @endphp
-                  @forelse($data as $index => $pegawai)
+                  @foreach ($data as $index => $pegawai)
                      @php
                         $absensis = $pegawai->absensis;
                         $hadir = $absensis->where('status', 'Hadir')->count();
@@ -88,7 +91,7 @@
                         $persentase = $hariKerja > 0 ? round((($hadir + $terlambat) / $hariKerja) * 100, 1) : 0;
                      @endphp
                      <tr>
-                        <td class="text-center">{{ $data->firstItem() + $index }}</td>
+                        <td class="text-center">{{ $index + 1 }}</td>
                         <td>
                            <div class="d-flex align-items-center">
                               <div class="avatar avatar-sm me-2">
@@ -113,28 +116,42 @@
                            </div>
                         </td>
                      </tr>
-                  @empty
-                     <tr>
-                        <td colspan="8" class="text-center py-4 text-muted">
-                           <i class="ri-file-list-line ri-3x mb-2"></i>
-                           <p class="mb-0">Tidak ada data pegawai</p>
-                        </td>
-                     </tr>
-                  @endforelse
+                  @endforeach
                </tbody>
             </table>
          </div>
-         @if ($data->hasPages())
-            <div class="card-footer border-top py-3 text-center">
-               {{ $data->links() }}
-            </div>
-         @endif
       </div>
    </div>
 @endsection
 
 @section('page-script')
    <script>
+      window.addEventListener('load', function() {
+         const dt_rekap = $('.datatables-rekap');
+
+         if (dt_rekap.length) {
+            dt_rekap.DataTable({
+               displayLength: 25,
+               lengthMenu: [10, 25, 50, 75, 100],
+               language: {
+                  paginate: {
+                     next: '<i class="ri-arrow-right-s-line"></i>',
+                     previous: '<i class="ri-arrow-left-s-line"></i>'
+                  },
+                  search: "",
+                  searchPlaceholder: "Cari...",
+                  lengthMenu: "_MENU_",
+                  info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+               },
+               dom: '<"card-header flex-column flex-md-row border-bottom"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"fB>><"row"<"col-sm-12 col-md-6"l>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+               buttons: []
+            });
+            $('div.head-label').html(
+               '<h5 class="card-title mb-0">Rekap {{ \Carbon\Carbon::create()->month((int) $bulan)->locale('id')->isoFormat('MMMM') }} {{ $tahun }}</h5>'
+               );
+         }
+      });
+
       function exportExcel() {
          const bulan = document.querySelector('select[name="bulan"]').value;
          const tahun = document.querySelector('select[name="tahun"]').value;

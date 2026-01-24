@@ -124,7 +124,7 @@ class IzinController extends Controller
      */
     public function adminIndex()
     {
-        $data = $this->service->paginate();
+        $data = $this->service->all();
         $statistik = $this->service->getStatistik();
 
         return view('pages.izin.admin.index', compact('data', 'statistik'));

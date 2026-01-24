@@ -17,7 +17,7 @@ class DivisiController extends Controller
      */
     public function index()
     {
-        $data = $this->service->paginate();
+        $data = $this->service->all();
         return view('pages.data-master.divisi.index', compact('data'));
     }
 

@@ -34,13 +34,34 @@ class PegawaiRepository extends BaseRepository implements PegawaiRepositoryInter
 
     public function paginate($filters = [], $perPage = 10)
     {
+        $query = $this->applyFilters($filters);
+        return $query->latest()->paginate($perPage);
+    }
+
+    public function getFiltered($filters = [])
+    {
+        $query = $this->applyFilters($filters);
+        return $query->latest()->get();
+    }
+
+    protected function applyFilters($filters = [])
+    {
         $query = $this->model->with(['user', 'divisi', 'shift', 'kantor']);
 
         if (!empty($filters['divisi_id'])) {
             $query->where('divisi_id', $filters['divisi_id']);
         }
 
-        return $query->latest()->paginate($perPage);
+        return $query;
+    }
+
+    public function rekapAll($bulan, $tahun)
+    {
+        return $this->model->aktif()
+            ->with(['divisi', 'shift', 'absensis' => function ($q) use ($bulan, $tahun) {
+                $q->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
+            }])
+            ->get();
     }
 
     public function rekapPaginate($bulan, $tahun, $perPage = 10)

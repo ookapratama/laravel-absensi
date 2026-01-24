@@ -17,7 +17,7 @@ class KantorController extends Controller
      */
     public function index()
     {
-        $data = $this->service->paginate();
+        $data = $this->service->all();
         return view('pages.data-master.kantor.index', compact('data'));
     }
 

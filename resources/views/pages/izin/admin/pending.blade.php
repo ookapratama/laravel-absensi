@@ -108,7 +108,7 @@
 
 @section('page-script')
    <script>
-      document.addEventListener('DOMContentLoaded', function() {
+      window.addEventListener('load', function() {
          let currentRejectId = null;
          const rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
 

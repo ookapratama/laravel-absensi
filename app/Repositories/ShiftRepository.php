@@ -24,12 +24,24 @@ class ShiftRepository extends BaseRepository implements ShiftRepositoryInterface
 
     public function paginateWithRelations($filters = [], $perPage = 10)
     {
+        $query = $this->applyFilters($filters);
+        return $query->latest()->paginate($perPage);
+    }
+
+    public function getAllWithRelations($filters = [])
+    {
+        $query = $this->applyFilters($filters);
+        return $query->latest()->get();
+    }
+
+    protected function applyFilters($filters = [])
+    {
         $query = $this->model->with('divisi');
 
         if (!empty($filters['divisi_id'])) {
             $query->where('divisi_id', $filters['divisi_id']);
         }
 
-        return $query->latest()->paginate($perPage);
+        return $query;
     }
 }

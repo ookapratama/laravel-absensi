@@ -18,7 +18,7 @@ class ActivityLogController extends Controller
     {
         $filters = $request->only(['action', 'user_id', 'subject_type', 'start_date', 'end_date', 'search']);
         
-        $logs = $this->activityLogService->getPaginated(20, $filters);
+        $logs = $this->activityLogService->getAll($filters);
         $actions = $this->activityLogService->getAvailableActions();
         $users = \App\Models\User::select('id', 'name')->get();
 

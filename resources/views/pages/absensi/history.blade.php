@@ -2,6 +2,14 @@
 
 @section('title', 'Riwayat Absensi')
 
+@section('vendor-style')
+   @vite(['resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss'])
+@endsection
+
+@section('vendor-script')
+   @vite(['resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js'])
+@endsection
+
 @section('content')
    <div class="container-xxl flex-grow-1 container-p-y">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -22,7 +30,7 @@
                   <select name="bulan" class="form-select">
                      @for ($i = 1; $i <= 12; $i++)
                         <option value="{{ $i }}" {{ $bulan == $i ? 'selected' : '' }}>
-                           {{ \Carbon\Carbon::create()->month($i)->locale('id')->isoFormat('MMMM') }}
+                           {{ \Carbon\Carbon::create()->month((int) $i)->locale('id')->isoFormat('MMMM') }}
                         </option>
                      @endfor
                   </select>
@@ -80,15 +88,8 @@
 
       <!-- Table -->
       <div class="card">
-         <div class="card-header border-bottom">
-            <h5 class="mb-0">
-               Riwayat {{ \Carbon\Carbon::create()->month($bulan)->locale('id')->isoFormat('MMMM') }} {{ $tahun }}
-            </h5>
-         </div>
-
-         <!-- Table View (Desktop & Large Tablets) -->
-         <div class="table-responsive d-none d-lg-block">
-            <table class="table table-hover">
+         <div class="card-datatable table-responsive d-none d-lg-block">
+            <table class="datatables-history table table-hover">
                <thead>
                   <tr>
                      <th>Tanggal</th>
@@ -306,6 +307,32 @@
 
 @section('page-script')
    <script>
+      window.addEventListener('load', function() {
+         const dt_history = $('.datatables-history');
+
+         if (dt_history.length) {
+            dt_history.DataTable({
+               displayLength: 10,
+               lengthMenu: [10, 25, 50, 75, 100],
+               language: {
+                  paginate: {
+                     next: '<i class="ri-arrow-right-s-line"></i>',
+                     previous: '<i class="ri-arrow-left-s-line"></i>'
+                  },
+                  search: "",
+                  searchPlaceholder: "Cari...",
+                  lengthMenu: "_MENU_",
+                  info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+               },
+               dom: '<"card-header flex-column flex-md-row border-bottom"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"fB>><"row"<"col-sm-12 col-md-6"l>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+               buttons: []
+            });
+            $('div.head-label').html(
+               '<h5 class="card-title mb-0">Riwayat {{ \Carbon\Carbon::create()->month((int) $bulan)->locale('id')->isoFormat('MMMM') }} {{ $tahun }}</h5>'
+               );
+         }
+      });
+
       function previewFoto(url, title) {
          const modal = new bootstrap.Modal(document.getElementById('modalPreviewFoto'));
          document.getElementById('foto-preview').src = url;

@@ -71,6 +71,21 @@ class ActivityLogService
      */
     public function getPaginated($perPage = 15, array $filters = []): LengthAwarePaginator
     {
+        $query = $this->applyFilters($filters);
+        return $query->paginate($perPage);
+    }
+
+    public function getAll(array $filters = [], $limit = 500)
+    {
+        $query = $this->applyFilters($filters);
+        if ($limit) {
+            $query->limit($limit);
+        }
+        return $query->get();
+    }
+
+    protected function applyFilters(array $filters = [])
+    {
         $query = ActivityLog::with('user')
             ->latest();
 
@@ -92,8 +107,8 @@ class ActivityLogService
         // Filter by date range
         if (!empty($filters['start_date']) && !empty($filters['end_date'])) {
             $query->whereBetween('created_at', [
-                $filters['start_date'],
-                $filters['end_date']
+                $filters['start_date'] . ' 00:00:00',
+                $filters['end_date'] . ' 23:59:59'
             ]);
         }
 
@@ -102,7 +117,7 @@ class ActivityLogService
             $query->where('description', 'like', "%{$filters['search']}%");
         }
 
-        return $query->paginate($perPage);
+        return $query;
     }
 
     /**

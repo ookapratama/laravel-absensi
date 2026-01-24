@@ -2,6 +2,14 @@
 
 @section('title', 'Manajemen Izin')
 
+@section('vendor-style')
+   @vite(['resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss'])
+@endsection
+
+@section('vendor-script')
+   @vite(['resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js'])
+@endsection
+
 @section('content')
    <div class="container-xxl flex-grow-1 container-p-y">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -45,11 +53,8 @@
 
       <!-- Table -->
       <div class="card">
-         <div class="card-header">
-            <h5 class="mb-0">Semua Pengajuan Izin</h5>
-         </div>
-         <div class="table-responsive">
-            <table class="table table-hover">
+         <div class="card-datatable table-responsive">
+            <table class="datatables-izin table table-hover">
                <thead>
                   <tr>
                      <th>#</th>
@@ -62,9 +67,9 @@
                   </tr>
                </thead>
                <tbody>
-                  @forelse($data as $index => $izin)
+                  @foreach ($data as $index => $izin)
                      <tr>
-                        <td>{{ $data->firstItem() + $index }}</td>
+                        <td>{{ $index + 1 }}</td>
                         <td>
                            <div class="d-flex align-items-center">
                               <div class="avatar avatar-sm me-2">
@@ -111,22 +116,11 @@
                            </div>
                         </td>
                      </tr>
-                  @empty
-                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">
-                           <i class="ri-file-list-3-line ri-3x mb-2"></i>
-                           <p class="mb-0">Belum ada pengajuan izin</p>
-                        </td>
-                     </tr>
-                  @endforelse
+                  @endforeach
                </tbody>
             </table>
          </div>
-         @if ($data->hasPages())
-            <div class="card-footer border-top py-3">
-               {{ $data->links() }}
-            </div>
-         @endif
+
       </div>
    </div>
 
@@ -160,7 +154,29 @@
 
 @section('page-script')
    <script>
-      document.addEventListener('DOMContentLoaded', function() {
+      window.addEventListener('load', function() {
+         const dt_izin = $('.datatables-izin');
+
+         if (dt_izin.length) {
+            dt_izin.DataTable({
+               displayLength: 10,
+               lengthMenu: [10, 25, 50, 75, 100],
+               language: {
+                  paginate: {
+                     next: '<i class="ri-arrow-right-s-line"></i>',
+                     previous: '<i class="ri-arrow-left-s-line"></i>'
+                  },
+                  search: "",
+                  searchPlaceholder: "Cari...",
+                  lengthMenu: "_MENU_",
+                  info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+               },
+               dom: '<"card-header flex-column flex-md-row border-bottom"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"fB>><"row"<"col-sm-12 col-md-6"l>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+               buttons: []
+            });
+            $('div.head-label').html('<h5 class="card-title mb-0">Semua Pengajuan Izin</h5>');
+         }
+
          let currentRejectId = null;
          const rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
 
