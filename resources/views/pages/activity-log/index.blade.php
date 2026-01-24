@@ -197,6 +197,7 @@
 
          if (dt_logs.length) {
             dt_logs.DataTable({
+               responsive: true,
                displayLength: 25,
                lengthMenu: [10, 25, 50, 75, 100],
                order: [

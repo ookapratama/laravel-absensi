@@ -131,7 +131,8 @@
 
          if (dt_rekap.length) {
             dt_rekap.DataTable({
-               displayLength: 25,
+               responsive: true,
+               displayLength: 50,
                lengthMenu: [10, 25, 50, 75, 100],
                language: {
                   paginate: {
@@ -148,7 +149,7 @@
             });
             $('div.head-label').html(
                '<h5 class="card-title mb-0">Rekap {{ \Carbon\Carbon::create()->month((int) $bulan)->locale('id')->isoFormat('MMMM') }} {{ $tahun }}</h5>'
-               );
+            );
          }
       });
 

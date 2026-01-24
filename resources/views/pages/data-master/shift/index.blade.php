@@ -156,6 +156,7 @@
 
          if (dt_shift.length) {
             dt_shift.DataTable({
+               responsive: true,
                displayLength: 10,
                lengthMenu: [10, 25, 50, 75, 100],
                language: {

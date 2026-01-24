@@ -159,6 +159,7 @@
 
          if (dt_izin.length) {
             dt_izin.DataTable({
+               responsive: true,
                displayLength: 10,
                lengthMenu: [10, 25, 50, 75, 100],
                language: {

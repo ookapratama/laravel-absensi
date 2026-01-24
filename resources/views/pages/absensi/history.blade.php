@@ -312,6 +312,7 @@
 
          if (dt_history.length) {
             dt_history.DataTable({
+               responsive: true,
                displayLength: 10,
                lengthMenu: [10, 25, 50, 75, 100],
                language: {
@@ -329,7 +330,7 @@
             });
             $('div.head-label').html(
                '<h5 class="card-title mb-0">Riwayat {{ \Carbon\Carbon::create()->month((int) $bulan)->locale('id')->isoFormat('MMMM') }} {{ $tahun }}</h5>'
-               );
+            );
          }
       });
 
