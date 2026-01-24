@@ -105,16 +105,14 @@
                            @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                           <label class="form-label" for="shift_id">Shift <span
-                                 class="text-muted">(Opsional)</span></label>
+                           <label class="form-label" for="shift_id">Shift</label>
                            <select class="form-select @error('shift_id') is-invalid @enderror" id="shift_id"
                               name="shift_id">
-                              <option value="">-- Pilih Shift (Opsional) --</option>
+                              <option value="">-- Pilih Shift --</option>
                            </select>
                            @error('shift_id')
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
-                           <div class="form-text">Bisa dikosongkan.</div>
                         </div>
                         <div class="col-md-3 mb-3">
                            <label class="form-label" for="kantor_id">Kantor Utama</label>
@@ -217,6 +215,7 @@
          </div>
       </div>
    </div>
+@endsection
 @section('page-script')
    <script>
       function loadShifts(divisiId, selectedShiftId = null) {

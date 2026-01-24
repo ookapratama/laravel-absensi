@@ -612,11 +612,10 @@
                })
                .then(response => response.json())
                .then(data => {
+                  window.AlertHandler.handle(data);
                   if (data.success) {
-                     window.AlertHandler.showSuccess(data.message);
                      setTimeout(() => window.location.reload(), 1500);
                   } else {
-                     window.AlertHandler.showError(data.message);
                      btn.disabled = false;
                      btn.innerHTML = type === 'masuk' ? '<i class="ri-login-box-line me-2"></i>Absen Masuk' :
                         '<i class="ri-logout-box-line me-2"></i>Absen Pulang';

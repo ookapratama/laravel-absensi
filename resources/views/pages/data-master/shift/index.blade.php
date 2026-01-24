@@ -224,27 +224,10 @@
                      'Accept': 'application/json'
                   }
                })
-               .then(async response => {
-                  const data = await response.json();
-                  if (!response.ok) {
-                     // Handle validation errors or other server errors
-                     if (window.AlertHandler) {
-                        window.AlertHandler.showError(data.message || 'Terjadi kesalahan', data.errors);
-                     } else {
-                        alert(data.message || 'Terjadi kesalahan');
-                     }
-                     return {
-                        success: false
-                     };
-                  }
-                  return data;
-               })
+               .then(response => response.json())
                .then(data => {
-                  if (data && data.success) {
-                     if (window.AlertHandler) {
-                        window.AlertHandler.showSuccess(data.message);
-                     }
-
+                  window.AlertHandler.handle(data);
+                  if (data.success) {
                      const modal = getModalInstance();
                      if (modal) modal.hide();
                      setTimeout(() => window.location.reload(), 1000);

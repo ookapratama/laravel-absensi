@@ -22,13 +22,17 @@ abstract class BaseRequest extends FormRequest
    */
   protected function failedValidation(Validator $validator)
   {
-    throw new HttpResponseException(
-      response()->json([
-        'status'  => false,
-        'message' => 'Validation error',
-        'errors'  => $validator->errors(),
-      ], 422)
-    );
+    if ($this->expectsJson() || $this->ajax()) {
+      throw new HttpResponseException(
+        response()->json([
+          'success' => false,
+          'message' => 'Terdapat kesalahan validasi data.',
+          'errors'  => $validator->errors(),
+        ], 422)
+      );
+    }
+
+    parent::failedValidation($validator);
   }
 
   /**
