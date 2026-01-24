@@ -11,7 +11,7 @@ class PegawaiRequest extends BaseRequest
         return [
             'user_id' => 'required|exists:users,id',
             'divisi_id' => 'required|exists:divisis,id',
-            // 'shift_id' => 'required|exists:shifts,id',
+            'shift_id' => 'required|exists:shifts,id',
             'kantor_id' => 'nullable|exists:kantors,id',
             'nip' => "nullable|string|max:50|unique:pegawais,nip,{$id}",
             'nama_lengkap' => 'required|string|max:150',
@@ -34,7 +34,7 @@ class PegawaiRequest extends BaseRequest
             'user_id.exists' => 'Akun user tidak ditemukan.',
             'divisi_id.required' => 'Divisi wajib dipilih.',
             'divisi_id.exists' => 'Divisi tidak ditemukan.',
-            // 'shift_id.required' => 'Shift wajib dipilih. (Buat shift terlebih dahulu di menu Shift Kerja jika belum ada)',
+            'shift_id.required' => 'Shift wajib dipilih. (Buat shift terlebih dahulu di menu Shift Kerja jika belum ada)',
             'shift_id.exists' => 'Shift tidak ditemukan.',
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
             'nip.unique' => 'NIP sudah digunakan.',
