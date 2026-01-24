@@ -130,7 +130,7 @@
 
       </div>
    </div>
-
+@endsection
 @section('page-script')
    <script>
       window.addEventListener('load', function() {
