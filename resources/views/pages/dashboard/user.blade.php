@@ -143,9 +143,9 @@
                      <div class="glass-badge">
                         <i class="ri-building-line me-1"></i> {{ $pegawai->kantor->nama }}
                      </div>
-                     <div class="glass-badge">
+                     {{-- <div class="glass-badge">
                         <i class="ri-time-line me-1"></i> {{ $pegawai->shift->nama ?? 'Shift Belum Diset' }}
-                     </div>
+                     </div> --}}
                   </div>
                </div>
                <div class="col-md-5 text-md-end mt-4 mt-md-0">
