@@ -412,6 +412,7 @@
       <input type="hidden" name="_token" value="{{ csrf_token() }}">
       <input type="hidden" name="latitude" id="input-latitude">
       <input type="hidden" name="longitude" id="input-longitude">
+      <input type="hidden" name="shift_id" value="{{ $shift->id ?? '' }}">
    </form>
 @endsection
 
@@ -591,6 +592,9 @@
             formData.append('foto', capturedBlob, 'foto.jpg');
             formData.append('latitude', currentLatitude);
             formData.append('longitude', currentLongitude);
+            // Ambil shift_id dari hidden input
+            const shiftId = document.querySelector('input[name="shift_id"]').value;
+            formData.append('shift_id', shiftId);
             formData.append('_token', '{{ csrf_token() }}');
 
             const url = type === 'masuk' ? '{{ route('absensi.masuk') }}' : '{{ route('absensi.pulang') }}';

@@ -104,16 +104,18 @@
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
                         </div>
-                        <div class="col-md-3 mb-3">
-                           <label class="form-label" for="shift_id">Shift <span class="text-danger">*</span></label>
+                        {{-- <div class="col-md-3 mb-3">
+                           <label class="form-label" for="shift_id">Shift <span
+                                 class="text-muted">(Opsional)</span></label>
                            <select class="form-select @error('shift_id') is-invalid @enderror" id="shift_id"
-                              name="shift_id" required>
-                              <option value="">-- Pilih Shift --</option>
+                              name="shift_id">
+                              <option value="">-- Pilih Shift (Opsional) --</option>
                            </select>
                            @error('shift_id')
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
-                        </div>
+                           <div class="form-text">Bisa dikosongkan.</div>
+                        </div> --}}
                         <div class="col-md-3 mb-3">
                            <label class="form-label" for="kantor_id">Kantor Utama</label>
                            <select class="form-select @error('kantor_id') is-invalid @enderror" id="kantor_id"
@@ -132,8 +134,8 @@
                         </div>
                         <div class="col-md-3 mb-3">
                            <label class="form-label" for="jabatan">Jabatan</label>
-                           <input type="text" class="form-control @error('jabatan') is-invalid @enderror"
-                              id="jabatan" name="jabatan" value="{{ old('jabatan', $data->jabatan) }}">
+                           <input type="text" class="form-control @error('jabatan') is-invalid @enderror" id="jabatan"
+                              name="jabatan" value="{{ old('jabatan', $data->jabatan) }}">
                            @error('jabatan')
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
@@ -152,8 +154,8 @@
                         </div>
                         <div class="col-md-8 mb-3">
                            <label class="form-label" for="foto">Foto</label>
-                           <input type="file" class="form-control @error('foto') is-invalid @enderror"
-                              id="foto" name="foto" accept="image/*">
+                           <input type="file" class="form-control @error('foto') is-invalid @enderror" id="foto"
+                              name="foto" accept="image/*">
                            @error('foto')
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror

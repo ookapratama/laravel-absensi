@@ -246,61 +246,192 @@
       <div class="row">
          <!-- Left Column: Today's Status & Quick Actions -->
          <div class="col-lg-8">
-            <!-- Today's Attendance Status -->
+            <!-- Shift Selection & Today's Attendance -->
             <div class="card mb-4 border-0 shadow-sm">
-               <div class="card-header d-flex justify-content-between align-items-center bg-transparent">
-                  <h5 class="mb-0"><i class="ri-user-follow-line me-2"></i>Status Kehadiran Hari Ini</h5>
-                  @if ($absensiHariIni)
-                     <span
-                        class="badge bg-{{ $absensiHariIni->status === 'Hadir' ? 'success' : ($absensiHariIni->status === 'Terlambat' ? 'warning' : 'info') }}">
-                        {{ $absensiHariIni->status }}
-                     </span>
-                  @else
-                     <span class="badge bg-label-secondary">Belum Absen</span>
-                  @endif
+               <div class="card-header bg-transparent">
+                  <h5 class="mb-0"><i class="ri-user-follow-line me-2"></i>Pilih Jadwal Absen</h5>
+                  <p class="text-muted small mb-0 mt-1">Silakan pilih shift yang ingin Anda ambil hari ini.</p>
                </div>
                <div class="card-body">
-                  <div class="row g-4 text-center">
-                     <div class="col-6 col-md-3">
-                        <small class="text-muted d-block mb-1">Jam Masuk</small>
-                        <h5 class="mb-0">
-                           {{ $absensiHariIni && $absensiHariIni->jam_masuk ? $absensiHariIni->jam_masuk->format('H:i') : '--:--' }}
-                        </h5>
-                     </div>
-                     <div class="col-6 col-md-3">
-                        <small class="text-muted d-block mb-1">Jam Pulang</small>
-                        <h5 class="mb-0">
-                           {{ $absensiHariIni && $absensiHariIni->jam_pulang ? $absensiHariIni->jam_pulang->format('H:i') : '--:--' }}
-                        </h5>
-                     </div>
-                     <div class="col-6 col-md-3">
-                        <small class="text-muted d-block mb-1">Shift Kerja</small>
-                        <h5 class="mb-0 text-primary">{{ $pegawai->shift->nama ?? '-' }}</h5>
-                     </div>
-                     <div class="col-6 col-md-3">
-                        <small class="text-muted d-block mb-1">Jam Kerja</small>
-                        <h5 class="mb-0">
-                           {{ $pegawai->shift ? $pegawai->shift->jam_masuk->format('H:i') . ' - ' . $pegawai->shift->jam_pulang->format('H:i') : '-' }}
-                        </h5>
-                     </div>
-                  </div>
+                  <div class="row g-3">
+                     @php
+                        // Ambil semua shift aktif di divisi pegawai
+                        $shifts = \App\Models\Shift::where('divisi_id', $pegawai->divisi_id)
+                            ->where('is_aktif', true)
+                            ->get();
+                        $now = now();
 
-                  <div class="mt-4 pt-2 border-top">
-                     <div class="d-flex justify-content-center gap-3">
-                        @if (!$absensiHariIni || !$absensiHariIni->jam_masuk)
-                           <a href="{{ route('absensi.index') }}" class="btn btn-primary btn-lg px-5">
-                              <i class="ri-fingerprint-line me-2"></i> Absen Masuk Sekarang
-                           </a>
-                        @elseif(!$absensiHariIni->jam_pulang)
-                           <a href="{{ route('absensi.index') }}" class="btn btn-danger btn-lg px-5">
-                              <i class="ri-logout-box-line me-2"></i> Absen Pulang Sekarang
-                           </a>
-                        @else
-                           <button class="btn btn-outline-success btn-lg px-5" disabled>
-                              <i class="ri-checkbox-circle-line me-2"></i> Absensi Hari Ini Selesai
-                           </button>
-                        @endif
-                     </div>
+                        // CARI SESI AKTIF GLOBAL (User sedang masuk di shift mana pun)
+                        $globalActiveSession = \App\Models\Absensi::where('pegawai_id', $pegawai->id)
+                            ->whereNotNull('jam_masuk')
+                            ->whereNull('jam_pulang')
+                            ->first();
+                     @endphp
+
+                     @forelse($shifts as $shift)
+                        @php
+                           // Cek status shift
+                           $jamMasuk = \Carbon\Carbon::parse($shift->jam_masuk);
+                           $jamPulang = \Carbon\Carbon::parse($shift->jam_pulang);
+
+                           // Cek apakah data absen spesifik untuk shift ini (riwayat)
+                           $absenShift = \App\Models\Absensi::where('pegawai_id', $pegawai->id)
+                               ->where('shift_id', $shift->id)
+                               ->whereDate('tanggal', today())
+                               ->first();
+
+                           // Logika tombol default
+                           $isMasuk = false;
+                           $isPulang = false;
+                           $isSelesai = false;
+                           $isDisabled = false;
+                           $isOtherShiftActive =
+                               $globalActiveSession && (!$absenShift || $globalActiveSession->id !== $absenShift->id);
+
+                           $btnText = 'Ambil Sesi Ini';
+                           $btnClass = 'btn-primary';
+                           $statusText = 'Tersedia';
+                           $statusClass = 'text-primary';
+
+                           if ($absenShift) {
+                               if ($absenShift->jam_pulang) {
+                                   $isSelesai = true;
+                                   $isDisabled = true;
+                                   $btnText = 'Selesai';
+                                   $btnClass = 'btn-success';
+                                   $statusText = 'Sudah Selesai';
+                                   $statusClass = 'text-success';
+                               } elseif ($absenShift->jam_masuk) {
+                                   // Cek apakah sudah boleh pulang
+                                   $jamMasukShift = $jamMasuk->copy();
+                                   $jamPulangShift = $jamPulang->copy();
+                                   $isCrossDay = $jamPulang->lt($jamMasuk); // Recalculate for this context
+
+                                   if ($isCrossDay && $now->lt($jamMasukShift)) {
+                                       // If it's a cross-day shift and current time is before the shift's start time (e.g., 2 AM for a shift ending at 3 AM)
+                                       // This means the shift started yesterday and ends today.
+                                       // Adjust jamPulangShift to be today's date.
+            $jamPulangShift->addDay();
+        }
+
+        if ($now->lt($jamPulangShift)) {
+            $isPulang = true; // State is 'Working'
+            // $isDisabled = true; // DISABLE DULU BIAR BISA PULANG CEPAT
+            $btnText = 'Absen Pulang';
+            $btnClass = 'btn-warning';
+            $statusText = 'Sedang Berjalan';
+            $statusClass = 'text-warning';
+        } else {
+            // Sudah lewat jam pulang, boleh pulang
+            $isPulang = true;
+            $btnText = 'Absen Pulang';
+            $btnClass = 'btn-danger';
+            $statusText = 'Waktunya Pulang';
+            $statusClass = 'text-danger';
+        }
+    }
+} else {
+    // Belum absen, cek waktu
+    $batasAwal = $jamMasuk->copy()->subHours(2); // Bisa absen 2 jam sebelum
+    $isCrossDay = $jamPulang->lt($jamMasuk); // Recalculate for this context
+
+    $valid = false;
+
+    if ($isCrossDay) {
+        // Logic Cross Day: Valid if Now > BatasAwal OR Now < JamPulang
+        // Invalid if Now is between JamPulang and BatasAwal
+        if ($now->gt($jamPulang) && $now->lt($batasAwal)) {
+            $isDisabled = true;
+            $btnClass = 'btn-secondary';
+            // Determine label based on proximity
+            if (
+                $now->diffInHours($batasAwal, false) > 0 &&
+                $now->diffInHours($batasAwal, false) < 6
+            ) {
+                $btnText = 'Belum Dibuka';
+                $statusText = 'Dibuka ' . $batasAwal->format('H:i');
+                $statusClass = 'text-muted';
+            } else {
+                $btnText = 'Sesi Berakhir';
+                $statusText = 'Shift Berakhir';
+                $statusClass = 'text-danger';
+            }
+        } else {
+            $valid = true;
+        }
+    } else {
+        // Logic Normal
+        if ($now->lt($batasAwal)) {
+            $isDisabled = true;
+            $btnClass = 'btn-secondary';
+            $btnText = 'Belum Dibuka';
+            $statusText = 'Dibuka ' . $batasAwal->format('H:i');
+            $statusClass = 'text-muted';
+        } elseif ($now->gt($jamPulang)) {
+            $isDisabled = true;
+            $btnClass = 'btn-secondary';
+            $btnText = 'Sesi Berakhir';
+            $statusText = 'Shift Berakhir';
+            $statusClass = 'text-danger';
+        } else {
+            $valid = true;
+        }
+    }
+
+    if ($valid) {
+        $isMasuk = true;
+    }
+
+    // OVERRIDE LOGIKA JIKA ADA SESI LAIN YANG AKTIF
+    if ($isOtherShiftActive) {
+        $isDisabled = true;
+        $btnText = 'Sedang Bekerja...';
+        $btnClass = 'btn-secondary';
+        $statusText = 'Sesi Lain Aktif';
+        $statusClass = 'text-warning';
+                               }
+                           }
+                        @endphp
+
+                        <div class="col-md-6">
+                           <div
+                              class="card border {{ $absenShift && $absenShift->id == ($globalActiveSession->id ?? 0) ? 'border-primary border-2' : '' }} {{ $isSelesai ? 'bg-label-success' : ($isPulang ? 'bg-label-warning' : '') }}">
+                              <div class="card-body p-3">
+                                 <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0 fw-bold">{{ $shift->nama }}</h6>
+                                    <span class="badge bg-white {{ $statusClass }} shadow-sm">{{ $statusText }}</span>
+                                 </div>
+                                 <div class="mb-3">
+                                    <div class="d-flex align-items-center text-muted small mb-1">
+                                       <i class="ri-time-line me-1"></i>
+                                       {{ $jamMasuk->format('H:i') }} - {{ $jamPulang->format('H:i') }}
+                                    </div>
+                                    @if ($absenShift && $absenShift->jam_masuk)
+                                       <div class="d-flex align-items-center text-success small">
+                                          <i class="ri-login-box-line me-1"></i>
+                                          Masuk: {{ $absenShift->jam_masuk->format('H:i') }}
+                                       </div>
+                                    @endif
+                                 </div>
+
+                                 @if ($isDisabled)
+                                    <button class="btn {{ $btnClass }} w-100" disabled>
+                                       {{ $btnText }}
+                                    </button>
+                                 @else
+                                    <a href="{{ route('absensi.index', ['shift_id' => $shift->id]) }}"
+                                       class="btn {{ $btnClass }} w-100">
+                                       {{ $btnText }}
+                                    </a>
+                                 @endif
+                              </div>
+                           </div>
+                        </div>
+                     @empty
+                        <div class="col-12 text-center py-4">
+                           <p class="text-muted mb-0">Tidak ada jadwal shift aktif untuk divisi Anda.</p>
+                        </div>
+                     @endforelse
                   </div>
                </div>
             </div>

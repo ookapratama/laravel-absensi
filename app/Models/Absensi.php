@@ -14,6 +14,7 @@ class Absensi extends Model
 
     protected $fillable = [
         'pegawai_id',
+        'shift_id',
         'tanggal',
         'jam_masuk',
         'foto_masuk',
@@ -47,6 +48,14 @@ class Absensi extends Model
     public function pegawai()
     {
         return $this->belongsTo(Pegawai::class);
+    }
+
+    /**
+     * Shift yang diambil
+     */
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class);
     }
 
     /**

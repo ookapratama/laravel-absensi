@@ -51,7 +51,7 @@
                      <th>NIP</th>
                      <th>Nama Lengkap</th>
                      <th>Divisi</th>
-                     <th>Shift</th>
+                     {{-- <th>Shift</th> --}}
                      <th>Kantor</th>
                      <th>Jabatan</th>
                      <th>Status</th>
@@ -73,7 +73,7 @@
                            <br><small class="text-muted">{{ $item->user->email ?? '-' }}</small>
                         </td>
                         <td>{{ $item->divisi->nama ?? '-' }}</td>
-                        <td>
+                        {{-- <td>
                            @if ($item->shift)
                               <strong>{{ $item->shift->nama }}</strong>
                               <br><small class="text-muted">{{ $item->shift->jam_masuk->format('H:i') }} -
@@ -81,7 +81,7 @@
                            @else
                               -
                            @endif
-                        </td>
+                        </td> --}}
                         <td>{{ $item->kantor->nama ?? '-' }}</td>
                         <td>{{ $item->jabatan ?? '-' }}</td>
                         <td>

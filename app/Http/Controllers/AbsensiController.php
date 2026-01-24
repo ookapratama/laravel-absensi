@@ -18,7 +18,7 @@ class AbsensiController extends Controller
     /**
      * Halaman utama absensi (untuk pegawai)
      */
-    public function index()
+    public function index(Request $request)
     {
         $pegawai = $this->pegawaiService->getByUserId(auth()->id());
         
@@ -27,14 +27,38 @@ class AbsensiController extends Controller
                 ->with('error', 'Anda belum terdaftar sebagai pegawai.');
         }
 
-        $absensiHariIni = $pegawai->absensiHariIni();
+        $shiftId = $request->get('shift_id');
+        $shift = null;
+        $absensiHariIni = null;
+
+        if ($shiftId) {
+            $shift = \App\Models\Shift::find($shiftId);
+            // Validasi shift milik divisi pegawai
+            if ($shift && $shift->divisi_id !== $pegawai->divisi_id) {
+                return redirect()->route('dashboard')->with('error', 'Shift tidak valid untuk divisi Anda.');
+            }
+            
+            // Ambil absensi spesifik untuk shift ini
+            $absensiHariIni = \App\Models\Absensi::where('pegawai_id', $pegawai->id)
+                ->where('shift_id', $shiftId)
+                ->whereDate('tanggal', today())
+                ->first();
+        } else {
+            // Fallback ke logic lama (ambil absensi pertama hari ini) atau redirect ke dashboard
+            // Agar konsisten dengan fitur baru, sebaiknya pegawai harus pilih shift dari dashboard
+            // Tapi jika akses langsung menu, kita bisa ambil shift yang "aktif" sekarang jika ada
+            
+            // Untuk sementara, jika tidak ada shift_id, redirect back ke dashboard agar user memilih
+            return redirect()->route('dashboard')->with('info', 'Silakan pilih shift terlebih dahulu.');
+        }
+
         $historyAbsensi = $this->service->getByPegawaiBulan(
             $pegawai->id,
             now()->month,
             now()->year
         );
 
-        return view('pages.absensi.index', compact('pegawai', 'absensiHariIni', 'historyAbsensi'));
+        return view('pages.absensi.index', compact('pegawai', 'absensiHariIni', 'historyAbsensi', 'shift'));
     }
 
     /**
@@ -54,6 +78,7 @@ class AbsensiController extends Controller
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
                 'device' => $request->device,
+                'shift_id' => $request->shift_id,
             ]);
 
             return ResponseHelper::success([
