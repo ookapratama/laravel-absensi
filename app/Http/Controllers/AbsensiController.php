@@ -108,6 +108,7 @@ class AbsensiController extends Controller
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
                 'device' => $request->device,
+                'shift_id' => $request->shift_id,
             ]);
 
             return ResponseHelper::success([
