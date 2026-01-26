@@ -225,10 +225,19 @@
                      'Accept': 'application/json'
                   }
                })
-               .then(response => response.json())
+               .then(async response => {
+                  const data = await response.json();
+                  if (!response.ok) {
+                     window.AlertHandler.handle(data);
+                     return {
+                        success: false
+                     };
+                  }
+                  return data;
+               })
                .then(data => {
-                  window.AlertHandler.handle(data);
                   if (data.success) {
+                     window.AlertHandler.handle(data);
                      const modal = getModalInstance();
                      if (modal) modal.hide();
                      setTimeout(() => window.location.reload(), 1000);
@@ -236,9 +245,7 @@
                })
                .catch(error => {
                   console.error('Error:', error);
-                  if (window.AlertHandler) {
-                     window.AlertHandler.showError('Terjadi kesalahan sistem');
-                  }
+                  window.AlertHandler.showError('Terjadi kesalahan sistem atau format data tidak valid');
                });
          };
 

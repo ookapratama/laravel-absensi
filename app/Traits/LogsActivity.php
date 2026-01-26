@@ -76,17 +76,25 @@ trait LogsActivity
             return;
         }
 
-        ActivityLog::create([
-            'user_id' => Auth::id(),
-            'action' => $action,
-            'description' => static::getLogDescription($action, $model),
-            'subject_type' => get_class($model),
-            'subject_id' => $model->getKey(),
-            'old_values' => $oldValues,
-            'new_values' => $newValues,
-            'ip_address' => Request::ip(),
-            'user_agent' => Request::userAgent(),
-        ]);
+        try {
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action' => $action,
+                'description' => static::getLogDescription($action, $model),
+                'subject_type' => get_class($model),
+                'subject_id' => $model->getKey(),
+                'old_values' => $oldValues,
+                'new_values' => $newValues,
+                'ip_address' => Request::ip(),
+                'user_agent' => Request::userAgent(),
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to log activity: ' . $e->getMessage(), [
+                'action' => $action,
+                'model' => get_class($model),
+                'id' => $model->getKey()
+            ]);
+        }
     }
 
     /**

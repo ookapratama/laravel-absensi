@@ -31,14 +31,11 @@ class PegawaiController extends Controller
         return view('pages.data-master.pegawai.index', compact('data', 'divisis'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $divisis = $this->divisiService->getAktif();
         $kantors = $this->kantorService->getAktif();
-        $users = $this->userService->all();
+        $users = $this->userService->getAvailableForPegawai();
 
         return view('pages.data-master.pegawai.create', compact('divisis', 'kantors', 'users'));
     }
@@ -81,15 +78,12 @@ class PegawaiController extends Controller
         return view('pages.data-master.pegawai.show', compact('data'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
         $data = $this->service->getWithRelations($id);
         $divisis = $this->divisiService->getAktif();
         $kantors = $this->kantorService->getAktif();
-        $users = $this->userService->all();
+        $users = $this->userService->getAvailableForPegawai($data->user_id);
 
         return view('pages.data-master.pegawai.edit', compact('data', 'divisis', 'kantors', 'users'));
     }

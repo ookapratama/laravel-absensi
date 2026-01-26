@@ -53,4 +53,13 @@ class UserService extends BaseService
             throw $e;
         }
     }
+    public function getAvailableForPegawai($currentUserId = null)
+    {
+        return \App\Models\User::whereDoesntHave('pegawai')
+            ->when($currentUserId, function ($query) use ($currentUserId) {
+                $query->orWhere('id', $currentUserId);
+            })
+            ->orderBy('name', 'asc')
+            ->get();
+    }
 }

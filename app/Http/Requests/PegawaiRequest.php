@@ -9,9 +9,9 @@ class PegawaiRequest extends BaseRequest
         $id = $this->route('pegawai');
 
         return [
-            'user_id' => 'required|exists:users,id',
+            'user_id' => "required|exists:users,id|unique:pegawais,user_id,{$id}",
             'divisi_id' => 'required|exists:divisis,id',
-            'shift_id' => 'required|exists:shifts,id',
+            'shift_id' => 'nullable|exists:shifts,id',
             'kantor_id' => 'nullable|exists:kantors,id',
             'nip' => "nullable|string|max:50|unique:pegawais,nip,{$id}",
             'nama_lengkap' => 'required|string|max:150',
@@ -32,6 +32,7 @@ class PegawaiRequest extends BaseRequest
         return [
             'user_id.required' => 'Akun user wajib dipilih.',
             'user_id.exists' => 'Akun user tidak ditemukan.',
+            'user_id.unique' => 'Akun user ini sudah digunakan oleh pegawai lain.',
             'divisi_id.required' => 'Divisi wajib dipilih.',
             'divisi_id.exists' => 'Divisi tidak ditemukan.',
             'shift_id.required' => 'Shift wajib dipilih. (Buat shift terlebih dahulu di menu Shift Kerja jika belum ada)',

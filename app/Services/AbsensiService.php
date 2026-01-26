@@ -220,9 +220,14 @@ class AbsensiService extends BaseService
             }
 
             // Aturan Ketat: Tidak boleh pulang sebelum jam pulang
-            // if ($now->lt($jamPulang)) {
-            //     throw new \Exception('Belum waktunya jam pulang (Jadwal: ' . $jamPulang->format('H:i') . ').');
-            // }
+            if ($now->lt($jamPulang)) {
+                $diff = $now->diffInMinutes($jamPulang);
+                $hours = floor($diff / 60);
+                $mins = $diff % 60;
+                $waitTime = ($hours > 0 ? "{$hours} jam " : "") . "{$mins} menit";
+                
+                throw new \Exception("Belum waktunya jam pulang. Silakan tunggu {$waitTime} lagi (Jadwal: " . $jamPulang->format('H:i') . ").");
+            }
         }
 
         // Validasi lokasi
@@ -378,20 +383,40 @@ class AbsensiService extends BaseService
     {
         $tanggal = $tanggal ?? today()->toDateString();
 
-        return DB::table('absensis')
+        $data = DB::table('absensis')
             ->join('pegawais', 'absensis.pegawai_id', '=', 'pegawais.id')
             ->join('divisis', 'pegawais.divisi_id', '=', 'divisis.id')
+            ->leftJoin('shifts', 'absensis.shift_id', '=', 'shifts.id')
             ->whereDate('absensis.tanggal', $tanggal)
             ->select(
                 'divisis.id',
                 'divisis.nama as divisi',
-                DB::raw('COUNT(*) as total'),
+                DB::raw('COUNT(absensis.id) as total_sesi'),
                 DB::raw("SUM(CASE WHEN absensis.status = 'Hadir' THEN 1 ELSE 0 END) as hadir"),
                 DB::raw("SUM(CASE WHEN absensis.status = 'Terlambat' THEN 1 ELSE 0 END) as terlambat"),
-                DB::raw("SUM(CASE WHEN absensis.status IN ('Izin', 'Cuti', 'Sakit') THEN 1 ELSE 0 END) as izin")
+                DB::raw("SUM(CASE WHEN absensis.status IN ('Izin', 'Cuti', 'Sakit') THEN 1 ELSE 0 END) as izin"),
+                DB::raw("SUM(
+                    CASE 
+                        WHEN absensis.jam_masuk IS NOT NULL AND absensis.jam_pulang IS NOT NULL AND shifts.id IS NOT NULL THEN
+                            CASE 
+                                WHEN shifts.jam_pulang < shifts.jam_masuk THEN
+                                    TIMESTAMPDIFF(MINUTE, shifts.jam_masuk, DATE_ADD(shifts.jam_pulang, INTERVAL 1 DAY))
+                                ELSE
+                                    TIMESTAMPDIFF(MINUTE, shifts.jam_masuk, shifts.jam_pulang)
+                            END
+                        ELSE 0 
+                    END
+                ) as total_menit")
             )
             ->groupBy('divisis.id', 'divisis.nama')
             ->get();
+
+        return $data->map(function($item) {
+            $jam = floor($item->total_menit / 60);
+            $menit = $item->total_menit % 60;
+            $item->total_jam_format = "{$jam}h" . ($menit > 0 ? " {$menit}m" : "");
+            return $item;
+        });
     }
 
     /**

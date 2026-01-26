@@ -65,30 +65,61 @@
                      <th rowspan="2" class="align-middle text-center">#</th>
                      <th rowspan="2" class="align-middle">Pegawai</th>
                      <th rowspan="2" class="align-middle">Divisi</th>
-                     <th colspan="4" class="text-center">Rekap</th>
+                     <th colspan="5" class="text-center">Rekap (Bulan Ini)</th>
+                     <th rowspan="2" class="align-middle text-center">Total Jam</th>
                      <th rowspan="2" class="align-middle text-center">%</th>
                   </tr>
                   <tr>
                      <th class="text-center bg-success text-white">Hadir</th>
-                     <th class="text-center bg-warning text-dark">Terlambat</th>
+                     <th class="text-center bg-warning text-dark">Telat</th>
                      <th class="text-center bg-info text-white">Izin</th>
                      <th class="text-center bg-danger text-white">Alpha</th>
+                     <th class="text-center bg-secondary text-white">Sesi</th>
                   </tr>
                </thead>
                <tbody>
                   @php
-                     $hariKerja = \Carbon\Carbon::create($tahun, $bulan, 1)->daysInMonth;
-                     // Simple calculation - you may want to exclude weekends
+                     $now = now();
+                     $currentBulan = $now->month;
+                     $currentTahun = $now->year;
+
+                     if ($bulan == $currentBulan && $tahun == $currentTahun) {
+                         $hariBerjalan = $now->day;
+                     } else {
+                         $hariBerjalan = \Carbon\Carbon::create($tahun, $bulan, 1)->daysInMonth;
+                     }
                   @endphp
                   @foreach ($data as $index => $pegawai)
                      @php
                         $absensis = $pegawai->absensis;
-                        $hadir = $absensis->where('status', 'Hadir')->count();
-                        $terlambat = $absensis->where('status', 'Terlambat')->count();
-                        $izin = $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count();
-                        $totalAbsen = $hadir + $terlambat + $izin;
-                        $alpha = max(0, $hariKerja - $totalAbsen);
-                        $persentase = $hariKerja > 0 ? round((($hadir + $terlambat) / $hariKerja) * 100, 1) : 0;
+                        $hadirCount = $absensis->where('status', 'Hadir')->count();
+                        $terlambatCount = $absensis->where('status', 'Terlambat')->count();
+                        $izinCount = $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count();
+
+                        // Total UNIQ days present or on leave
+                        $daysActive = $absensis
+                            ->unique(function ($item) {
+                                return $item->tanggal->format('Y-m-d');
+                            })
+                            ->count();
+
+                        $alphaCount = max(0, $hariBerjalan - $daysActive);
+
+                        // Total work hours (based on shift duration)
+                        $totalMenit = $absensis->sum('durasi_shift_menit');
+                        $totalJam = floor($totalMenit / 60);
+                        $sisaMenit = $totalMenit % 60;
+
+                        $persentase = $hariBerjalan > 0 ? round(($daysActive / $hariBerjalan) * 100, 1) : 0;
+
+                        $progressClass = 'bg-danger';
+                        if ($persentase >= 90) {
+                            $progressClass = 'bg-success';
+                        } elseif ($persentase >= 75) {
+                            $progressClass = 'bg-primary';
+                        } elseif ($persentase >= 50) {
+                            $progressClass = 'bg-warning';
+                        }
                      @endphp
                      <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
@@ -98,21 +129,32 @@
                                  <img src="{{ $pegawai->foto_url }}" alt="" class="rounded-circle">
                               </div>
                               <div>
-                                 <strong>{{ $pegawai->nama_lengkap }}</strong>
-                                 <br><small class="text-muted">{{ $pegawai->nip ?? '-' }}</small>
+                                 <h6 class="mb-0 text-truncate" style="max-width: 150px;">{{ $pegawai->nama_lengkap }}
+                                 </h6>
+                                 <small class="text-muted">{{ $pegawai->nip ?? '-' }}</small>
                               </div>
                            </div>
                         </td>
-                        <td>{{ $pegawai->divisi->nama ?? '-' }}</td>
-                        <td class="text-center"><span class="badge bg-success">{{ $hadir }}</span></td>
-                        <td class="text-center"><span class="badge bg-warning">{{ $terlambat }}</span></td>
-                        <td class="text-center"><span class="badge bg-info">{{ $izin }}</span></td>
-                        <td class="text-center"><span class="badge bg-danger">{{ $alpha }}</span></td>
+                        <td><small>{{ $pegawai->divisi->nama ?? '-' }}</small></td>
+                        <td class="text-center text-success fw-bold">{{ $hadirCount }}</td>
+                        <td class="text-center text-warning fw-bold">{{ $terlambatCount }}</td>
+                        <td class="text-center text-info fw-bold">{{ $izinCount }}</td>
+                        <td class="text-center text-danger fw-bold">{{ $alphaCount }}</td>
+                        <td class="text-center"><span class="badge bg-label-secondary">{{ $absensis->count() }}</span>
+                        </td>
                         <td class="text-center">
-                           <div class="progress" style="height: 20px;">
-                              <div class="progress-bar bg-success" style="width: {{ $persentase }}%">
-                                 {{ $persentase }}%
+                           <span class="fw-bold">{{ $totalJam }}h</span>
+                           @if ($sisaMenit > 0)
+                              <small>{{ $sisaMenit }}m</small>
+                           @endif
+                        </td>
+                        <td class="text-center">
+                           <div class="d-flex align-items-center gap-2">
+                              <div class="progress w-100" style="height: 8px;">
+                                 <div class="progress-bar {{ $progressClass }}" style="width: {{ $persentase }}%">
+                                 </div>
                               </div>
+                              <small class="fw-bold">{{ $persentase }}%</small>
                            </div>
                         </td>
                      </tr>

@@ -24,32 +24,17 @@ class ShiftService extends BaseService
 
     public function storeShift(array $data)
     {
-        try {
-            return $this->create($data);
-        } catch (\Exception $e) {
-            Log::error('Error storing shift: ' . $e->getMessage());
-            return false;
-        }
+        return $this->create($data);
     }
 
     public function updateShift($shiftId, array $data)
     {
-        try {
-            return $this->update($shiftId, $data);
-        } catch (\Exception $e) {
-            Log::error('Error updating shift: ' . $e->getMessage());
-            return false;
-        }
+        return $this->update($shiftId, $data);
     }
 
     public function deleteShift($shiftId)
     {
-        try {
-            return $this->delete($shiftId);
-        } catch (\Exception $e) {
-            Log::error('Error deleting shift: ' . $e->getMessage());
-            return false;
-        }
+        return $this->delete($shiftId);
     }
 
     public function getShiftsByDivisi($divisiId)

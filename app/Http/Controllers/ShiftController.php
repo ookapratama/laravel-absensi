@@ -31,13 +31,15 @@ class ShiftController extends Controller
         $data = $request->validated();
         $data['is_aktif'] = $request->boolean('is_aktif', true);
 
-        $result = $this->shiftService->storeShift($data);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
+            $result = $this->shiftService->storeShift($data);
 
-        if ($result) {
-            return ResponseHelper::success($result, 'Shift berhasil ditambahkan');
-        }
+            if ($result) {
+                return ResponseHelper::success($result, 'Shift berhasil ditambahkan');
+            }
 
-        return ResponseHelper::error('Gagal menambahkan shift', 500);
+            return ResponseHelper::error('Gagal menambahkan shift', 500);
+        });
     }
 
     public function update(ShiftRequest $request, $id)
@@ -45,24 +47,28 @@ class ShiftController extends Controller
         $data = $request->validated();
         $data['is_aktif'] = $request->boolean('is_aktif', true);
 
-        $result = $this->shiftService->updateShift($id, $data);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($id, $data) {
+            $result = $this->shiftService->updateShift($id, $data);
 
-        if ($result) {
-            return ResponseHelper::success($result, 'Shift berhasil diperbarui');
-        }
+            if ($result) {
+                return ResponseHelper::success($result, 'Shift berhasil diperbarui');
+            }
 
-        return ResponseHelper::error('Gagal memperbarui shift', 500);
+            return ResponseHelper::error('Gagal memperbarui shift', 500);
+        });
     }
 
     public function destroy($id)
     {
-        $result = $this->shiftService->deleteShift($id);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($id) {
+            $result = $this->shiftService->deleteShift($id);
 
-        if ($result) {
-            return ResponseHelper::success(null, 'Shift berhasil dihapus');
-        }
+            if ($result) {
+                return ResponseHelper::success(null, 'Shift berhasil dihapus');
+            }
 
-        return ResponseHelper::error('Gagal menghapus shift', 500);
+            return ResponseHelper::error('Gagal menghapus shift', 500);
+        });
     }
 
     public function getByDivisi($divisiId)

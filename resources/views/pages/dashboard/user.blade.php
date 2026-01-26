@@ -143,8 +143,10 @@
                      <div class="glass-badge">
                         <i class="ri-building-line me-1"></i> {{ $pegawai->kantor->nama }}
                      </div>
-                     <div class="glass-badge">
-                        <i class="ri-time-line me-1"></i> {{ $pegawai->shift->nama ?? 'Shift Belum Diset' }}
+                     <div class="glass-badge shadow-sm">
+                        <i class="ri-time-line me-1"></i>
+                        <span class="fw-bold">{{ $pegawai->divisi->shifts->where('is_aktif', true)->count() }} Shift</span>
+                        <small class="opacity-75 ms-1">(Fleksibel)</small>
                      </div>
                   </div>
                </div>

@@ -129,8 +129,31 @@ class Absensi extends Model
         return !is_null($this->jam_pulang);
     }
 
+    public function getDurasiShiftMenitAttribute()
+    {
+        if (!$this->jam_masuk || !$this->jam_pulang || !$this->shift) {
+            return 0;
+        }
+
+        return $this->shift->durasi_menit;
+    }
+
     /**
-     * Hitung durasi kerja
+     * Format durasi shift (berdasarkan shift yang diambil)
+     */
+    public function getDurasiShiftAttribute()
+    {
+        $minutes = $this->durasi_shift_menit;
+        if ($minutes === 0) return '-';
+
+        $hours = floor($minutes / 60);
+        $remMinutes = $minutes % 60;
+
+        return "{$hours} Jam " . ($remMinutes > 0 ? "{$remMinutes} Menit" : "");
+    }
+
+    /**
+     * Hitung durasi kerja actual (log masuk - log pulang)
      */
     public function getDurasiKerjaAttribute()
     {

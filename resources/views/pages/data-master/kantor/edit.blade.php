@@ -73,9 +73,12 @@
                      </div>
 
                      <div class="mb-3">
+                        <button type="button" class="btn btn-outline-info btn-sm" id="btn-get-location">
+                           <i class="ri-map-pin-line me-1"></i>Ambil Lokasi Saya
+                        </button>
                         <a href="https://maps.google.com/?q={{ $data->titik_lokasi }}" target="_blank"
-                           class="btn btn-outline-info btn-sm">
-                           <i class="ri-map-pin-line me-1"></i>Lihat di Google Maps
+                           class="btn btn-outline-secondary btn-sm ms-2">
+                           <i class="ri-external-link-line me-1"></i>Lihat Current
                         </a>
                      </div>
 
@@ -97,4 +100,37 @@
          </div>
       </div>
    </div>
+@endsection
+
+@section('page-script')
+   <script>
+      document.getElementById('btn-get-location').addEventListener('click', function() {
+         if (navigator.geolocation) {
+            this.innerHTML = '<i class="ri-loader-4-line ri-spin me-1"></i>Mengambil...';
+            this.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(
+               (position) => {
+                  const lat = position.coords.latitude.toFixed(8);
+                  const lng = position.coords.longitude.toFixed(8);
+                  document.getElementById('titik_lokasi').value = `${lat}, ${lng}`;
+                  this.innerHTML = '<i class="ri-check-line me-1"></i>Lokasi Diambil';
+                  setTimeout(() => {
+                     this.innerHTML = '<i class="ri-map-pin-line me-1"></i>Ambil Lokasi Saya';
+                     this.disabled = false;
+                  }, 2000);
+               },
+               (error) => {
+                  window.AlertHandler.showError('Gagal mengambil lokasi: ' + error.message);
+                  this.innerHTML = '<i class="ri-map-pin-line me-1"></i>Ambil Lokasi Saya';
+                  this.disabled = false;
+               }, {
+                  enableHighAccuracy: true
+               }
+            );
+         } else {
+            window.AlertHandler.showError('Geolocation tidak didukung browser ini');
+         }
+      });
+   </script>
 @endsection

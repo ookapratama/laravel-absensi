@@ -271,6 +271,19 @@
                   </div>
 
                   <!-- Absen Buttons -->
+                  @php
+                     $isBelumWaktunyaPulang = false;
+                     if ($shift && $absensiHariIni && $absensiHariIni->jam_masuk && !$absensiHariIni->jam_pulang) {
+                         $now = now();
+                         $jamPulang = \Carbon\Carbon::parse($shift->jam_pulang->format('H:i:s'));
+                         if (\Carbon\Carbon::parse($shift->jam_masuk->format('H:i:s'))->gt($jamPulang)) {
+                             if ($now->format('H:i:s') > $shift->jam_masuk->format('H:i:s')) {
+                                 $jamPulang->addDay();
+                             }
+                         }
+                         $isBelumWaktunyaPulang = $now->lt($jamPulang);
+                     }
+                  @endphp
                   <div class="row g-3">
                      <div class="col-6">
                         <button type="button" class="btn btn-success btn-lg w-100" id="btn-absen-masuk"
@@ -285,7 +298,7 @@
                      </div>
                      <div class="col-6">
                         <button type="button" class="btn btn-danger btn-lg w-100" id="btn-absen-pulang"
-                           @if (!$absensiHariIni || !$absensiHariIni->jam_masuk || $absensiHariIni->jam_pulang) disabled @endif>
+                           @if (!$absensiHariIni || !$absensiHariIni->jam_masuk || $absensiHariIni->jam_pulang || $isBelumWaktunyaPulang) disabled @endif>
                            <i class="ri-logout-box-line me-2"></i>
                            @if ($absensiHariIni && $absensiHariIni->jam_pulang)
                               Pulang: {{ $absensiHariIni->jam_pulang->format('H:i') }}
@@ -296,25 +309,21 @@
                      </div>
                   </div>
 
-                  @if ($pegawai->shift)
-                     <div class="alert alert-light mt-4 mb-0">
-                        <div class="d-flex justify-content-between">
-                           <span><i class="ri-time-line me-1"></i>Shift Anda:
-                              <strong>{{ $pegawai->shift->nama }}</strong></span>
-                           <strong>{{ $pegawai->shift->jam_masuk->format('H:i') }} -
-                              {{ $pegawai->shift->jam_pulang->format('H:i') }}</strong>
+                  @if ($shift)
+                     <div class="alert alert-primary mt-4 mb-0 shadow-sm border-0">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                           <span class="fw-bold"><i class="ri-time-line me-1"></i> Sesi Shift:
+                              {{ $shift->nama }}</span>
+                           <span class="badge bg-primary">{{ $shift->jam_masuk->format('H:i') }} -
+                              {{ $shift->jam_pulang->format('H:i') }}</span>
                         </div>
-                        @if ($pegawai->divisi && $pegawai->divisi->toleransi_terlambat > 0)
-                           <div class="d-flex justify-content-between mt-1">
-                              <span><i class="ri-timer-line me-1"></i>Toleransi:</span>
-                              <strong>{{ $pegawai->divisi->toleransi_terlambat }} menit</strong>
-                           </div>
-                        @endif
-                     </div>
-                  @elseif($pegawai->divisi)
-                     <div class="alert alert-warning mt-4 mb-0">
-                        <i class="ri-error-warning-line me-1"></i> Anda belum ditempatkan ke shift apapun. Silakan hubungi
-                        admin.
+                        <div class="d-flex justify-content-between align-items-center small opacity-75">
+                           <span><i class="ri-building-line me-1"></i> {{ $pegawai->divisi->nama }}</span>
+                           @if ($pegawai->divisi && $pegawai->divisi->toleransi_terlambat > 0)
+                              <span><i class="ri-timer-line me-1"></i> Toleransi:
+                                 {{ $pegawai->divisi->toleransi_terlambat }} mnt</span>
+                           @endif
+                        </div>
                      </div>
                   @endif
                </div>
@@ -543,7 +552,8 @@
                btnStartCamera.classList.add('d-none');
                captureControls.classList.remove('d-none');
             } catch (error) {
-               alert('Gagal mengakses kamera. Pastikan Anda mengizinkan akses kamera.');
+               window.AlertHandler.showError(
+                  'Gagal mengakses kamera. Pastikan Anda mengizinkan akses kamera.');
             }
          });
 

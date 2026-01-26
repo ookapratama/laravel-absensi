@@ -50,12 +50,35 @@ class AlertHandler {
      * @param {Object} response - The response object (axios response or plain object)
      */
     handle(response) {
-        const data = response.data || response;
+        // Distinguish between Axios response and plain data object
+        // Axios response always has 'status' and 'data'
+        let data = response;
+        if (
+            response &&
+            response.data !== undefined &&
+            response.status !== undefined
+        ) {
+            data = response.data;
+        }
 
-        if (data.success) {
-            this.showSuccess(data.message);
+        // Ensure we have a data object
+        if (!data) {
+            this.showError("Alur data tidak valid.");
+            return;
+        }
+
+        // Standardized check for success
+        if (
+            data.success === true ||
+            data.success === 1 ||
+            data.status === true
+        ) {
+            this.showSuccess(data.message || "Permintaan berhasil diproses.");
         } else {
-            this.showError(data.message, data.errors);
+            this.showError(
+                data.message || "Terjadi kesalahan pada sistem.",
+                data.errors || data.error,
+            );
         }
     }
 

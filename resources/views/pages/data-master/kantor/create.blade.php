@@ -118,7 +118,7 @@
                   }, 2000);
                },
                (error) => {
-                  alert('Gagal mengambil lokasi: ' + error.message);
+                  window.AlertHandler.showError('Gagal mengambil lokasi: ' + error.message);
                   this.innerHTML = '<i class="ri-map-pin-line me-1"></i>Ambil Lokasi Saya';
                   this.disabled = false;
                }, {
@@ -126,7 +126,7 @@
                }
             );
          } else {
-            alert('Geolocation tidak didukung browser ini');
+            window.AlertHandler.showError('Geolocation tidak didukung browser ini');
          }
       });
    </script>

@@ -37,4 +37,20 @@ class Shift extends Model
     {
         return $query->where('is_aktif', true);
     }
+
+    public function getDurasiMenitAttribute()
+    {
+        if (!$this->jam_masuk || !$this->jam_pulang) {
+            return 0;
+        }
+
+        $masuk = \Carbon\Carbon::parse($this->jam_masuk->format('H:i:s'));
+        $pulang = \Carbon\Carbon::parse($this->jam_pulang->format('H:i:s'));
+
+        if ($pulang->lt($masuk)) {
+            $pulang->addDay();
+        }
+
+        return $masuk->diffInMinutes($pulang);
+    }
 }

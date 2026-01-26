@@ -104,7 +104,7 @@
                               <div class="invalid-feedback">{{ $message }}</div>
                            @enderror
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3 mb-3 d-none">
                            <label class="form-label" for="shift_id">Shift</label>
                            <select class="form-select @error('shift_id') is-invalid @enderror" id="shift_id"
                               name="shift_id">

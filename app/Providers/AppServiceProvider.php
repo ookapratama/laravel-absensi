@@ -126,15 +126,15 @@ class AppServiceProvider extends ServiceProvider
         // Share template variables config
         config([
             'variables' => [
-                'templateName' => 'Base Laravel',
+                'templateName' => 'SOFIKOPI',
                 'templateVersion' => '1.0.0',
                 'templateFree' => false,
                 'templatePrefix' => '',
                 'templateSuffix' => '',
                 'templateDomain' => 'localhost',
-                'templateAuthor' => 'Ooka Pratama',
+                'templateAuthor' => 'CV. Data Cipta Celebes',
                 'templateAuthorUrl' => '#',
-                'creatorName' => 'Ooka Pratama',
+                'creatorName' => 'CV. Data Cipta Celebes',
                 'creatorUrl' => '#',
                 'documentation' => 'https://demos.pixinvent.com/materialize-html-admin-template/documentation/',
             ],

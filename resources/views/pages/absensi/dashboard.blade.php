@@ -98,8 +98,9 @@
                         <tr>
                            <th>Divisi</th>
                            <th class="text-center">Hadir</th>
-                           <th class="text-center">Terlambat</th>
+                           <th class="text-center">Telat</th>
                            <th class="text-center">Izin</th>
+                           <th class="text-center">Jam Kerja</th>
                         </tr>
                      </thead>
                      <tbody>
@@ -109,6 +110,7 @@
                               <td class="text-center"><span class="badge bg-success">{{ $rekap->hadir }}</span></td>
                               <td class="text-center"><span class="badge bg-warning">{{ $rekap->terlambat }}</span></td>
                               <td class="text-center"><span class="badge bg-info">{{ $rekap->izin }}</span></td>
+                              <td class="text-center text-primary fw-bold">{{ $rekap->total_jam_format }}</td>
                            </tr>
                         @empty
                            <tr>
@@ -224,11 +226,7 @@
                            @endif
                         </td>
                         <td class="text-center">
-                           @if ($absen->durasi_kerja)
-                              <small class="text-muted">{{ $absen->durasi_kerja }}</small>
-                           @else
-                              -
-                           @endif
+                           <strong>{{ $absen->durasi_shift }}</strong>
                         </td>
                         <td>{{ $absen->lokasi_masuk ?? '-' }}</td>
                         <td class="text-center">

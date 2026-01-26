@@ -85,22 +85,25 @@
                   </div>
                   <div class="col-sm-4 mb-3">
                      <div class="p-3 bg-light border-start border-info border-4 rounded shadow-sm">
-                        <small class="text-muted d-block mb-1">Shift Kerja</small>
-                        <h6 class="mb-0 fw-bold">{{ $data->shift->nama ?? '-' }}</h6>
+                        <small class="text-muted d-block mb-1">Informasi Shift</small>
+                        <h6 class="mb-0 fw-bold">Jadwal Fleksibel</h6>
                      </div>
                   </div>
                   <div class="col-12 mt-2">
-                     <div class="alert alert-primary mb-0 py-2 d-flex align-items-center">
-                        <i class="ri-time-line me-2 ri-lg"></i>
-                        <span>
-                           @if ($data->shift)
-                              <strong>Jadwal Shift ({{ $data->shift->nama }}):</strong>
-                              {{ $data->shift->jam_masuk->format('H:i') }} -
-                              {{ $data->shift->jam_pulang->format('H:i') }}
-                           @else
-                              <strong>Jam Kerja:</strong> Belum diatur
-                           @endif
-                        </span>
+                     <div class="alert alert-primary mb-0 py-3">
+                        <h6 class="alert-heading fw-bold mb-2"><i class="ri-time-line me-1"></i> Daftar Shift di Divisi
+                           {{ $data->divisi->nama }}</h6>
+                        <div class="row g-2">
+                           @foreach ($data->divisi->shifts->where('is_aktif', true) as $s)
+                              <div class="col-md-6 col-lg-4">
+                                 <div class="bg-white p-2 rounded shadow-sm border">
+                                    <div class="fw-bold small">{{ $s->nama }}</div>
+                                    <div class="text-muted" style="font-size: 11px;">{{ $s->jam_masuk->format('H:i') }} -
+                                       {{ $s->jam_pulang->format('H:i') }}</div>
+                                 </div>
+                              </div>
+                           @endforeach
+                        </div>
                      </div>
                   </div>
                </div>
