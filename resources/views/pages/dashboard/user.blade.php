@@ -287,8 +287,7 @@
                            $isPulang = false;
                            $isSelesai = false;
                            $isDisabled = false;
-                           $isOtherShiftActive =
-                               $globalActiveSession && (!$absenShift || $globalActiveSession->id !== $absenShift->id);
+                           $isOtherShiftActive = false; // REVISI USER: Perbolehkan irisan shift (selalu false)
 
                            $btnText = 'Ambil Sesi Ini';
                            $btnClass = 'btn-primary';
@@ -397,7 +396,7 @@
 
                         <div class="col-md-6">
                            <div
-                              class="card border {{ $absenShift && $absenShift->id == ($globalActiveSession->id ?? 0) ? 'border-primary border-2' : '' }} {{ $isSelesai ? 'bg-label-success' : ($isPulang ? 'bg-label-warning' : '') }}">
+                              class="card border {{ $absenShift && $absenShift->jam_masuk && !$absenShift->jam_pulang ? 'border-primary border-2 bg-label-primary' : '' }} {{ $isSelesai ? 'bg-label-success' : ($isPulang ? 'bg-label-warning' : '') }}">
                               <div class="card-body p-3">
                                  <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h6 class="mb-0 fw-bold">{{ $shift->nama }}</h6>

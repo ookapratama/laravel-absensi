@@ -80,10 +80,14 @@ class AbsensiService extends BaseService
             ->whereNull('jam_pulang')
             ->first();
 
+        // Check apakah masih ada sesi aktif di shift mana pun
+        // REVISI USER: Perbolehkan masuk shift baru meskipun shift sebelumnya belum pulang (irisan)
+        /*
         if ($activeSession) {
              $shiftName = $activeSession->shift ? $activeSession->shift->nama : 'sebelumnya';
              throw new \Exception("Anda masih memiliki sesi aktif di {$shiftName}. Silakan absen pulang terlebih dahulu.");
         }
+        */
 
         // Check apakah sudah absen masuk untuk shift ini hari ini (untuk mencegah double entry di shift yang sama)
         $existing = Absensi::where('pegawai_id', $pegawai->id)
@@ -392,8 +396,8 @@ class AbsensiService extends BaseService
                 'divisis.id',
                 'divisis.nama as divisi',
                 DB::raw('COUNT(absensis.id) as total_sesi'),
-                DB::raw("SUM(CASE WHEN absensis.status = 'Hadir' THEN 1 ELSE 0 END) as hadir"),
-                DB::raw("SUM(CASE WHEN absensis.status = 'Terlambat' THEN 1 ELSE 0 END) as terlambat"),
+                DB::raw("SUM(CASE WHEN absensis.status = 'Hadir' AND absensis.jam_pulang IS NOT NULL THEN 1 ELSE 0 END) as hadir"),
+                DB::raw("SUM(CASE WHEN absensis.status = 'Terlambat' AND absensis.jam_pulang IS NOT NULL THEN 1 ELSE 0 END) as terlambat"),
                 DB::raw("SUM(CASE WHEN absensis.status IN ('Izin', 'Cuti', 'Sakit') THEN 1 ELSE 0 END) as izin"),
                 DB::raw("SUM(
                     CASE 
@@ -433,8 +437,8 @@ class AbsensiService extends BaseService
             'total_pegawai' => $totalPegawai,
             'sudah_absen' => $absensis->whereNotNull('jam_masuk')->unique('pegawai_id')->count(),
             'belum_absen' => $totalPegawai - $absensis->whereNotNull('jam_masuk')->unique('pegawai_id')->count(),
-            'hadir' => $absensis->where('status', 'Hadir')->count(),
-            'terlambat' => $absensis->where('status', 'Terlambat')->count(),
+            'hadir' => $absensis->where('status', 'Hadir')->whereNotNull('jam_pulang')->count(),
+            'terlambat' => $absensis->where('status', 'Terlambat')->whereNotNull('jam_pulang')->count(),
             'izin' => $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count(),
         ];
     }
@@ -446,8 +450,8 @@ class AbsensiService extends BaseService
         $absensis = $this->repository->getByPegawaiBulan($pegawaiId, $bulan, $tahun);
 
         return [
-            'hadir' => $absensis->where('status', 'Hadir')->count(),
-            'terlambat' => $absensis->where('status', 'Terlambat')->count(),
+            'hadir' => $absensis->where('status', 'Hadir')->whereNotNull('jam_pulang')->count(),
+            'terlambat' => $absensis->where('status', 'Terlambat')->whereNotNull('jam_pulang')->count(),
             'izin' => $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count(),
             'alfa' => 0, // Bisa dikembangkan dengan membandingkan hari kerja vs jumlah absen
             'total_hari_kerja' => $absensis->count(),

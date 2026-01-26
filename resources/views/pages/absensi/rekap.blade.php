@@ -92,8 +92,8 @@
                   @foreach ($data as $index => $pegawai)
                      @php
                         $absensis = $pegawai->absensis;
-                        $hadirCount = $absensis->where('status', 'Hadir')->count();
-                        $terlambatCount = $absensis->where('status', 'Terlambat')->count();
+                        $hadirCount = $absensis->where('status', 'Hadir')->whereNotNull('jam_pulang')->count();
+                        $terlambatCount = $absensis->where('status', 'Terlambat')->whereNotNull('jam_pulang')->count();
                         $izinCount = $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count();
 
                         // Total UNIQ days present or on leave
