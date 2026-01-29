@@ -276,10 +276,14 @@
                            $jamMasuk = \Carbon\Carbon::parse($shift->jam_masuk);
                            $jamPulang = \Carbon\Carbon::parse($shift->jam_pulang);
 
-                           // Cek apakah data absen spesifik untuk shift ini (riwayat)
+                           // Cek apakah data absen spesifik untuk shift ini (termasuk yang masih terbuka dari kemarin)
                            $absenShift = \App\Models\Absensi::where('pegawai_id', $pegawai->id)
                                ->where('shift_id', $shift->id)
-                               ->whereDate('tanggal', today())
+                               ->where(function ($q) {
+                                   $q->whereNull('jam_pulang') // Sesi yang masih terbuka (bisa dari kemarin)
+                                       ->orWhereDate('tanggal', today()); // Atau sudah absen hari ini
+                               })
+                               ->orderBy('tanggal', 'desc')
                                ->first();
 
                            // Logika tombol default

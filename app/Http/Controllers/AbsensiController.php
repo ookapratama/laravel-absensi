@@ -39,9 +39,14 @@ class AbsensiController extends Controller
             }
             
             // Ambil absensi spesifik untuk shift ini
+            // REVISI: Cari sesi yang masih terbuka (bisa dari kemarin) atau yang sudah selesai hari ini
             $absensiHariIni = \App\Models\Absensi::where('pegawai_id', $pegawai->id)
                 ->where('shift_id', $shiftId)
-                ->whereDate('tanggal', today())
+                ->where(function($q) {
+                    $q->whereNull('jam_pulang')
+                      ->orWhereDate('tanggal', today());
+                })
+                ->orderBy('tanggal', 'desc')
                 ->first();
         } else {
             // Fallback ke logic lama (ambil absensi pertama hari ini) atau redirect ke dashboard

@@ -89,13 +89,20 @@ class AbsensiService extends BaseService
         }
         */
 
-        // Check apakah sudah absen masuk untuk shift ini hari ini (untuk mencegah double entry di shift yang sama)
+        // Check apakah sudah absen masuk untuk shift ini (untuk mencegah double entry di shift yang sama)
+        // REVISI: Check sesi terbuka atau sesi yang baru saja selesai hari ini
         $existing = Absensi::where('pegawai_id', $pegawai->id)
             ->where('shift_id', $shiftId)
-            ->whereDate('tanggal', today())
+            ->where(function($q) {
+                $q->whereNull('jam_pulang') // Sesi yang masih terbuka (bisa dari kemarin)
+                  ->orWhereDate('tanggal', today()); // Atau sudah absen hari ini
+            })
             ->first();
 
         if ($existing && $existing->jam_masuk) {
+            if (!$existing->jam_pulang) {
+                throw new \Exception('Anda masih memiliki sesi aktif untuk shift ini yang belum ditutup.');
+            }
             throw new \Exception('Anda sudah absen masuk pada shift ini hari ini.');
         }
 
@@ -190,7 +197,6 @@ class AbsensiService extends BaseService
         $shiftId = $data['shift_id'] ?? null;
         
         $query = Absensi::where('pegawai_id', $pegawai->id)
-            ->whereDate('tanggal', today())
             ->whereNotNull('jam_masuk')
             ->whereNull('jam_pulang');
 
@@ -198,14 +204,11 @@ class AbsensiService extends BaseService
             $query->where('shift_id', $shiftId);
         }
 
-        $existing = $query->latest()->first();
+        // Cari sesi terbaru yang belum pulang (bisa dari hari ini atau kemarin)
+        $existing = $query->orderBy('tanggal', 'desc')->orderBy('jam_masuk', 'desc')->first();
 
         if (!$existing) {
-             // Coba cari tanpa shift_id, siapa tau ada sesi nyangkut
-             if ($shiftId) {
-                 throw new \Exception('Tidak ditemukan data absen masuk untuk shift ini.');
-             }
-             throw new \Exception('Anda belum absen masuk atau sudah absen pulang.');
+             throw new \Exception('Tidak ditemukan data absen masuk yang aktif (belum pulang)' . ($shiftId ? ' untuk shift ini.' : '.'));
         }
 
         // VALIDASI WAKTU PULANG
