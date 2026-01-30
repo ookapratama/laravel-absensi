@@ -84,6 +84,7 @@ class AbsensiController extends Controller
                 'longitude' => $request->longitude,
                 'device' => $request->device,
                 'shift_id' => $request->shift_id,
+                'keterangan' => $request->keterangan,
             ]);
 
             return ResponseHelper::success([
@@ -114,6 +115,7 @@ class AbsensiController extends Controller
                 'longitude' => $request->longitude,
                 'device' => $request->device,
                 'shift_id' => $request->shift_id,
+                'keterangan' => $request->keterangan,
             ]);
 
             return ResponseHelper::success([

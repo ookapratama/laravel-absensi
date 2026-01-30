@@ -173,6 +173,7 @@
                      <th class="text-center">Durasi</th>
                      <th>Lokasi</th>
                      <th class="text-center">Status</th>
+                     <th>Keterangan</th>
                   </tr>
                </thead>
                <tbody>
@@ -234,6 +235,9 @@
                               class="badge bg-{{ $absen->status === 'Hadir' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
                               {{ $absen->status }}
                            </span>
+                        </td>
+                        <td>
+                           <small class="text-muted">{{ $absen->keterangan ?? '-' }}</small>
                         </td>
                      </tr>
                   @empty
