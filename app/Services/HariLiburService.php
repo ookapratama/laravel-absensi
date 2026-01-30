@@ -67,6 +67,15 @@ class HariLiburService
         return $query->orderBy('tanggal')->get();
     }
 
+    public function getPaginated($year = null, $perPage = 10)
+    {
+        $query = HariLibur::query();
+        if ($year) {
+            $query->whereYear('tanggal', $year);
+        }
+        return $query->orderBy('tanggal')->paginate($perPage);
+    }
+
     public function create(array $data)
     {
         return HariLibur::create($data);

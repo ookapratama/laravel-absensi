@@ -18,7 +18,7 @@ class HariLiburController extends Controller
     public function index(Request $request)
     {
         $year = $request->get('year', now()->year);
-        $data = $this->service->getAll($year);
+        $data = $this->service->getPaginated($year);
         return view('pages.data-master.hari-libur.index', compact('data', 'year'));
     }
 
@@ -44,7 +44,7 @@ class HariLiburController extends Controller
      */
     public function create()
     {
-        return view('pages.hari-libur.create');
+        return view('pages.data-master.hari-libur.create');
     }
 
     /**
@@ -65,7 +65,7 @@ class HariLiburController extends Controller
     public function show($id)
     {
         $data = $this->service->find($id);
-        return view('pages.hari-libur.show', compact('data'));
+        return view('pages.data-master.hari-libur.show', compact('data'));
     }
 
     /**
@@ -74,7 +74,7 @@ class HariLiburController extends Controller
     public function edit($id)
     {
         $data = $this->service->find($id);
-        return view('pages.hari-libur.edit', compact('data'));
+        return view('pages.data-master.hari-libur.edit', compact('data'));
     }
 
     /**

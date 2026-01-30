@@ -1,5 +1,7 @@
 @extends('layouts/layoutMaster')
 
+@section('title', 'Data Hari Libur')
+
 @section('vendor-style')
    @vite(['resources/assets/vendor/libs/fullcalendar/fullcalendar.scss', 'resources/assets/vendor/libs/flatpickr/flatpickr.scss', 'resources/assets/vendor/libs/select2/select2.scss'])
 @endsection
@@ -22,29 +24,31 @@
 
       <div class="card mb-4">
          <div class="card-body">
-            <form action="{{ route('hari-libur.index') }}" method="GET" class="row g-3 align-items-end">
+            <div class="row g-3 align-items-end">
                <div class="col-md-3">
-                  <label class="form-label">Tahun</label>
-                  <select name="year" class="form-select" onchange="this.form.submit()">
-                     @for ($y = now()->year - 1; $y <= now()->year + 2; $y++)
-                        <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}
-                        </option>
-                     @endfor
-                  </select>
+                  <form action="{{ route('hari-libur.index') }}" method="GET" id="filterForm">
+                     <label class="form-label">Tahun</label>
+                     <select name="year" class="form-select" onchange="this.form.submit()">
+                        @for ($y = now()->year - 1; $y <= now()->year + 2; $y++)
+                           <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}
+                           </option>
+                        @endfor
+                     </select>
+                  </form>
                </div>
                <div class="col-md-9 text-end">
                   <form action="{{ route('hari-libur.sync') }}" method="POST" class="d-inline">
                      @csrf
                      <input type="hidden" name="year" value="{{ $year }}">
                      <button type="submit" class="btn btn-primary me-2">
-                        <i class="ri-refresh-line me-1"></i> Sinkronisasi API
+                        <i class="ri-refresh-line me-1"></i> Perbarui dari Data Pemerintah
                      </button>
                   </form>
-                  <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalAdd">
+                  <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalAdd">
                      <i class="ri-add-line me-1"></i> Tambah Manual
                   </button>
                </div>
-            </form>
+            </div>
          </div>
       </div>
 
@@ -107,14 +111,16 @@
                               </td>
                               <td class="text-center">
                                  <form action="{{ route('hari-libur.destroy', $item->id) }}" method="POST"
-                                    onsubmit="return confirm('Hapus data ini?');">
+                                    class="d-inline delete-form">
                                     @csrf
                                     @method('DELETE')
                                     <a href="{{ route('hari-libur.edit', $item->id) }}"
                                        class="btn btn-sm btn-icon btn-text-primary rounded-pill me-2">
                                        <i class="ri-pencil-line"></i>
                                     </a>
-                                    <button type="submit" class="btn btn-sm btn-icon btn-text-danger rounded-pill">
+                                    <button type="submit"
+                                       class="btn btn-sm btn-icon btn-text-danger rounded-pill btn-delete"
+                                       data-name="{{ $item->nama }}">
                                        <i class="ri-delete-bin-line"></i>
                                     </button>
                                  </form>
@@ -128,6 +134,9 @@
                         @endforelse
                      </tbody>
                   </table>
+               </div>
+               <div class="card-footer d-flex justify-content-end">
+                  {{ $data->appends(['year' => $year])->links() }}
                </div>
             </div>
          </div>
@@ -193,34 +202,81 @@
          let calendar;
 
          function initCalendar() {
-            if (!calendar) {
-               calendar = new FullCalendar.Calendar(calendarEl, {
-                  initialView: 'dayGridMonth',
-                  locale: 'id',
-                  events: "{{ route('api.hari-libur.events') }}",
-                  plugins: [FullCalendar.dayGridPlugin, FullCalendar.interactionPlugin, FullCalendar
-                     .listPlugin, FullCalendar.timeGridPlugin
-                  ],
-                  headerToolbar: {
-                     start: 'prev,next, title',
-                     end: 'dayGridMonth,listMonth'
-                  },
-                  direction: 'ltr',
-                  eventClassNames: function({
-                     event: calendarEvent
-                  }) {
-                     const colorName = calendarEvent.extendedProps.calendar || 'primary';
-                     return ['fc-event-' + colorName];
+            if (calendarEl && typeof window.Calendar !== 'undefined') {
+               if (!calendar) {
+                  try {
+                     calendar = new window.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        locale: 'id',
+                        plugins: [window.dayGridPlugin, window.interactionPlugin, window.listPlugin],
+                        headerToolbar: {
+                           start: 'prev,next title',
+                           end: 'dayGridMonth,listMonth'
+                        },
+                        buttonText: {
+                           today: 'Hari Ini',
+                           month: 'Bulan',
+                           list: 'List'
+                        },
+                        events: function(info, successCallback, failureCallback) {
+                           fetch("{{ route('api.hari-libur.events') }}?start=" + info.startStr + "&end=" +
+                                 info.endStr)
+                              .then(response => response.json())
+                              .then(data => successCallback(data))
+                              .catch(error => {
+                                 console.error('Error fetching events:', error);
+                                 failureCallback(error);
+                              });
+                        },
+                        eventClassNames: function({
+                           event: calendarEvent
+                        }) {
+                           const colorName = calendarEvent.extendedProps.calendar || 'primary';
+                           return ['fc-event-' + colorName];
+                        },
+                        eventDidMount: function(info) {
+                           if (info.event.extendedProps.description) {
+                              new bootstrap.Tooltip(info.el, {
+                                 title: info.event.extendedProps.description,
+                                 placement: 'top',
+                                 trigger: 'hover',
+                                 container: 'body'
+                              });
+                           }
+                        },
+                        eventClick: function(info) {
+                           if (window.AlertHandler) {
+                              window.AlertHandler.swal.fire({
+                                 title: info.event.title,
+                                 text: info.event.extendedProps.description ||
+                                    'Tidak ada keterangan tambahan.',
+                                 icon: 'info',
+                                 confirmButtonText: 'Tutup',
+                                 customClass: {
+                                    confirmButton: 'btn btn-primary'
+                                 },
+                                 buttonsStyling: false
+                              });
+                           }
+                        }
+                     });
+                     calendar.render();
+                  } catch (error) {
+                     console.error('Error initializing calendar:', error);
                   }
-               });
-               calendar.render();
+               } else {
+                  calendar.render();
+                  calendar.updateSize();
+               }
             }
          }
 
          // Initialize calendar when tab is shown
          if (calendarTab) {
             calendarTab.addEventListener('shown.bs.tab', function() {
-               initCalendar();
+               setTimeout(() => {
+                  initCalendar();
+               }, 50);
             });
          }
 
@@ -229,6 +285,28 @@
             const tab = new bootstrap.Tab(calendarTab);
             tab.show();
          }
+
+         // Handle Delete Confirmation
+         $('.delete-form').on('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const name = $(this).find('.btn-delete').data('name') || 'data ini';
+
+            if (window.AlertHandler) {
+               window.AlertHandler.confirm(
+                  'Hapus Hari Libur?',
+                  `Apakah Anda yakin ingin menghapus "${name}"?`,
+                  'Ya, Hapus!',
+                  function() {
+                     form.submit();
+                  }
+               );
+            } else {
+               if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                  form.submit();
+               }
+            }
+         });
       });
    </script>
 @endsection

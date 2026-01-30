@@ -77,22 +77,28 @@
    <script>
       document.addEventListener('DOMContentLoaded', function() {
          const calendarEl = document.getElementById('calendar');
-         if (calendarEl) {
-            const calendar = new FullCalendar.Calendar(calendarEl, {
+         if (calendarEl && typeof window.Calendar !== 'undefined') {
+            const calendar = new window.Calendar(calendarEl, {
                initialView: 'dayGridMonth',
                locale: 'id',
-               events: "{{ route('absensi.calendar-events') }}",
-               plugins: [FullCalendar.dayGridPlugin, FullCalendar.interactionPlugin, FullCalendar.listPlugin,
-                  FullCalendar.timeGridPlugin
-               ],
                headerToolbar: {
-                  start: 'prev,next, title',
+                  start: 'prev,next title',
                   end: 'dayGridMonth,listMonth'
                },
                buttonText: {
                   today: 'Hari Ini',
                   month: 'Bulan',
                   list: 'List'
+               },
+               events: function(info, successCallback, failureCallback) {
+                  fetch("{{ route('absensi.calendar-events') }}?start=" + info.startStr + "&end=" + info
+                        .endStr)
+                     .then(response => response.json())
+                     .then(data => successCallback(data))
+                     .catch(error => {
+                        console.error('Error fetching events:', error);
+                        failureCallback(error);
+                     });
                },
                eventClassNames: function({
                   event: calendarEvent
@@ -111,17 +117,19 @@
                   }
                },
                eventClick: function(info) {
-                  // Show simple alert or modal for detail
-                  Swal.fire({
-                     title: info.event.title,
-                     text: info.event.extendedProps.description || 'Tidak ada keterangan tambahan.',
-                     icon: 'info',
-                     confirmButtonText: 'Tutup',
-                     customClass: {
-                        confirmButton: 'btn btn-primary'
-                     },
-                     buttonsStyling: false
-                  });
+                  if (window.AlertHandler) {
+                     window.AlertHandler.swal.fire({
+                        title: info.event.title,
+                        text: info.event.extendedProps.description ||
+                           'Tidak ada keterangan tambahan.',
+                        icon: 'info',
+                        confirmButtonText: 'Tutup',
+                        customClass: {
+                           confirmButton: 'btn btn-primary'
+                        },
+                        buttonsStyling: false
+                     });
+                  }
                }
             });
             calendar.render();
