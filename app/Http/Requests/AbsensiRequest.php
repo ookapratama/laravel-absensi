@@ -12,6 +12,7 @@ class AbsensiRequest extends BaseRequest
             'longitude' => 'required|numeric|between:-180,180',
             'device' => 'nullable|string|max:100',
             'shift_id' => 'required|exists:shifts,id',
+            'keterangan' => 'nullable|string',
         ];
     }
 

@@ -272,22 +272,20 @@
 
                   <!-- Absen Buttons -->
                   @php
-                     $isBelumWaktunyaPulang = false;
+                     $isEarly = false;
+                     $targetJamPulang = null;
                      if ($shift && $absensiHariIni && $absensiHariIni->jam_masuk && !$absensiHariIni->jam_pulang) {
                          $now = now();
                          $jamPulang = \Carbon\Carbon::parse($shift->jam_pulang->format('H:i:s'));
                          $jamMasuk = \Carbon\Carbon::parse($shift->jam_masuk->format('H:i:s'));
 
-                         // Handle Cross-Day Shift
                          if ($jamMasuk->gt($jamPulang)) {
                              if ($now->format('H:i:s') > $jamMasuk->format('H:i:s')) {
                                  $jamPulang->addDay();
                              }
                          }
-
-                         // Perbolehkan pulang lebih awal maksimal 2 jam (120 menit)
-                         $batasAwalPulang = $jamPulang->copy()->subHours(2);
-                         $isBelumWaktunyaPulang = $now->lt($batasAwalPulang);
+                         $isEarly = $now->lt($jamPulang);
+                         $targetJamPulang = $jamPulang->format('Y-m-d\TH:i:s');
                      }
                   @endphp
                   <div class="row g-3">
@@ -304,7 +302,7 @@
                      </div>
                      <div class="col-6">
                         <button type="button" class="btn btn-danger btn-lg w-100" id="btn-absen-pulang"
-                           @if (!$absensiHariIni || !$absensiHariIni->jam_masuk || $absensiHariIni->jam_pulang || $isBelumWaktunyaPulang) disabled @endif>
+                           data-target-pulang="{{ $targetJamPulang }}" @if (!$absensiHariIni || !$absensiHariIni->jam_masuk || $absensiHariIni->jam_pulang) disabled @endif>
                            <i class="ri-logout-box-line me-2"></i>
                            @if ($absensiHariIni && $absensiHariIni->jam_pulang)
                               Pulang: {{ $absensiHariIni->jam_pulang->format('H:i') }}
@@ -417,6 +415,33 @@
                      </div>
                   @endforelse
                </div>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Modal Alasan Pulang Cepat -->
+   <div class="modal fade" id="modalAlasanPulang" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title">Alasan Pulang Lebih Awal</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               <div class="alert alert-warning">
+                  <i class="ri-error-warning-line me-2"></i>
+                  Anda melakukan absen pulang sebelum jam kerja berakhir. Silakan berikan alasan.
+               </div>
+               <div class="form-group">
+                  <label for="alasan_pulang" class="form-label">Alasan / Keterangan</label>
+                  <textarea class="form-control" id="alasan_pulang" rows="3"
+                     placeholder="Contoh: Sakit, Ada urusan mendesak, dll"></textarea>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+               <button type="button" class="btn btn-primary" id="btn-submit-alasan">Kirim & Absen Pulang</button>
             </div>
          </div>
       </div>
@@ -593,7 +618,7 @@
          });
 
          // Submit absensi
-         function submitAbsensi(type) {
+         function submitAbsensi(type, keterangan = '') {
             if (!capturedBlob) {
                window.AlertHandler.showError('Silakan ambil foto terlebih dahulu!');
                return;
@@ -608,6 +633,9 @@
             formData.append('foto', capturedBlob, 'foto.jpg');
             formData.append('latitude', currentLatitude);
             formData.append('longitude', currentLongitude);
+            if (keterangan) {
+               formData.append('keterangan', keterangan);
+            }
             // Ambil shift_id dari hidden input
             const shiftId = document.querySelector('input[name="shift_id"]').value;
             formData.append('shift_id', shiftId);
@@ -644,7 +672,38 @@
          }
 
          btnAbsenMasuk.addEventListener('click', () => submitAbsensi('masuk'));
-         btnAbsenPulang.addEventListener('click', () => submitAbsensi('pulang'));
+
+         const modalAlasan = new bootstrap.Modal(document.getElementById('modalAlasanPulang'));
+         const btnSubmitAlasan = document.getElementById('btn-submit-alasan');
+         const inputAlasan = document.getElementById('alasan_pulang');
+
+         btnAbsenPulang.addEventListener('click', function() {
+            const targetPulangStr = this.getAttribute('data-target-pulang');
+            if (targetPulangStr) {
+               const targetPulang = new Date(targetPulangStr);
+               const now = new Date();
+
+               if (now < targetPulang) {
+                  // Pulang lebih awal
+                  modalAlasan.show();
+               } else {
+                  // Sudah jam pulang
+                  submitAbsensi('pulang');
+               }
+            } else {
+               submitAbsensi('pulang');
+            }
+         });
+
+         btnSubmitAlasan.addEventListener('click', function() {
+            const alasan = inputAlasan.value.trim();
+            if (!alasan) {
+               window.AlertHandler.showError('Harap masukkan alasan pulang lebih awal!');
+               return;
+            }
+            modalAlasan.hide();
+            submitAbsensi('pulang', alasan);
+         });
 
          // Initialize
          getLocation();

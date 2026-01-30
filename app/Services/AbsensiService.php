@@ -220,31 +220,23 @@ class AbsensiService extends BaseService
              throw new \Exception('Tidak ditemukan data absen masuk yang aktif (belum pulang)' . ($shiftId ? ' untuk shift ini.' : '.'));
         }
 
-        // VALIDASI WAKTU PULANG
+        // VALIDASI WAKTU PULANG (REVISI: Sekarang bebas pulang kapan saja)
         $shift = $existing->shift;
         if ($shift) {
             $now = now();
             $jamPulang = Carbon::parse($shift->jam_pulang->format('H:i:s'));
             
             // Handle Cross Day logic for check out
-            // Jika jam pulang < jam masuk (misal masuk 20.00, pulang 04.00)
             if (Carbon::parse($shift->jam_masuk->format('H:i:s'))->gt($jamPulang)) {
-                // Jika sekarang jam > jam masuk (misal 21.00), berarti jam pulang adalah besok
                 if ($now->format('H:i:s') > $shift->jam_masuk->format('H:i:s')) {
                     $jamPulang->addDay();
                 }
             }
 
-            // Perbolehkan pulang lebih awal maksimal 2 jam (120 menit)
+            // Jika pulang lebih awal, keterangan wajib ada
             if ($now->lt($jamPulang)) {
-                $diff = $now->diffInMinutes($jamPulang);
-                
-                if ($diff > 120) {
-                    $hours = floor($diff / 60);
-                    $mins = $diff % 60;
-                    $waitTime = ($hours > 0 ? "{$hours} jam " : "") . "{$mins} menit";
-                    
-                    throw new \Exception("Belum waktunya jam pulang. Silakan tunggu {$waitTime} lagi (Jadwal: " . $jamPulang->format('H:i') . "). Anda diperbolehkan pulang maksimal 2 jam sebelum jadwal.");
+                if (empty($data['keterangan'])) {
+                    throw new \Exception("Anda pulang lebih awal (Jadwal: " . $jamPulang->format('H:i') . "). Harap berikan alasan pulang.");
                 }
             }
         }
@@ -279,6 +271,7 @@ class AbsensiService extends BaseService
             'longitude_pulang' => $data['longitude'],
             'lokasi_pulang' => $validasiLokasi['kantor_nama'] ?? null,
             'device_pulang' => $data['device'] ?? request()->header('User-Agent'),
+            'keterangan' => $data['keterangan'] ?? $existing->keterangan,
         ]);
 
         return $existing->fresh();
