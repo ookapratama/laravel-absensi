@@ -12,69 +12,94 @@
             <i class="ri-arrow-left-line me-1"></i>Kembali
          </a>
       </div>
-
-      @if ($data->isEmpty())
-         <div class="card">
-            <div class="card-body text-center py-5">
-               <i class="ri-check-double-line ri-4x text-success mb-3"></i>
-               <h5>Tidak Ada Izin Pending</h5>
-               <p class="text-muted">Semua pengajuan izin sudah diproses</p>
-            </div>
-         </div>
-      @else
-         <div class="row">
-            @foreach ($data as $izin)
-               <div class="col-md-6 col-lg-4 mb-4">
-                  <div class="card h-100">
-                     <div class="card-header d-flex justify-content-between align-items-center">
+   @else
+      <div class="row g-4">
+         @foreach ($data as $izin)
+            <div class="col-md-6 col-lg-4">
+               <div class="card h-100 border-0 shadow-sm overflow-hidden ripple-effect">
+                  <div class="card-header bg-label-secondary border-bottom p-3">
+                     <div class="d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center">
                            <div class="avatar avatar-sm me-2">
-                              <img src="{{ $izin->pegawai->foto_url }}" alt="" class="rounded-circle">
+                              <img src="{{ $izin->pegawai->foto_url }}" alt="avatar"
+                                 class="rounded-circle border border-2 border-white shadow-sm">
                            </div>
-                           <div>
-                              <h6 class="mb-0">{{ $izin->pegawai->nama_lengkap }}</h6>
-                              <small class="text-muted">{{ $izin->pegawai->divisi->nama ?? '-' }}</small>
+                           <div class="user-info">
+                              <h6 class="mb-0 text-dark fw-bold">{{ $izin->pegawai->nama_lengkap }}</h6>
+                              <small class="text-muted d-block"
+                                 style="font-size: 0.75rem;">{{ $izin->pegawai->divisi->nama ?? '-' }}</small>
                            </div>
                         </div>
-                        <span class="badge bg-warning">Pending</span>
+                        <span class="badge bg-label-warning px-2 rounded-pill">Pending</span>
                      </div>
-                     <div class="card-body">
-                        <h5 class="mb-2">{{ $izin->jenisIzin->nama }}</h5>
-                        <p class="text-muted mb-3">
-                           <i class="ri-calendar-line me-1"></i>
-                           {{ $izin->tgl_mulai->format('d M Y') }}
+                  </div>
+                  <div class="card-body p-4">
+                     <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                           <p class="text-muted small mb-1">Jenis Pengajuan</p>
+                           <h5 class="mb-0 fw-bold text-primary">{{ $izin->jenisIzin->nama }}</h5>
+                        </div>
+                        <div class="text-end">
+                           <p class="text-muted small mb-1">Durasi</p>
+                           <span class="badge bg-light text-dark border fw-bold">{{ $izin->jumlah_hari }} Hari</span>
+                        </div>
+                     </div>
+
+                     <div class="bg-light rounded p-3 mb-3 border-start border-4 border-info">
+                        <div class="d-flex align-items-center mb-2">
+                           <i class="ri-calendar-event-line text-info me-2"></i>
+                           <span class="fw-medium small text-dark">Rentang Tanggal</span>
+                        </div>
+                        <p class="mb-0 text-dark fw-bold small">
+                           {{ $izin->tgl_mulai->translatedFormat('d M Y') }}
                            @if ($izin->tgl_mulai != $izin->tgl_selesai)
-                              - {{ $izin->tgl_selesai->format('d M Y') }}
+                              <span class="text-muted fw-normal px-1">s/d</span>
+                              {{ $izin->tgl_selesai->translatedFormat('d M Y') }}
                            @endif
-                           <span class="badge bg-label-info ms-1">{{ $izin->jumlah_hari }} hari</span>
-                        </p>
-                        <p class="mb-0"><strong>Alasan:</strong></p>
-                        <p class="text-muted mb-3">{{ Str::limit($izin->alasan, 100) }}</p>
-
-                        @if ($izin->file_surat)
-                           <a href="{{ $izin->file_surat_url }}" target="_blank" class="btn btn-sm btn-outline-info mb-3">
-                              <i class="ri-attachment-line me-1"></i>Lihat Surat
-                           </a>
-                        @endif
-
-                        <p class="text-muted small mb-0">
-                           <i class="ri-time-line me-1"></i>Diajukan: {{ $izin->created_at->diffForHumans() }}
                         </p>
                      </div>
-                     <div class="card-footer d-flex gap-2">
-                        <button type="button" class="btn btn-success flex-grow-1 btn-approve"
-                           data-id="{{ $izin->id }}" data-name="{{ $izin->pegawai->nama_lengkap }}">
-                           <i class="ri-check-line me-1"></i>Setujui
-                        </button>
-                        <button type="button" class="btn btn-outline-danger flex-grow-1 btn-reject"
-                           data-id="{{ $izin->id }}" data-name="{{ $izin->pegawai->nama_lengkap }}">
-                           <i class="ri-close-line me-1"></i>Tolak
-                        </button>
+
+                     <div class="mb-3">
+                        <label class="text-muted small mb-1">Alasan:</label>
+                        <p class="text-dark mb-0 bg-white p-2 border rounded shadow-none"
+                           style="font-size: 0.85rem; border-style: dashed !important;">
+                           {{ $izin->alasan }}
+                        </p>
+                     </div>
+
+                     @if ($izin->file_surat)
+                        <a href="{{ $izin->file_surat_url }}" target="_blank"
+                           class="btn btn-sm btn-outline-info w-100 mb-3 border-dashed">
+                           <i class="ri-attachment-line me-1"></i>Lihat Bukti Pendukung
+                        </a>
+                     @endif
+
+                     <div class="d-flex align-items-center mt-3 pt-3 border-top">
+                        <small class="text-muted">
+                           <i class="ri-history-line me-1"></i>Diajukan {{ $izin->created_at->diffForHumans() }}
+                        </small>
+                     </div>
+                  </div>
+                  <div class="card-footer bg-white border-top p-3">
+                     <div class="row g-2">
+                        <div class="col-6">
+                           <button type="button" class="btn btn-success w-100 btn-approve shadow-sm"
+                              data-id="{{ $izin->id }}" data-name="{{ $izin->pegawai->nama_lengkap }}">
+                              <i class="ri-check-line me-1"></i>Terima
+                           </button>
+                        </div>
+                        <div class="col-6">
+                           <button type="button" class="btn btn-outline-danger w-100 btn-reject"
+                              data-id="{{ $izin->id }}" data-name="{{ $izin->pegawai->nama_lengkap }}">
+                              <i class="ri-close-line me-1"></i>Tolak
+                           </button>
+                        </div>
                      </div>
                   </div>
                </div>
-            @endforeach
-         </div>
+            </div>
+         @endforeach
+      </div>
       @endif
    </div>
 

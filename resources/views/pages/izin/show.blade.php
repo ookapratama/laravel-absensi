@@ -102,10 +102,132 @@
                            </tr>
                         @endif
                      </table>
+                  @elseif(auth()->user()->role &&
+                          (auth()->user()->role->slug === 'super-admin' || auth()->user()->hasPermission('izin.admin', 'update')))
+                     <hr>
+                     <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success flex-grow-1 btn-approve"
+                           data-id="{{ $data->id }}" data-name="{{ $data->pegawai->nama_lengkap }}">
+                           <i class="ri-check-line me-1"></i>Setujui Izin
+                        </button>
+                        <button type="button" class="btn btn-outline-danger flex-grow-1 btn-reject"
+                           data-id="{{ $data->id }}" data-name="{{ $data->pegawai->nama_lengkap }}">
+                           <i class="ri-close-line me-1"></i>Tolak Izin
+                        </button>
+                     </div>
                   @endif
                </div>
             </div>
          </div>
       </div>
    </div>
+
+   <!-- Modal Reject -->
+   <div class="modal fade" id="rejectModal" tabindex="-1">
+      <div class="modal-dialog">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title">Tolak Izin</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="reject-form">
+               <div class="modal-body">
+                  <p>Izin dari: <strong id="reject-name"></strong></p>
+                  <div class="mb-3">
+                     <label class="form-label">Alasan Penolakan <span class="text-danger">*</span></label>
+                     <textarea class="form-control" id="reject-catatan" name="catatan" rows="3" required
+                        placeholder="Jelaskan alasan penolakan..."></textarea>
+                     <small class="text-muted">Minimal 10 karakter</small>
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                  <button type="submit" class="btn btn-danger">Tolak Izin</button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+@endsection
+
+@section('page-script')
+   <script>
+      window.addEventListener('load', function() {
+         let currentRejectId = null;
+         const rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
+
+         // Approve
+         document.querySelectorAll('.btn-approve').forEach(btn => {
+            btn.addEventListener('click', function() {
+               const id = this.dataset.id;
+               const name = this.dataset.name;
+
+               window.AlertHandler.confirm(
+                  'Setujui Izin?',
+                  `Setujui pengajuan izin dari "${name}"?`,
+                  'Ya, Setujui',
+                  function() {
+                     fetch(`{{ url('izin/admin') }}/${id}/approve`, {
+                           method: 'POST',
+                           headers: {
+                              'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                              'Accept': 'application/json',
+                              'Content-Type': 'application/json'
+                           },
+                           body: JSON.stringify({})
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                           window.AlertHandler.handle(data);
+                           if (data.success) {
+                              setTimeout(() => window.location.reload(), 1500);
+                           }
+                        });
+                  }
+               );
+            });
+         });
+
+         // Reject - Open Modal
+         document.querySelectorAll('.btn-reject').forEach(btn => {
+            btn.addEventListener('click', function() {
+               currentRejectId = this.dataset.id;
+               document.getElementById('reject-name').textContent = this.dataset.name;
+               document.getElementById('reject-catatan').value = '';
+               rejectModal.show();
+            });
+         });
+
+         // Reject - Submit
+         document.getElementById('reject-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const catatan = document.getElementById('reject-catatan').value;
+
+            if (catatan.length < 10) {
+               window.AlertHandler.error('Alasan penolakan minimal 10 karakter');
+               return;
+            }
+
+            fetch(`{{ url('izin/admin') }}/${currentRejectId}/reject`, {
+                  method: 'POST',
+                  headers: {
+                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                     'Accept': 'application/json',
+                     'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                     catatan: catatan
+                  })
+               })
+               .then(response => response.json())
+               .then(data => {
+                  rejectModal.hide();
+                  window.AlertHandler.handle(data);
+                  if (data.success) {
+                     setTimeout(() => window.location.reload(), 1500);
+                  }
+               });
+         });
+      });
+   </script>
 @endsection

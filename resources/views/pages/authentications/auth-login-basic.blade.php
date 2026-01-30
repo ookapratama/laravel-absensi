@@ -109,16 +109,16 @@
                      <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-google-plus">
                         <i class="tf-icons ri-google-fill"></i>
                      </a>
-                  </div>
-               </div>
-            </div> --}}
-                  <!-- /Login -->
-                  <img alt="mask"
-                     src="{{ asset('assets/img/illustrations/auth-basic-login-mask-' . $configData['style'] . '.png') }}"
-                     class="authentication-image d-none d-lg-block"
-                     data-app-light-img="illustrations/auth-basic-login-mask-light.png"
-                     data-app-dark-img="illustrations/auth-basic-login-mask-dark.png" />
+                  </div> --}}
                </div>
             </div>
+            <!-- /Login -->
+            <img alt="mask"
+               src="{{ asset('assets/img/illustrations/auth-basic-login-mask-' . $configData['style'] . '.png') }}"
+               class="authentication-image d-none d-lg-block"
+               data-app-light-img="illustrations/auth-basic-login-mask-light.png"
+               data-app-dark-img="illustrations/auth-basic-login-mask-dark.png" />
          </div>
-      @endsection
+      </div>
+   </div>
+@endsection

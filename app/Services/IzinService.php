@@ -65,10 +65,22 @@ class IzinService extends BaseService
 
         // Check max hari (jika ada limit)
         $jenisIzin = \App\Models\JenisIzin::find($data['jenis_izin_id']);
-        if ($jenisIzin && $jenisIzin->max_hari) {
-            $jumlahHari = $tglMulai->diffInDays($tglSelesai) + 1;
-            if ($jumlahHari > $jenisIzin->max_hari) {
-                throw new \Exception("Maksimal izin {$jenisIzin->nama} adalah {$jenisIzin->max_hari} hari.");
+        if ($jenisIzin) {
+            $isCuti = str_contains(strtolower($jenisIzin->nama), 'cuti') || str_contains(strtolower($jenisIzin->kode), 'cuti');
+            
+            // Aturan khusus Cuti: Minimal 7 hari sebelumnya
+            if ($isCuti) {
+                $today = now()->startOfDay();
+                if ($today->diffInDays($tglMulai, false) < 7) {
+                    throw new \Exception("Pengajuan {$jenisIzin->nama} harus dilakukan minimal 7 hari (1 minggu) sebelumnya.");
+                }
+            }
+
+            if ($jenisIzin->max_hari) {
+                $jumlahHari = $tglMulai->diffInDays($tglSelesai) + 1;
+                if ($jumlahHari > $jenisIzin->max_hari) {
+                    throw new \Exception("Maksimal izin {$jenisIzin->nama} adalah {$jenisIzin->max_hari} hari.");
+                }
             }
         }
 
@@ -150,32 +162,29 @@ class IzinService extends BaseService
     {
         $jenisIzin = $izin->jenisIzin;
         
-        // Map jenis izin ke status absensi
-        $statusMap = [
-            'sakit' => 'Sakit',
-            'cuti' => 'Cuti',
-            'izin' => 'Izin',
-        ];
-
-        $kodeJenis = strtolower($jenisIzin->kode ?? $jenisIzin->nama);
-        $status = $statusMap[$kodeJenis] ?? 'Izin';
+        $kodeStr = strtolower(($jenisIzin->kode ?? '') . ' ' . ($jenisIzin->nama ?? ''));
+        
+        $status = 'Izin';
+        if (str_contains($kodeStr, 'sakit')) {
+            $status = 'Sakit';
+        } elseif (str_contains($kodeStr, 'cuti') || str_contains($kodeStr, 'melahirkan') || str_contains($kodeStr, 'menikah') || str_contains($kodeStr, 'duka')) {
+            $status = 'Cuti';
+        }
 
         $current = Carbon::parse($izin->tgl_mulai);
         $end = Carbon::parse($izin->tgl_selesai);
 
-        while ($current->lte($end)) {
-            // Skip weekend jika perlu (optional)
-            // if ($current->isWeekend()) {
-            //     $current->addDay();
-            //     continue;
-            // }
+        $pegawai = $izin->pegawai;
+        $shiftId = $pegawai->shift_id;
 
+        while ($current->lte($end)) {
             Absensi::updateOrCreate(
                 [
                     'pegawai_id' => $izin->pegawai_id,
                     'tanggal' => $current->toDateString(),
                 ],
                 [
+                    'shift_id' => $shiftId,
                     'status' => $status,
                     'keterangan' => "Izin: {$jenisIzin->nama} - {$izin->alasan}",
                 ]

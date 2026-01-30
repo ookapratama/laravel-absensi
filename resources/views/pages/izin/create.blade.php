@@ -75,10 +75,9 @@
                      </div>
 
                      <div class="mb-3">
-                        <label class="form-label" for="alasan">Alasan <small
-                              class="text-muted">(Opsional)</small></label>
+                        <label class="form-label" for="alasan">Alasan <span class="text-danger">*</span></label>
                         <textarea class="form-control @error('alasan') is-invalid @enderror" id="alasan" name="alasan" rows="4"
-                           placeholder="Jelaskan alasan pengajuan izin Anda...">{{ old('alasan') }}</textarea>
+                           placeholder="Jelaskan alasan pengajuan izin Anda..." required>{{ old('alasan') }}</textarea>
                         @error('alasan')
                            <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -124,29 +123,111 @@
          const tglMulai = document.getElementById('tgl_mulai');
          const tglSelesai = document.getElementById('tgl_selesai');
 
-         jenisSelect.addEventListener('change', function() {
-            const selected = this.options[this.selectedIndex];
+         const today = new Date();
+         today.setHours(0, 0, 0, 0);
+
+         const sevenDaysLater = new Date(today);
+         sevenDaysLater.setDate(today.getDate() + 7);
+
+         const formatDate = (date) => {
+            let d = new Date(date),
+               month = '' + (d.getMonth() + 1),
+               day = '' + d.getDate(),
+               year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [year, month, day].join('-');
+         };
+
+         const dateTodayStr = formatDate(today);
+         const dateSevenDaysStr = formatDate(sevenDaysLater);
+
+         function updateDateConstraints() {
+            const selected = jenisSelect.options[jenisSelect.selectedIndex];
+            if (!selected || !selected.value) return;
+
+            const nama = selected.text.toLowerCase();
+            const isCuti = nama.includes('cuti');
             const maxHari = selected.dataset.maxHari;
 
-            // Show info about max hari
+            let minDate = dateTodayStr;
+            let info = '';
+
+            if (isCuti) {
+               minDate = dateSevenDaysStr;
+               info =
+                  `<strong>Info Cuti:</strong> Pengajuan cuti harus dilakukan minimal 1 minggu sebelumnya (Minimal tanggal ${dateSevenDaysStr}).`;
+            }
+
             if (maxHari) {
-               infoAlert.classList.remove('d-none');
-               infoText.textContent = `Jenis izin ini maksimal ${maxHari} hari.`;
+               info += (info ? '<br>' : '') + `<strong>Maksimal:</strong> Jenis izin ini maksimal ${maxHari} hari.`;
+            }
+
+            if (info) {
+               infoAlert.classList.remove('d-none', 'alert-info', 'alert-warning');
+               infoAlert.classList.add(isCuti ? 'alert-warning' : 'alert-info');
+               infoText.innerHTML = info;
             } else {
                infoAlert.classList.add('d-none');
             }
-         });
 
-         // Validate date range
+            tglMulai.setAttribute('min', minDate);
+            if (tglMulai.value < minDate) {
+               tglMulai.value = minDate;
+               tglSelesai.value = minDate;
+            }
+            tglSelesai.setAttribute('min', tglMulai.value);
+         }
+
+         jenisSelect.addEventListener('change', updateDateConstraints);
+
          tglMulai.addEventListener('change', function() {
             tglSelesai.setAttribute('min', this.value);
             if (tglSelesai.value < this.value) {
                tglSelesai.value = this.value;
             }
+
+            // Check max hari
+            const selected = jenisSelect.options[jenisSelect.selectedIndex];
+            const maxHari = selected.dataset.maxHari;
+            if (maxHari && tglSelesai.value) {
+               const start = new Date(this.value);
+               const end = new Date(tglSelesai.value);
+               const diffTime = Math.abs(end - start);
+               const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+               if (diffDays > maxHari) {
+                  // Adjust tglSelesai to max allowed
+                  const newEnd = new Date(start);
+                  newEnd.setDate(start.getDate() + parseInt(maxHari) - 1);
+                  tglSelesai.value = formatDate(newEnd);
+                  window.AlertHandler.showError(`Maksimal izin ini adalah ${maxHari} hari.`);
+               }
+            }
          });
 
-         // Trigger initial change
-         jenisSelect.dispatchEvent(new Event('change'));
+         tglSelesai.addEventListener('change', function() {
+            const selected = jenisSelect.options[jenisSelect.selectedIndex];
+            const maxHari = selected.dataset.maxHari;
+            if (maxHari && tglMulai.value) {
+               const start = new Date(tglMulai.value);
+               const end = new Date(this.value);
+               const diffTime = Math.abs(end - start);
+               const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+               if (diffDays > maxHari) {
+                  const newEnd = new Date(start);
+                  newEnd.setDate(start.getDate() + parseInt(maxHari) - 1);
+                  this.value = formatDate(newEnd);
+                  window.AlertHandler.showError(`Maksimal izin ini adalah ${maxHari} hari.`);
+               }
+            }
+         });
+
+         // Trigger initial
+         updateDateConstraints();
       });
    </script>
 @endsection

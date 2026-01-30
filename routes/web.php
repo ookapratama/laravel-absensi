@@ -79,21 +79,21 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ============== IZIN ==============
-    // Route untuk pegawai
     Route::prefix('izin')->name('izin.')->group(function () {
-        Route::get('/', [IzinController::class, 'index'])->name('index');
-        Route::get('/create', [IzinController::class, 'create'])->name('create');
-        Route::post('/', [IzinController::class, 'store'])->name('store');
-        Route::get('/{izin}', [IzinController::class, 'show'])->name('show');
-        Route::delete('/{izin}/cancel', [IzinController::class, 'cancel'])->name('cancel');
-
-        // Route untuk admin
+        // Route untuk admin (Harus di atas agar tidak tertangkap oleh /{izin})
         Route::prefix('admin')->name('admin.')->middleware('check.permission:izin.admin')->group(function () {
             Route::get('/', [IzinController::class, 'adminIndex'])->name('index');
             Route::get('/pending', [IzinController::class, 'pending'])->name('pending');
             Route::post('/{izin}/approve', [IzinController::class, 'approve'])->name('approve');
             Route::post('/{izin}/reject', [IzinController::class, 'reject'])->name('reject');
         });
+
+        // Route untuk pegawai
+        Route::get('/', [IzinController::class, 'index'])->name('index');
+        Route::get('/create', [IzinController::class, 'create'])->name('create');
+        Route::post('/', [IzinController::class, 'store'])->name('store');
+        Route::get('/{izin}', [IzinController::class, 'show'])->name('show');
+        Route::delete('/{izin}/cancel', [IzinController::class, 'cancel'])->name('cancel');
     });
 });
 

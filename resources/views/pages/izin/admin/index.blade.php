@@ -23,29 +23,73 @@
          </div>
       </div>
 
-      <!-- Stats -->
-      <div class="row mb-4">
-         <div class="col-md-4">
-            <div class="card bg-warning text-white">
+      <!-- Stats Cards -->
+      <div class="row g-4 mb-4">
+         <div class="col-sm-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
                <div class="card-body">
-                  <h3 class="mb-0 text-white">{{ $statistik['pending'] }}</h3>
-                  <span>Menunggu Persetujuan</span>
+                  <div class="d-flex align-items-center justify-content-between">
+                     <div class="content-left">
+                        <h4 class="mb-0 fw-bold">{{ $statistik['pending'] }}</h4>
+                        <small class="text-warning fw-medium">Menunggu</small>
+                     </div>
+                     <div class="avatar avatar-lg">
+                        <div class="avatar-initial bg-label-warning rounded">
+                           <i class="ri-time-line ri-24px"></i>
+                        </div>
+                     </div>
+                  </div>
                </div>
             </div>
          </div>
-         <div class="col-md-4">
-            <div class="card bg-success text-white">
+         <div class="col-sm-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
                <div class="card-body">
-                  <h3 class="mb-0 text-white">{{ $statistik['approved'] }}</h3>
-                  <span>Disetujui</span>
+                  <div class="d-flex align-items-center justify-content-between">
+                     <div class="content-left">
+                        <h4 class="mb-0 fw-bold">{{ $statistik['approved'] }}</h4>
+                        <small class="text-success fw-medium">Disetujui</small>
+                     </div>
+                     <div class="avatar avatar-lg">
+                        <div class="avatar-initial bg-label-success rounded">
+                           <i class="ri-check-double-line ri-24px"></i>
+                        </div>
+                     </div>
+                  </div>
                </div>
             </div>
          </div>
-         <div class="col-md-4">
-            <div class="card bg-danger text-white">
+         <div class="col-sm-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
                <div class="card-body">
-                  <h3 class="mb-0 text-white">{{ $statistik['rejected'] }}</h3>
-                  <span>Ditolak</span>
+                  <div class="d-flex align-items-center justify-content-between">
+                     <div class="content-left">
+                        <h4 class="mb-0 fw-bold">{{ $statistik['rejected'] }}</h4>
+                        <small class="text-danger fw-medium">Ditolak</small>
+                     </div>
+                     <div class="avatar avatar-lg">
+                        <div class="avatar-initial bg-label-danger rounded">
+                           <i class="ri-close-circle-line ri-24px"></i>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="col-sm-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
+               <div class="card-body">
+                  <div class="d-flex align-items-center justify-content-between">
+                     <div class="content-left">
+                        <h4 class="mb-0 fw-bold">{{ $statistik['total'] }}</h4>
+                        <small class="text-primary fw-medium">Total Pengajuan</small>
+                     </div>
+                     <div class="avatar avatar-lg">
+                        <div class="avatar-initial bg-label-primary rounded">
+                           <i class="ri-file-list-3-line ri-24px"></i>
+                        </div>
+                     </div>
+                  </div>
                </div>
             </div>
          </div>
@@ -81,7 +125,14 @@
                               </div>
                            </div>
                         </td>
-                        <td>{{ $izin->jenisIzin->nama }}</td>
+                        <td>
+                           {{ $izin->jenisIzin->nama }}
+                           @if ($izin->file_surat)
+                              <a href="{{ $izin->file_surat_url }}" target="_blank" class="ms-1">
+                                 <i class="ri-attachment-line text-primary" title="Lihat Lampiran"></i>
+                              </a>
+                           @endif
+                        </td>
                         <td>
                            {{ $izin->tgl_mulai->format('d/m/Y') }}
                            @if ($izin->tgl_mulai != $izin->tgl_selesai)

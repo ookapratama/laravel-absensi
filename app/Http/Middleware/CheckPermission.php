@@ -22,6 +22,8 @@ class CheckPermission
             'store'   => 'create',
             'edit'    => 'update',
             'update'  => 'update',
+            'approve' => 'update',
+            'reject'  => 'update',
             'destroy' => 'delete',
         ];
 
