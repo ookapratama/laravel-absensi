@@ -12,6 +12,7 @@ class ShiftRequest extends BaseRequest
             'jam_masuk' => 'required',
             'jam_pulang' => 'required',
             'is_aktif' => 'nullable|boolean',
+            'ikut_libur' => 'nullable|boolean',
         ];
     }
 

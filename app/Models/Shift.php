@@ -15,10 +15,12 @@ class Shift extends Model
         'jam_masuk',
         'jam_pulang',
         'is_aktif',
+        'ikut_libur',
     ];
 
     protected $casts = [
         'is_aktif' => 'boolean',
+        'ikut_libur' => 'boolean',
         'jam_masuk' => 'datetime:H:i',
         'jam_pulang' => 'datetime:H:i',
     ];

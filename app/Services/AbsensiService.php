@@ -108,9 +108,11 @@ class AbsensiService extends BaseService
 
         // CEK HARI LIBUR
         // Jika hari ini terdaftar di tabel hari_liburs, tolak absen
+        // CEK HARI LIBUR
+        // REVISI: Hanya tolak absen jika shift tersebut dikonfigurasi mengikuti hari libur
         $hariLibur = \App\Models\HariLibur::whereDate('tanggal', today())->first();
-        if ($hariLibur) {
-             throw new \Exception("Hari ini libur nasional/cuti bersama: {$hariLibur->nama}. Absensi dinonaktifkan.");
+        if ($hariLibur && $shift->ikut_libur) {
+             throw new \Exception("Hari ini libur nasional/cuti bersama: {$hariLibur->nama}. Shift '{$shift->nama}' tidak diizinkan absen.");
         }
 
         // VALIDASI WAKTU MASUK

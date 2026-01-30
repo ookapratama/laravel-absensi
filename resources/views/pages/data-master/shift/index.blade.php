@@ -56,6 +56,7 @@
                      <th>Nama Shift</th>
                      <th>Jam Masuk</th>
                      <th>Jam Pulang</th>
+                     <th>Ikut Libur</th>
                      <th>Status</th>
                      <th class="text-center">Aksi</th>
                   </tr>
@@ -68,6 +69,13 @@
                         <td><strong>{{ $item->nama }}</strong></td>
                         <td><span class="badge bg-label-primary">{{ $item->jam_masuk->format('H:i') }}</span></td>
                         <td><span class="badge bg-label-secondary">{{ $item->jam_pulang->format('H:i') }}</span></td>
+                        <td>
+                           @if ($item->ikut_libur)
+                              <span class="badge bg-label-warning">Ya</span>
+                           @else
+                              <span class="badge bg-label-success">Tidak</span>
+                           @endif
+                        </td>
                         <td>
                            @if ($item->is_aktif)
                               <span class="badge bg-success">Aktif</span>
@@ -131,11 +139,20 @@
                         <input type="time" name="jam_pulang" id="jam_pulang" class="form-control" required>
                      </div>
                   </div>
-                  <div class="mb-0">
-                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="is_aktif" name="is_aktif" value="1"
-                           checked>
-                        <label class="form-check-label" for="is_aktif">Aktif</label>
+                  <div class="row">
+                     <div class="col-md-6 mb-3">
+                        <div class="form-check form-switch pt-2">
+                           <input class="form-check-input" type="checkbox" id="ikut_libur" name="ikut_libur"
+                              value="1">
+                           <label class="form-check-label" for="ikut_libur">Ikuti Hari Libur</label>
+                        </div>
+                     </div>
+                     <div class="col-md-6 mb-0">
+                        <div class="form-check form-switch pt-2">
+                           <input class="form-check-input" type="checkbox" id="is_aktif" name="is_aktif"
+                              value="1" checked>
+                           <label class="form-check-label" for="is_aktif">Aktif</label>
+                        </div>
                      </div>
                   </div>
                </div>
@@ -204,6 +221,7 @@
             if (data.jam_masuk) document.getElementById('jam_masuk').value = data.jam_masuk.substring(0, 5);
             if (data.jam_pulang) document.getElementById('jam_pulang').value = data.jam_pulang.substring(0, 5);
 
+            document.getElementById('ikut_libur').checked = !!data.ikut_libur;
             document.getElementById('is_aktif').checked = !!data.is_aktif;
             const modal = getModalInstance();
             if (modal) modal.show();

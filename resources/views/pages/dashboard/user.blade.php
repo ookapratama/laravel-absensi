@@ -150,11 +150,23 @@
                      </div>
                      @php
                         $hariLibur = \App\Models\HariLibur::whereDate('tanggal', today())->first();
+                        $shifts = \App\Models\Shift::where('divisi_id', $pegawai->divisi_id)
+                            ->where('is_aktif', true)
+                            ->get();
+                        // Shift yang tetap masuk meskipun libur
+                        $workingShifts = $shifts->filter(fn($s) => $s->ikut_libur == false);
+                        $anyShiftWorkingToday = $workingShifts->isNotEmpty();
                      @endphp
                      @if ($hariLibur)
-                        <div class="glass-badge bg-danger shadow-sm border-0 text-white">
-                           <i class="ri-calendar-event-fill me-1"></i> Libur: {{ $hariLibur->nama }}
-                        </div>
+                        @if (!$anyShiftWorkingToday)
+                           <div class="glass-badge bg-danger shadow-sm border-0 text-white">
+                              <i class="ri-calendar-event-fill me-1"></i> Libur: {{ $hariLibur->nama }}
+                           </div>
+                        @else
+                           <div class="glass-badge bg-info shadow-sm border-0 text-white">
+                              <i class="ri-calendar-event-fill me-1"></i> Hari Ini: {{ $hariLibur->nama }} (Tetap Bertugas)
+                           </div>
+                        @endif
                      @endif
                   </div>
                </div>
@@ -322,88 +334,96 @@
                                    $jamPulangShift = $jamPulang->copy();
                                    $isCrossDay = $jamPulang->lt($jamMasuk); // Recalculate for this context
 
-                                   if ($isCrossDay && $now->lt($jamMasukShift)) {
-                                       // If it's a cross-day shift and current time is before the shift's start time (e.g., 2 AM for a shift ending at 3 AM)
-                                       // This means the shift started yesterday and ends today.
-                                       // Adjust jamPulangShift to be today's date.
-            $jamPulangShift->addDay();
-        }
+                                   if ($isCrossDay) {
+                                       if ($now->format('H:i:s') > $jamMasukShift->format('H:i:s')) {
+                                           $jamPulangShift->addDay();
+                                       }
+                                   }
 
-        if ($now->lt($jamPulangShift)) {
-            $isPulang = true; // State is 'Working'
-            // $isDisabled = true; // DISABLE DULU BIAR BISA PULANG CEPAT
-            $btnText = 'Absen Pulang';
-            $btnClass = 'btn-warning';
-            $statusText = 'Sedang Berjalan';
-            $statusClass = 'text-warning';
-        } else {
-            // Sudah lewat jam pulang, boleh pulang
-            $isPulang = true;
-            $btnText = 'Absen Pulang';
-            $btnClass = 'btn-danger';
-            $statusText = 'Waktunya Pulang';
-            $statusClass = 'text-danger';
-        }
-    }
-} else {
-    // Belum absen, cek waktu
-    $batasAwal = $jamMasuk->copy()->subHours(2); // Bisa absen 2 jam sebelum
-    $isCrossDay = $jamPulang->lt($jamMasuk); // Recalculate for this context
+                                   if ($now->lt($jamPulangShift)) {
+                                       $isPulang = true; // State is 'Working'
+                                       // $isDisabled = true; // DISABLE DULU BIAR BISA PULANG CEPAT
+                                       $btnText = 'Absen Pulang';
+                                       $btnClass = 'btn-warning';
+                                       $statusText = 'Sedang Berjalan';
+                                       $statusClass = 'text-warning';
+                                   } else {
+                                       // Sudah lewat jam pulang, boleh pulang
+                                       $isPulang = true;
+                                       $btnText = 'Absen Pulang';
+                                       $btnClass = 'btn-danger';
+                                       $statusText = 'Waktunya Pulang';
+                                       $statusClass = 'text-danger';
+                                   }
+                               }
+                           } else {
+                               // Belum absen, cek apakah hari ini libur dan shift mengikuti libur
+                               if ($hariLibur && $shift->ikut_libur) {
+                                   $isDisabled = true;
+                                   $btnText = 'Libur';
+                                   $btnClass = 'btn-danger';
+                                   $statusText = 'Libur Nasional';
+                                   $statusClass = 'text-danger';
+                               }
 
-    $valid = false;
+                               // Belum absen, cek waktu
+                               $batasAwal = $jamMasuk->copy()->subHours(2); // Bisa absen 2 jam sebelum
+                               $isCrossDay = $jamPulang->lt($jamMasuk); // Recalculate for this context
 
-    if ($isCrossDay) {
-        // Logic Cross Day: Valid if Now > BatasAwal OR Now < JamPulang
-        // Invalid if Now is between JamPulang and BatasAwal
-        if ($now->gt($jamPulang) && $now->lt($batasAwal)) {
-            $isDisabled = true;
-            $btnClass = 'btn-secondary';
-            // Determine label based on proximity
-            if (
-                $now->diffInHours($batasAwal, false) > 0 &&
-                $now->diffInHours($batasAwal, false) < 6
-            ) {
-                $btnText = 'Belum Dibuka';
-                $statusText = 'Dibuka ' . $batasAwal->format('H:i');
-                $statusClass = 'text-muted';
-            } else {
-                $btnText = 'Sesi Berakhir';
-                $statusText = 'Shift Berakhir';
-                $statusClass = 'text-danger';
-            }
-        } else {
-            $valid = true;
-        }
-    } else {
-        // Logic Normal
-        if ($now->lt($batasAwal)) {
-            $isDisabled = true;
-            $btnClass = 'btn-secondary';
-            $btnText = 'Belum Dibuka';
-            $statusText = 'Dibuka ' . $batasAwal->format('H:i');
-            $statusClass = 'text-muted';
-        } elseif ($now->gt($jamPulang)) {
-            $isDisabled = true;
-            $btnClass = 'btn-secondary';
-            $btnText = 'Sesi Berakhir';
-            $statusText = 'Shift Berakhir';
-            $statusClass = 'text-danger';
-        } else {
-            $valid = true;
-        }
-    }
+                               $valid = false;
 
-    if ($valid) {
-        $isMasuk = true;
-    }
+                               if ($isCrossDay) {
+                                   // Logic Cross Day: Valid if Now > BatasAwal OR Now < JamPulang
+                                   // Invalid if Now is between JamPulang and BatasAwal
+                                   if ($now->gt($jamPulang) && $now->lt($batasAwal)) {
+                                       $isDisabled = true;
+                                       $btnClass = 'btn-secondary';
+                                       // Determine label based on proximity
+                                       if (
+                                           $now->diffInHours($batasAwal, false) > 0 &&
+                                           $now->diffInHours($batasAwal, false) < 6
+                                       ) {
+                                           $btnText = 'Belum Dibuka';
+                                           $statusText = 'Dibuka ' . $batasAwal->format('H:i');
+                                           $statusClass = 'text-muted';
+                                       } else {
+                                           $btnText = 'Sesi Berakhir';
+                                           $statusText = 'Shift Berakhir';
+                                           $statusClass = 'text-danger';
+                                       }
+                                   } else {
+                                       $valid = true;
+                                   }
+                               } else {
+                                   // Logic Normal
+                                   if ($now->lt($batasAwal)) {
+                                       $isDisabled = true;
+                                       $btnClass = 'btn-secondary';
+                                       $btnText = 'Belum Dibuka';
+                                       $statusText = 'Dibuka ' . $batasAwal->format('H:i');
+                                       $statusClass = 'text-muted';
+                                   } elseif ($now->gt($jamPulang)) {
+                                       $isDisabled = true;
+                                       $btnClass = 'btn-secondary';
+                                       $btnText = 'Sesi Berakhir';
+                                       $statusText = 'Shift Berakhir';
+                                       $statusClass = 'text-danger';
+                                   } else {
+                                       $valid = true;
+                                   }
+                               }
 
-    // OVERRIDE LOGIKA JIKA ADA SESI LAIN YANG AKTIF
-    if ($isOtherShiftActive) {
-        $isDisabled = true;
-        $btnText = 'Sedang Bekerja...';
-        $btnClass = 'btn-secondary';
-        $statusText = 'Sesi Lain Aktif';
-        $statusClass = 'text-warning';
+                               if ($valid) {
+                                   $isMasuk = true;
+                               }
+
+                               // OVERRIDE LOGIKA JIKA ADA SESI LAIN YANG AKTIF
+                               if ($isOtherShiftActive) {
+                                   $isDisabled = true;
+                                   $btnText = 'Sedang Bekerja...';
+                                   $btnClass = 'btn-secondary';
+                                   $statusText = 'Sesi Lain Aktif';
+                                   $statusClass = 'text-warning';
                                }
                            }
                         @endphp

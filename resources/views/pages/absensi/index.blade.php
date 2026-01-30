@@ -276,12 +276,18 @@
                      if ($shift && $absensiHariIni && $absensiHariIni->jam_masuk && !$absensiHariIni->jam_pulang) {
                          $now = now();
                          $jamPulang = \Carbon\Carbon::parse($shift->jam_pulang->format('H:i:s'));
-                         if (\Carbon\Carbon::parse($shift->jam_masuk->format('H:i:s'))->gt($jamPulang)) {
-                             if ($now->format('H:i:s') > $shift->jam_masuk->format('H:i:s')) {
+                         $jamMasuk = \Carbon\Carbon::parse($shift->jam_masuk->format('H:i:s'));
+
+                         // Handle Cross-Day Shift
+                         if ($jamMasuk->gt($jamPulang)) {
+                             if ($now->format('H:i:s') > $jamMasuk->format('H:i:s')) {
                                  $jamPulang->addDay();
                              }
                          }
-                         $isBelumWaktunyaPulang = $now->lt($jamPulang);
+
+                         // Perbolehkan pulang lebih awal maksimal 2 jam (120 menit)
+                         $batasAwalPulang = $jamPulang->copy()->subHours(2);
+                         $isBelumWaktunyaPulang = $now->lt($batasAwalPulang);
                      }
                   @endphp
                   <div class="row g-3">

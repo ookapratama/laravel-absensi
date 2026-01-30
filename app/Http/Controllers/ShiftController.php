@@ -30,6 +30,7 @@ class ShiftController extends Controller
     {
         $data = $request->validated();
         $data['is_aktif'] = $request->boolean('is_aktif', true);
+        $data['ikut_libur'] = $request->boolean('ikut_libur', false);
 
         return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
             $result = $this->shiftService->storeShift($data);
@@ -46,6 +47,7 @@ class ShiftController extends Controller
     {
         $data = $request->validated();
         $data['is_aktif'] = $request->boolean('is_aktif', true);
+        $data['ikut_libur'] = $request->boolean('ikut_libur', false);
 
         return \Illuminate\Support\Facades\DB::transaction(function () use ($id, $data) {
             $result = $this->shiftService->updateShift($id, $data);
