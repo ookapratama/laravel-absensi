@@ -106,6 +106,13 @@ class AbsensiService extends BaseService
             throw new \Exception('Anda sudah absen masuk pada shift ini hari ini.');
         }
 
+        // CEK HARI LIBUR
+        // Jika hari ini terdaftar di tabel hari_liburs, tolak absen
+        $hariLibur = \App\Models\HariLibur::whereDate('tanggal', today())->first();
+        if ($hariLibur) {
+             throw new \Exception("Hari ini libur nasional/cuti bersama: {$hariLibur->nama}. Absensi dinonaktifkan.");
+        }
+
         // VALIDASI WAKTU MASUK
         $now = now();
         $jamMasuk = Carbon::parse($shift->jam_masuk->format('H:i:s'));
@@ -226,14 +233,17 @@ class AbsensiService extends BaseService
                 }
             }
 
-            // Aturan Ketat: Tidak boleh pulang sebelum jam pulang
+            // Perbolehkan pulang lebih awal maksimal 2 jam (120 menit)
             if ($now->lt($jamPulang)) {
                 $diff = $now->diffInMinutes($jamPulang);
-                $hours = floor($diff / 60);
-                $mins = $diff % 60;
-                $waitTime = ($hours > 0 ? "{$hours} jam " : "") . "{$mins} menit";
                 
-                throw new \Exception("Belum waktunya jam pulang. Silakan tunggu {$waitTime} lagi (Jadwal: " . $jamPulang->format('H:i') . ").");
+                if ($diff > 120) {
+                    $hours = floor($diff / 60);
+                    $mins = $diff % 60;
+                    $waitTime = ($hours > 0 ? "{$hours} jam " : "") . "{$mins} menit";
+                    
+                    throw new \Exception("Belum waktunya jam pulang. Silakan tunggu {$waitTime} lagi (Jadwal: " . $jamPulang->format('H:i') . "). Anda diperbolehkan pulang maksimal 2 jam sebelum jadwal.");
+                }
             }
         }
 
@@ -451,13 +461,54 @@ class AbsensiService extends BaseService
     public function getStatistikPegawai($pegawaiId, $bulan, $tahun)
     {
         $absensis = $this->repository->getByPegawaiBulan($pegawaiId, $bulan, $tahun);
+        
+        // Hitung total hari kerja efektif (sampai hari ini atau Full Bulan jika sudah lewat)
+        $totalHariKerja = $this->getHariKerjaEfektif($bulan, $tahun);
 
+        $daysActive = $absensis->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
+        
         return [
             'hadir' => $absensis->where('status', 'Hadir')->whereNotNull('jam_pulang')->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
             'terlambat' => $absensis->where('status', 'Terlambat')->whereNotNull('jam_pulang')->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
             'izin' => $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count(),
-            'alfa' => 0, // Bisa dikembangkan dengan membandingkan hari kerja vs jumlah absen
-            'total_hari_kerja' => $absensis->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
+            'alfa' => max(0, $totalHariKerja - $daysActive),
+            'total_hari_kerja' => $totalHariKerja,
         ];
+    }
+
+    /**
+     * Hitung hari kerja efektif (tidak termasuk sabtu, minggu, dan hari libur)
+     */
+    public function getHariKerjaEfektif($bulan, $tahun)
+    {
+        $start = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
+        $end = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth();
+        
+        // Jika bulan ini, hitung sampai hari ini saja
+        if ($tahun == now()->year && $bulan == now()->month) {
+            $end = now();
+        }
+
+        $holidays = \App\Models\HariLibur::whereBetween('tanggal', [
+                $start->format('Y-m-d'), 
+                $end->format('Y-m-d')
+            ])->pluck('tanggal')
+            ->map(fn($d) => $d->format('Y-m-d'))
+            ->toArray();
+
+        $count = 0;
+        $current = $start->copy();
+        while ($current <= $end) {
+            // Check weekend (Saturday/Sunday)
+            $isWeekend = $current->isWeekend();
+            $isHoliday = in_array($current->format('Y-m-d'), $holidays);
+
+            if (!$isWeekend && !$isHoliday) {
+                $count++;
+            }
+            $current->addDay();
+        }
+
+        return $count;
     }
 }

@@ -201,11 +201,80 @@ class AbsensiController extends Controller
      */
     public function rekap(Request $request)
     {
-        $bulan = $request->get('bulan', now()->month);
-        $tahun = $request->get('tahun', now()->year);
+        $bulan = (int)$request->get('bulan', now()->month);
+        $tahun = (int)$request->get('tahun', now()->year);
 
         $data = $this->pegawaiService->rekapPaginate($bulan, $tahun);
+        
+        // Hitung hari kerja efektif bulan ini
+        $absensiService = app(\App\Services\AbsensiService::class);
+        $hariEfektif = $absensiService->getHariKerjaEfektif($bulan, $tahun);
 
-        return view('pages.absensi.rekap', compact('data', 'bulan', 'tahun'));
+        return view('pages.absensi.rekap', compact('data', 'bulan', 'tahun', 'hariEfektif'));
+    }
+
+    /**
+     * Halaman calendar absensi untuk pegawai
+     */
+    public function calendar()
+    {
+        return view('pages.absensi.calendar');
+    }
+
+    /**
+     * API for calendar events
+     */
+    public function getCalendarEvents(Request $request)
+    {
+        $start = $request->get('start');
+        $end = $request->get('end');
+        $pegawai = auth()->user()->pegawai;
+
+        if (!$pegawai) {
+            return response()->json([]);
+        }
+
+        // Attendance Events
+        $absensis = \App\Models\Absensi::where('pegawai_id', $pegawai->id)
+            ->whereBetween('tanggal', [$start, $end])
+            ->get();
+
+        $events = [];
+
+        foreach ($absensis as $absen) {
+            $color = 'success';
+            if ($absen->status === 'Terlambat') $color = 'warning';
+            if ($absen->status === 'Alpha') $color = 'danger';
+            if (in_array($absen->status, ['Izin', 'Cuti', 'Sakit'])) $color = 'info';
+
+            $events[] = [
+                'id' => 'absen-' . $absen->id,
+                'title' => $absen->status . ($absen->jam_masuk ? ' (' . $absen->jam_masuk->format('H:i') . ')' : ''),
+                'start' => $absen->tanggal->format('Y-m-d') . ($absen->jam_masuk ? 'T' . $absen->jam_masuk->format('H:i:s') : ''),
+                'end' => $absen->tanggal->format('Y-m-d') . ($absen->jam_pulang ? 'T' . $absen->jam_pulang->format('H:i:s') : ''),
+                'allDay' => $absen->jam_masuk ? false : true,
+                'extendedProps' => [
+                    'calendar' => $color,
+                    'description' => $absen->keterangan ?? 'Absensi Shift: ' . ($absen->shift->nama ?? '-'),
+                ]
+            ];
+        }
+
+        // Holiday Events
+        $holidays = \App\Models\HariLibur::whereBetween('tanggal', [$start, $end])->get();
+        foreach ($holidays as $holiday) {
+            $events[] = [
+                'id' => 'holiday-' . $holiday->id,
+                'title' => 'Libur: ' . $holiday->nama,
+                'start' => $holiday->tanggal->format('Y-m-d'),
+                'allDay' => true,
+                'extendedProps' => [
+                    'calendar' => 'danger',
+                    'description' => $holiday->deskripsi ?? 'Libur Nasional',
+                ]
+            ];
+        }
+
+        return response()->json($events);
     }
 }

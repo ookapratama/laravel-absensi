@@ -57,6 +57,11 @@ Route::middleware(['auth'])->group(function () {
     // Pegawai
     Route::resource('pegawai', PegawaiController::class)->middleware('check.permission:pegawai.index');
 
+    // Hari Libur
+    Route::post('hari-libur/sync', [\App\Http\Controllers\HariLiburController::class, 'sync'])->name('hari-libur.sync')->middleware('check.permission:hari-libur.index');
+    Route::resource('hari-libur', \App\Http\Controllers\HariLiburController::class)->middleware('check.permission:hari-libur.index');
+    Route::get('api/hari-libur/events', [\App\Http\Controllers\HariLiburController::class, 'getEvents'])->name('api.hari-libur.events');
+
     // ============== ABSENSI ==============
     Route::prefix('absensi')->name('absensi.')->group(function () {
         // Halaman absensi untuk pegawai
@@ -65,6 +70,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/pulang', [AbsensiController::class, 'absenPulang'])->name('pulang');
         Route::post('/validate-location', [AbsensiController::class, 'validateLocation'])->name('validate-location');
         Route::get('/history', [AbsensiController::class, 'history'])->name('history');
+        Route::get('/calendar', [AbsensiController::class, 'calendar'])->name('calendar');
+        Route::get('/calendar-events', [AbsensiController::class, 'getCalendarEvents'])->name('calendar-events');
 
         // Dashboard & Rekap untuk Admin
         Route::get('/dashboard', [AbsensiController::class, 'dashboard'])->name('dashboard')->middleware('check.permission:absensi.dashboard');

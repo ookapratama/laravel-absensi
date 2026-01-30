@@ -73,6 +73,14 @@ class AbsensiMenuSeeder extends Seeder
                 'parent_slug' => 'data-master',
                 'order_no' => 5
             ],
+            [
+                'slug' => 'hari-libur.index',
+                'name' => 'Hari Libur',
+                'icon' => 'ri-calendar-todo-line',
+                'path' => '/hari-libur',
+                'parent_slug' => 'data-master',
+                'order_no' => 6
+            ],
             
             // Absensi (Group)
             [

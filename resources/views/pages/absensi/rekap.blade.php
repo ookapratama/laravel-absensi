@@ -79,15 +79,7 @@
                </thead>
                <tbody>
                   @php
-                     $now = now();
-                     $currentBulan = $now->month;
-                     $currentTahun = $now->year;
-
-                     if ($bulan == $currentBulan && $tahun == $currentTahun) {
-                         $hariBerjalan = $now->day;
-                     } else {
-                         $hariBerjalan = \Carbon\Carbon::create($tahun, $bulan, 1)->daysInMonth;
-                     }
+                     $hariBerjalan = $hariEfektif;
                   @endphp
                   @foreach ($data as $index => $pegawai)
                      @php

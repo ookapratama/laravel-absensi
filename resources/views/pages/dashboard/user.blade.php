@@ -148,6 +148,14 @@
                         <span class="fw-bold">{{ $pegawai->divisi->shifts->where('is_aktif', true)->count() }} Shift</span>
                         <small class="opacity-75 ms-1">(Fleksibel)</small>
                      </div>
+                     @php
+                        $hariLibur = \App\Models\HariLibur::whereDate('tanggal', today())->first();
+                     @endphp
+                     @if ($hariLibur)
+                        <div class="glass-badge bg-danger shadow-sm border-0 text-white">
+                           <i class="ri-calendar-event-fill me-1"></i> Libur: {{ $hariLibur->nama }}
+                        </div>
+                     @endif
                   </div>
                </div>
                <div class="col-md-5 text-md-end mt-4 mt-md-0">
@@ -237,7 +245,9 @@
                   </div>
                   <div class="mt-2 pt-1">
                      <div class="progress" style="height: 6px;">
-                        <div class="progress-bar bg-danger" style="width: 0%"></div>
+                        <div class="progress-bar bg-danger"
+                           style="width: {{ $statistik['total_hari_kerja'] > 0 ? ($statistik['alfa'] / $statistik['total_hari_kerja']) * 100 : 0 }}%">
+                        </div>
                      </div>
                   </div>
                </div>
@@ -444,25 +454,31 @@
             <!-- Quick Actions Grid -->
             <h5 class="mb-3">Akses Cepat</h5>
             <div class="row g-3 mb-4 text-center">
-               <div class="col-6 col-md-3">
+               <div class="col-6 col-md">
                   <a href="{{ route('absensi.index') }}" class="quick-action-btn shadow-sm">
                      <i class="ri-camera-lens-line"></i>
                      <span>Absensi</span>
                   </a>
                </div>
-               <div class="col-6 col-md-3">
+               <div class="col-6 col-md">
                   <a href="{{ route('izin.create') }}" class="quick-action-btn shadow-sm">
                      <i class="ri-file-add-line"></i>
                      <span>Ajukan Izin</span>
                   </a>
                </div>
-               <div class="col-6 col-md-3">
+               <div class="col-6 col-md">
+                  <a href="{{ route('absensi.calendar') }}" class="quick-action-btn shadow-sm">
+                     <i class="ri-calendar-2-line"></i>
+                     <span>Kalender</span>
+                  </a>
+               </div>
+               <div class="col-6 col-md">
                   <a href="{{ route('absensi.history') }}" class="quick-action-btn shadow-sm">
                      <i class="ri-history-line"></i>
                      <span>Riwayat</span>
                   </a>
                </div>
-               <div class="col-6 col-md-3">
+               <div class="col-6 col-md">
                   <a href="{{ url('user/profile') }}" class="quick-action-btn shadow-sm">
                      <i class="ri-user-settings-line"></i>
                      <span>Profil Saya</span>
