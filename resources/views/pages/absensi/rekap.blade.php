@@ -105,8 +105,8 @@
 
                         $alphaCount = max(0, $hariBerjalan - $daysActive);
 
-                        // Total work hours (based on shift duration)
-                        $totalMenit = $absensis->sum('durasi_shift_menit');
+                        // Total work hours (based on actual duration)
+                        $totalMenit = $absensis->sum('durasi_kerja_menit');
                         $totalJam = floor($totalMenit / 60);
                         $sisaMenit = $totalMenit % 60;
 

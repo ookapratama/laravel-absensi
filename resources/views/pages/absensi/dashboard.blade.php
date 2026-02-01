@@ -227,7 +227,7 @@
                            @endif
                         </td>
                         <td class="text-center">
-                           <strong>{{ $absen->durasi_shift }}</strong>
+                           <strong>{{ $absen->durasi_kerja }}</strong>
                         </td>
                         <td>{{ $absen->lokasi_masuk ?? '-' }}</td>
                         <td class="text-center">

@@ -64,7 +64,7 @@ class Absensi extends Model
     public function getFotoMasukUrlAttribute()
     {
         if ($this->foto_masuk) {
-            return Storage::url($this->foto_masuk);
+            return Storage::disk('public')->url($this->foto_masuk);
         }
         return null;
     }
@@ -75,7 +75,7 @@ class Absensi extends Model
     public function getFotoPulangUrlAttribute()
     {
         if ($this->foto_pulang) {
-            return Storage::url($this->foto_pulang);
+            return Storage::disk('public')->url($this->foto_pulang);
         }
         return null;
     }
@@ -152,13 +152,10 @@ class Absensi extends Model
         return "{$hours} Jam " . ($remMinutes > 0 ? "{$remMinutes} Menit" : "");
     }
 
-    /**
-     * Hitung durasi kerja actual (log masuk - log pulang)
-     */
-    public function getDurasiKerjaAttribute()
+    public function getDurasiKerjaMenitAttribute()
     {
         if (!$this->jam_masuk || !$this->jam_pulang) {
-            return null;
+            return 0;
         }
 
         $masuk = \Carbon\Carbon::parse($this->tanggal->format('Y-m-d') . ' ' . $this->jam_masuk->format('H:i:s'));
@@ -168,9 +165,20 @@ class Absensi extends Model
             $pulang->addDay();
         }
 
-        $hours = $masuk->diffInHours($pulang);
-        $minutes = $masuk->diffInMinutes($pulang) % 60;
+        return $masuk->diffInMinutes($pulang);
+    }
 
-        return "{$hours} Jam {$minutes} Menit";
+    /**
+     * Hitung durasi kerja actual (log masuk - log pulang)
+     */
+    public function getDurasiKerjaAttribute()
+    {
+        $minutes = $this->durasi_kerja_menit;
+        if ($minutes === 0) return '-';
+
+        $hours = floor($minutes / 60);
+        $remMinutes = $minutes % 60;
+
+        return "{$hours} Jam " . ($remMinutes > 0 ? "{$remMinutes} Menit" : "");
     }
 }

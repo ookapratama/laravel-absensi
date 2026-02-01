@@ -409,12 +409,12 @@ class AbsensiService extends BaseService
                 DB::raw("COUNT(DISTINCT CASE WHEN absensis.status IN ('Izin', 'Cuti', 'Sakit') THEN absensis.pegawai_id END) as izin"),
                 DB::raw("SUM(
                     CASE 
-                        WHEN absensis.jam_masuk IS NOT NULL AND absensis.jam_pulang IS NOT NULL AND shifts.id IS NOT NULL THEN
+                        WHEN absensis.jam_masuk IS NOT NULL AND absensis.jam_pulang IS NOT NULL THEN
                             CASE 
-                                WHEN shifts.jam_pulang < shifts.jam_masuk THEN
-                                    TIMESTAMPDIFF(MINUTE, shifts.jam_masuk, DATE_ADD(shifts.jam_pulang, INTERVAL 1 DAY))
+                                WHEN absensis.jam_pulang < absensis.jam_masuk THEN
+                                    TIMESTAMPDIFF(MINUTE, absensis.jam_masuk, DATE_ADD(absensis.jam_pulang, INTERVAL 1 DAY))
                                 ELSE
-                                    TIMESTAMPDIFF(MINUTE, shifts.jam_masuk, shifts.jam_pulang)
+                                    TIMESTAMPDIFF(MINUTE, absensis.jam_masuk, absensis.jam_pulang)
                             END
                         ELSE 0 
                     END
