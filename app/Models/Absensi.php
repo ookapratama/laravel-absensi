@@ -173,7 +173,7 @@ class Absensi extends Model
      */
     public function getDurasiKerjaAttribute()
     {
-        $minutes = $this->durasi_kerja_menit;
+        $minutes = (int) $this->durasi_kerja_menit; // Cast to integer to remove decimals
         if ($minutes === 0) return '-';
 
         $hours = floor($minutes / 60);
