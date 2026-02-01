@@ -391,15 +391,16 @@ class AbsensiService extends BaseService
     /**
      * Get rekap absensi per divisi
      */
-    public function getRekapPerDivisi(string $tanggal = null)
+    public function getRekapPerDivisi(string $startDate = null, string $endDate = null)
     {
-        $tanggal = $tanggal ?? today()->toDateString();
+        $startDate = $startDate ?? today()->toDateString();
+        $endDate = $endDate ?? $startDate;
 
-        $data = DB::table('absensis')
+        $query = DB::table('absensis')
             ->join('pegawais', 'absensis.pegawai_id', '=', 'pegawais.id')
             ->join('divisis', 'pegawais.divisi_id', '=', 'divisis.id')
             ->leftJoin('shifts', 'absensis.shift_id', '=', 'shifts.id')
-            ->whereDate('absensis.tanggal', $tanggal)
+            ->whereBetween('absensis.tanggal', [$startDate, $endDate])
             ->select(
                 'divisis.id',
                 'divisis.nama as divisi',
@@ -420,8 +421,9 @@ class AbsensiService extends BaseService
                     END
                 ) as total_menit")
             )
-            ->groupBy('divisis.id', 'divisis.nama')
-            ->get();
+            ->groupBy('divisis.id', 'divisis.nama');
+
+        $data = $query->get();
 
         return $data->map(function($item) {
             $jam = floor($item->total_menit / 60);

@@ -4,81 +4,105 @@
 
 @section('content')
    <div class="container-xxl flex-grow-1 container-p-y">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-         <h4 class="fw-bold mb-0">
-            <span class="text-muted fw-light">Absensi /</span> Dashboard
-         </h4>
+      <div class="d-flex justify-content-between align-items-center mb-6">
          <div>
-            <input type="date" class="form-control" id="filter-tanggal" value="{{ $tanggal }}">
+            <h4 class="fw-bold mb-1">Monitoring Kehadiran</h4>
+            <p class="text-muted mb-0">Pemantauan log absensi pegawai secara real-time</p>
+         </div>
+         <div class="d-flex flex-column align-items-end">
+            <label class="form-label small text-muted mb-1">Filter Tanggal</label>
+            <input type="date" class="form-control shadow-sm border-0 bg-white" id="filter-tanggal"
+               value="{{ $tanggal }}" style="width: 200px; border-radius: 10px;">
          </div>
       </div>
 
       <!-- Statistics Cards -->
-      <div class="row mb-4">
-         <div class="col-sm-6 col-lg-3 mb-4">
-            <div class="card h-100">
+      <div class="row g-4 mb-6">
+         <div class="col-sm-6 col-xl-3">
+            <div class="card dash-card card-gradient-primary shadow-lg h-100 stat-card-custom">
                <div class="card-body">
-                  <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-start justify-content-between mb-3">
                      <div>
-                        <span class="text-muted">Total Pegawai</span>
-                        <h3 class="mb-0">{{ $statistik['total_pegawai'] }}</h3>
+                        <div class="glass-card mb-2 d-inline-block p-1 px-2">
+                           <small class="text-white fw-medium" style="font-size: 0.65rem;">TOTAL PEGAWAI</small>
+                        </div>
+                        <h2 class="mb-0 text-white fw-bold display-6">{{ $statistik['total_pegawai'] }}</h2>
                      </div>
-                     <div class="avatar avatar-sm">
-                        <span class="avatar-initial rounded bg-label-primary">
-                           <i class="ri-group-line"></i>
-                        </span>
+                     <div class="stat-icon bg-white shadow-lg rounded-pill" style="width: 50px; height: 50px;">
+                        <i class="ri-group-fill text-primary ri-24px"></i>
                      </div>
+                  </div>
+                  <div class="mt-4 pt-1 border-top border-white border-opacity-10">
+                     <small class="text-white opacity-75">Seluruh Anggota Tim</small>
                   </div>
                </div>
             </div>
          </div>
-         <div class="col-sm-6 col-lg-3 mb-4">
-            <div class="card h-100">
+         <div class="col-sm-6 col-xl-3">
+            <div class="card dash-card card-gradient-success shadow-lg h-100 stat-card-custom">
                <div class="card-body">
-                  <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-start justify-content-between mb-3">
                      <div>
-                        <span class="text-muted">Sudah Absen</span>
-                        <h3 class="mb-0 text-success">{{ $statistik['sudah_absen'] }}</h3>
+                        <div class="glass-card mb-2 d-inline-block p-1 px-2">
+                           <small class="text-white fw-medium" style="font-size: 0.65rem;">SUDAH ABSEN</small>
+                        </div>
+                        <h2 class="mb-0 text-white fw-bold display-6">{{ $statistik['sudah_absen'] }}</h2>
                      </div>
-                     <div class="avatar avatar-sm">
-                        <span class="avatar-initial rounded bg-label-success">
-                           <i class="ri-check-line"></i>
-                        </span>
+                     <div class="stat-icon bg-white shadow-lg rounded-pill" style="width: 50px; height: 50px;">
+                        <i class="ri-checkbox-circle-fill text-success ri-24px"></i>
                      </div>
+                  </div>
+                  @php
+                     $percentMasuk =
+                         $statistik['total_pegawai'] > 0
+                             ? round(($statistik['sudah_absen'] / $statistik['total_pegawai']) * 100)
+                             : 0;
+                  @endphp
+                  <div class="mt-3">
+                     <div class="progress bg-white bg-opacity-25 shadow-sm" style="height: 6px; border-radius: 3px;">
+                        <div class="progress-bar bg-white" style="width: {{ $percentMasuk }}%;"></div>
+                     </div>
+                     <small class="text-white opacity-75 mt-1 d-block">{{ $percentMasuk }}% partisipasi</small>
                   </div>
                </div>
             </div>
          </div>
-         <div class="col-sm-6 col-lg-3 mb-4">
-            <div class="card h-100">
+         <div class="col-sm-6 col-xl-3">
+            <div class="card dash-card shadow-lg h-100 bg-white border-0 stat-card-custom"
+               style="border-bottom: 4px solid #ff9800 !important;">
                <div class="card-body">
-                  <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-start justify-content-between mb-3">
                      <div>
-                        <span class="text-muted">Belum Absen</span>
-                        <h3 class="mb-0 text-warning">{{ $statistik['belum_absen'] }}</h3>
+                        <div class="badge bg-label-warning mb-2" style="font-size: 0.65rem;">BELUM ABSEN</div>
+                        <h2 class="mb-0 text-warning fw-bold display-6">{{ $statistik['belum_absen'] }}</h2>
                      </div>
-                     <div class="avatar avatar-sm">
-                        <span class="avatar-initial rounded bg-label-warning">
-                           <i class="ri-time-line"></i>
-                        </span>
+                     <div class="stat-icon bg-warning shadow-warning shadow-sm rounded-pill"
+                        style="width: 50px; height: 50px;">
+                        <i class="ri-time-fill text-white ri-24px"></i>
                      </div>
+                  </div>
+                  <div class="mt-4 pt-1 border-top border-light">
+                     <small class="text-muted">Menunggu Kehadiran</small>
                   </div>
                </div>
             </div>
          </div>
-         <div class="col-sm-6 col-lg-3 mb-4">
-            <div class="card h-100">
+         <div class="col-sm-6 col-xl-3">
+            <div class="card dash-card shadow-lg h-100 bg-white border-0 stat-card-custom"
+               style="border-bottom: 4px solid #f44336 !important;">
                <div class="card-body">
-                  <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-start justify-content-between mb-3">
                      <div>
-                        <span class="text-muted">Terlambat</span>
-                        <h3 class="mb-0 text-danger">{{ $statistik['terlambat'] }}</h3>
+                        <div class="badge bg-label-danger mb-2" style="font-size: 0.65rem;">TERLAMBAT</div>
+                        <h2 class="mb-0 text-danger fw-bold display-6">{{ $statistik['terlambat'] }}</h2>
                      </div>
-                     <div class="avatar avatar-sm">
-                        <span class="avatar-initial rounded bg-label-danger">
-                           <i class="ri-alarm-warning-line"></i>
-                        </span>
+                     <div class="stat-icon bg-danger shadow-danger shadow-sm rounded-pill"
+                        style="width: 50px; height: 50px;">
+                        <i class="ri-alarm-warning-fill text-white ri-24px"></i>
                      </div>
+                  </div>
+                  <div class="mt-4 pt-1 border-top border-light">
+                     <small class="text-muted">Butuh Perhatian</small>
                   </div>
                </div>
             </div>
@@ -106,11 +130,20 @@
                      <tbody>
                         @forelse($rekapDivisi as $rekap)
                            <tr>
-                              <td>{{ $rekap->divisi }}</td>
-                              <td class="text-center"><span class="badge bg-success">{{ $rekap->hadir }}</span></td>
-                              <td class="text-center"><span class="badge bg-warning">{{ $rekap->terlambat }}</span></td>
-                              <td class="text-center"><span class="badge bg-info">{{ $rekap->izin }}</span></td>
-                              <td class="text-center text-primary fw-bold">{{ $rekap->total_jam_format }}</td>
+                              <td class="ps-4">
+                                 <div class="d-flex align-items-center">
+                                    <div class="stat-icon bg-label-primary rounded-pill me-3"
+                                       style="width: 35px; height: 35px;">
+                                       <i class="ri-community-line" style="font-size: 1rem;"></i>
+                                    </div>
+                                    <span class="fw-bold">{{ $rekap->divisi }}</span>
+                                 </div>
+                              </td>
+                              <td class="text-center"><span class="badge bg-label-success">{{ $rekap->hadir }}</span></td>
+                              <td class="text-center"><span class="badge bg-label-warning">{{ $rekap->terlambat }}</span>
+                              </td>
+                              <td class="text-center"><span class="badge bg-label-info">{{ $rekap->izin }}</span></td>
+                              <td class="text-center fw-bold text-dark">{{ $rekap->total_jam_format }}</td>
                            </tr>
                         @empty
                            <tr>
@@ -134,7 +167,8 @@
                   @forelse($belumAbsen as $pegawai)
                      <div class="d-flex align-items-center mb-3">
                         <div class="avatar avatar-sm me-3">
-                           <img src="{{ $pegawai->foto_url }}" alt="{{ $pegawai->nama_lengkap }}" class="rounded-circle">
+                           <img src="{{ $pegawai->foto_url }}" alt="{{ $pegawai->nama_lengkap }}"
+                              class="rounded-circle">
                         </div>
                         <div class="flex-grow-1">
                            <h6 class="mb-0">{{ $pegawai->nama_lengkap }}</h6>
@@ -288,6 +322,63 @@
    </div>
 
    <style>
+      .dash-card {
+         border: none;
+         border-radius: 20px;
+         transition: all 0.3s ease;
+         overflow: hidden;
+      }
+
+      .dash-card:hover {
+         transform: translateY(-5px);
+         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+      }
+
+      .card-gradient-primary {
+         background: linear-gradient(135deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+         color: white;
+      }
+
+      .card-gradient-success {
+         background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+         color: white;
+      }
+
+      .stat-card-custom {
+         position: relative;
+         z-index: 1;
+      }
+
+      .stat-card-custom::before {
+         content: "";
+         position: absolute;
+         top: -15px;
+         right: -15px;
+         width: 100px;
+         height: 100px;
+         background: rgba(255, 255, 255, 0.1);
+         border-radius: 50%;
+         z-index: -1;
+      }
+
+      .glass-card {
+         background: rgba(255, 255, 255, 0.15);
+         backdrop-filter: blur(5px);
+         border: 1px solid rgba(255, 255, 255, 0.2);
+         border-radius: 12px;
+      }
+
+      .stat-icon {
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         transition: all 0.3s ease;
+      }
+
+      .stat-icon i {
+         line-height: 1;
+      }
+
       .modal-backdrop.show {
          backdrop-filter: blur(8px);
          -webkit-backdrop-filter: blur(8px);
@@ -296,6 +387,15 @@
 
       .shadow-2xl {
          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+
+      .table-premium thead th {
+         background-color: #f8f9fa;
+         text-transform: uppercase;
+         font-size: 0.75rem;
+         letter-spacing: 1px;
+         font-weight: 700;
+         border: none;
       }
    </style>
 @endsection

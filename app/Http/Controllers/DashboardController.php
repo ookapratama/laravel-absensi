@@ -22,7 +22,46 @@ class DashboardController extends Controller
 
         // Admin dan Superadmin melihat dashboard admin
         if (in_array($roleSlug, ['super-admin', 'admin'])) {
-            return view('pages.dashboard.dashboard');
+            $tanggal = today()->toDateString();
+            $filterRekap = request('filter_rekap', 'today');
+            
+            // Determine date range for rekap
+            $startDate = $tanggal;
+            $endDate = $tanggal;
+            
+            if ($filterRekap === 'yesterday') {
+                $startDate = today()->subDay()->toDateString();
+                $endDate = $startDate;
+            } elseif ($filterRekap === 'week') {
+                $startDate = today()->startOfWeek()->toDateString();
+                $endDate = today()->endOfWeek()->toDateString();
+            }
+
+            $statistikAbsensi = $this->absensiService->getStatistik($tanggal);
+            $rekapDivisi = $this->absensiService->getRekapPerDivisi($startDate, $endDate);
+            
+            $izinService = app(\App\Services\IzinService::class);
+            $statistikIzin = $izinService->getStatistik();
+            
+            $recentAbsensi = \App\Models\Absensi::with(['pegawai', 'shift'])
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+                
+            $recentIzin = \App\Models\Izin::with(['pegawai', 'jenisIzin'])
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+
+            return view('pages.dashboard.dashboard', compact(
+                'statistikAbsensi',
+                'rekapDivisi',
+                'statistikIzin',
+                'recentAbsensi',
+                'recentIzin',
+                'tanggal',
+                'filterRekap'
+            ));
         }
 
         // User biasa (pegawai) melihat dashboard khusus user
