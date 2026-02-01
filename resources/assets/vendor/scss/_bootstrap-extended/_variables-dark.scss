@@ -31,8 +31,8 @@ $gray-900: rgba($base, 0.9) !default;
 
 // scss-docs-start gray-colors-map
 $grays: (
-  '25': $gray-25,
-  '50': $gray-50
+    "25": $gray-25,
+    "50": $gray-50,
 ) !default;
 // scss-docs-end gray-colors-map
 
@@ -50,7 +50,7 @@ $cyan: #28c3d7 !default;
 // scss-docs-end color-variables
 
 // scss-docs-start theme-color-variables
-$primary: $indigo !default;
+$primary: #c51e2e;
 $secondary: #6d788d !default;
 $success: $green !default;
 $info: $blue !default;
@@ -63,19 +63,19 @@ $gray: $gray-100 !default; // (C)
 
 // scss-docs-start theme-colors-map
 $theme-colors: (
-  'primary': $primary,
-  'secondary': $secondary,
-  'success': $success,
-  'info': $info,
-  'warning': $warning,
-  'danger': $danger,
-  'light': $light,
-  'dark': $dark,
-  'gray': $gray
+    "primary": $primary,
+    "secondary": $secondary,
+    "success": $success,
+    "info": $info,
+    "warning": $warning,
+    "danger": $danger,
+    "light": $light,
+    "dark": $dark,
+    "gray": $gray,
 ) !default;
 // scss-docs-end theme-colors-map
 
-$color-scheme: 'dark' !default; // (C)
+$color-scheme: "dark" !default; // (C)
 
 // * Body
 // *******************************************************************************
@@ -107,9 +107,9 @@ $box-shadow-xl: 0 0.5rem 1.625rem 0 rgba($shadow-bg, 0.3) !default;
 $floating-component-border-color: rgba($white, 0.05) !default; // (C)
 // $floating-component-shadow: 0 1px 16px 1px rgba($white, 0.09) !default; // (C)
 $floating-component-shadow:
-  0px 5px 5px -3px rgba($black, 0.2),
-  0px 8px 10px 1px rgba($black, 0.14),
-  0px 3px 14px 2px rgba($black, 0.12) !default; // (C)
+    0px 5px 5px -3px rgba($black, 0.2),
+    0px 8px 10px 1px rgba($black, 0.14),
+    0px 3px 14px 2px rgba($black, 0.12) !default; // (C)
 
 // * Typography
 // *******************************************************************************
@@ -133,7 +133,10 @@ $table-hover-bg-factor: 0.06 !default;
 $table-hover-bg: rgba($base, $table-hover-bg-factor) !default;
 
 $table-striped-bg-factor: 0.025 !default;
-$table-striped-bg: rgba-to-hex(rgba($white, $table-striped-bg-factor), $rgba-to-hex-bg) !default;
+$table-striped-bg: rgba-to-hex(
+    rgba($white, $table-striped-bg-factor),
+    $rgba-to-hex-bg
+) !default;
 
 $table-active-color: $body-color !default;
 $table-active-bg-factor: 0.08 !default;
@@ -152,8 +155,14 @@ $table-header-bg-color: #3a3e5b !default; // (c)
 // *******************************************************************************
 
 $pagination-bg: rgba-to-hex(rgba($base, 0.08), $rgba-to-hex-bg) !default;
-$pagination-border-color: rgba-to-hex(rgba($base, 0.22), $rgba-to-hex-bg) !default;
-$pagination-disabled-border-color: rgba-to-hex(rgba($base, 0.22), $rgba-to-hex-bg) !default;
+$pagination-border-color: rgba-to-hex(
+    rgba($base, 0.22),
+    $rgba-to-hex-bg
+) !default;
+$pagination-disabled-border-color: rgba-to-hex(
+    rgba($base, 0.22),
+    $rgba-to-hex-bg
+) !default;
 
 // * Cards
 // *******************************************************************************
@@ -172,13 +181,13 @@ $accordion-bg: $card-bg !default;
 
 $btn-label-bg-tint-amount: 84% !default; // (C)
 $btn-fab-box-shadow:
-  0px 3px 5px -1px rgba($black, 0.2),
-  0px 5px 8px rgba($black, 0.14),
-  0px 1px 14px rgba($black, 0.12) !default;
+    0px 3px 5px -1px rgba($black, 0.2),
+    0px 5px 8px rgba($black, 0.14),
+    0px 1px 14px rgba($black, 0.12) !default;
 $btn-fab-active-box-shadow:
-  0px 7px 8px -4px rgba($black, 0.2),
-  0px 12px 17px 2px rgba($black, 0.14),
-  0px 5px 22px 4px rgba($black, 0.12) !default;
+    0px 7px 8px -4px rgba($black, 0.2),
+    0px 12px 17px 2px rgba($black, 0.14),
+    0px 5px 22px 4px rgba($black, 0.12) !default;
 
 // * Forms
 // *******************************************************************************
@@ -187,13 +196,22 @@ $input-bg: transparent !default;
 
 // $input-border-color: rgba($white, 0.15) !default;
 $input-border-color: rgba-to-hex(rgba($base, 0.22), $rgba-to-hex-bg) !default;
-$input-border-hover-color: rgba-to-hex($gray-600, $rgba-to-hex-bg) !default; // (C)
+$input-border-hover-color: rgba-to-hex(
+    $gray-600,
+    $rgba-to-hex-bg
+) !default; // (C)
 
 $input-placeholder-color: rgba-to-hex($gray-400, $rgba-to-hex-bg) !default;
 
-$form-floating-hover-bg: rgba-to-hex(rgba($base, 0.079), $rgba-to-hex-bg) !default; // (C)
+$form-floating-hover-bg: rgba-to-hex(
+    rgba($base, 0.079),
+    $rgba-to-hex-bg
+) !default; // (C)
 
-$form-check-input-disabled-bg: rgba-to-hex(rgba($base, 0.305), $rgba-to-hex-bg) !default; // (C)
+$form-check-input-disabled-bg: rgba-to-hex(
+    rgba($base, 0.305),
+    $rgba-to-hex-bg
+) !default; // (C)
 
 $form-switch-bg: rgba-to-hex(rgba($base, 0.1), $rgba-to-hex-bg) !default; // (C)
 

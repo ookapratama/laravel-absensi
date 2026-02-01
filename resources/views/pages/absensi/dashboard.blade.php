@@ -335,7 +335,7 @@
       }
 
       .card-gradient-primary {
-         background: linear-gradient(135deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+         background: linear-gradient(135deg, #C51E2E 0%, #E53935 46%, #FF5252 100%);
          color: white;
       }
 

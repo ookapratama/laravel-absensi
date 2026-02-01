@@ -27,8 +27,8 @@ $gray-900: rgba($black, 0.901) !default;
 
 // scss-docs-start gray-colors-map
 $grays: (
-  '25': $gray-25,
-  '50': $gray-50
+    "25": $gray-25,
+    "50": $gray-50,
 ) !default;
 // scss-docs-end gray-colors-map
 
@@ -46,7 +46,7 @@ $cyan: #28c3d7 !default;
 // scss-docs-end color-variables
 
 // scss-docs-start theme-color-variables
-$primary: $indigo !default;
+$primary: #c51e2e;
 $secondary: #6d788d !default;
 $success: $green !default;
 $info: $blue !default;
@@ -59,25 +59,31 @@ $gray: $gray-100 !default; // (C)
 
 // scss-docs-start theme-colors-map
 $theme-colors: (
-  'primary': $primary,
-  'secondary': $secondary,
-  'success': $success,
-  'info': $info,
-  'warning': $warning,
-  'danger': $danger,
-  'light': $light,
-  'dark': $dark,
-  'gray': $gray
+    "primary": $primary,
+    "secondary": $secondary,
+    "success": $success,
+    "info": $info,
+    "warning": $warning,
+    "danger": $danger,
+    "light": $light,
+    "dark": $dark,
+    "gray": $gray,
 ) !default;
 // scss-docs-end theme-colors-map
 
-$color-scheme: 'light' !default; // (C)
+$color-scheme: "light" !default; // (C)
 // The contrast ratio to reach against white, to determine if color changes from "light" to "dark". Acceptable values for WCAG 2.0 are 3, 4.5 and 7.
 // See https://www.w3.org/TR/WCAG20/#visual-audio-contrast-contrast
 $min-contrast-ratio: 1.6 !default;
 
 // Characters which are escaped by the escape-svg function
-$escaped-characters: (('<', '%3c'), ('>', '%3e'), ('#', '%23'), ('(', '%28'), (')', '%29')) !default;
+$escaped-characters: (
+    ("<", "%3c"),
+    (">", "%3e"),
+    ("#", "%23"),
+    ("(", "%28"),
+    (")", "%29")
+) !default;
 
 // * Options
 // *******************************************************************************
@@ -95,43 +101,43 @@ $prefix: $variable-prefix !default;
 
 $spacer: 1rem !default;
 $spacers: (
-  0: 0,
-  50: $spacer * 0.125,
-  1: $spacer * 0.25,
-  1_5: $spacer * 0.375,
-  2: $spacer * 0.5,
-  3: $spacer * 0.75,
-  4: $spacer,
-  5: $spacer * 1.25,
-  6: $spacer * 1.5,
-  7: $spacer * 1.75,
-  8: $spacer * 2,
-  9: $spacer * 2.25,
-  10: $spacer * 2.5,
-  11: $spacer * 2.75,
-  12: $spacer * 3
+    0: 0,
+    50: $spacer * 0.125,
+    1: $spacer * 0.25,
+    1_5: $spacer * 0.375,
+    2: $spacer * 0.5,
+    3: $spacer * 0.75,
+    4: $spacer,
+    5: $spacer * 1.25,
+    6: $spacer * 1.5,
+    7: $spacer * 1.75,
+    8: $spacer * 2,
+    9: $spacer * 2.25,
+    10: $spacer * 2.5,
+    11: $spacer * 2.75,
+    12: $spacer * 3,
 ) !default;
 
 $sizes-px: (
-  px-18: 18px,
-  px-20: 20px,
-  px-30: 30px,
-  px-40: 40px,
-  px-50: 50px,
-  px-75: 75px,
-  px-100: 100px,
-  px-120: 120px,
-  px-150: 150px,
-  px-200: 200px,
-  px-250: 250px,
-  px-300: 300px,
-  px-350: 350px,
-  px-400: 400px,
-  px-500: 500px,
-  px-600: 600px,
-  px-700: 700px,
-  px-800: 800px,
-  auto: auto
+    px-18: 18px,
+    px-20: 20px,
+    px-30: 30px,
+    px-40: 40px,
+    px-50: 50px,
+    px-75: 75px,
+    px-100: 100px,
+    px-120: 120px,
+    px-150: 150px,
+    px-200: 200px,
+    px-250: 250px,
+    px-300: 300px,
+    px-350: 350px,
+    px-400: 400px,
+    px-500: 500px,
+    px-600: 600px,
+    px-700: 700px,
+    px-800: 800px,
+    auto: auto,
 ) !default; // (C)
 
 // * Body
@@ -158,11 +164,11 @@ $link-hover-decoration: null !default;
 
 // scss-docs-start container-max-widths
 $container-max-widths: (
-  sm: 540px,
-  md: 720px,
-  lg: 960px,
-  xl: 1140px,
-  xxl: 1440px // Custom xxl size
+    sm: 540px,
+    md: 720px,
+    lg: 960px,
+    xl: 1140px,
+    xxl: 1440px // Custom xxl size,,
 ) !default;
 // scss-docs-end container-max-widths
 
@@ -206,9 +212,9 @@ $component-focus-shadow-width: 0px !default; // (C)
 $floating-component-border-color: rgba($black, 0.05) !default; // (C)
 // $floating-component-shadow: 0 0.3125rem 1.25rem rgba($black, 0.3) !default; // (C)
 $floating-component-shadow:
-  0px 5px 5px -3px rgba($black, 0.2),
-  0px 8px 10px 1px rgba($black, 0.14),
-  0px 3px 14px 2px rgba($black, 0.12) !default; // (C)
+    0px 5px 5px -3px rgba($black, 0.2),
+    0px 8px 10px 1px rgba($black, 0.14),
+    0px 3px 14px 2px rgba($black, 0.12) !default; // (C)
 
 $hr-color: $border-color !default;
 $hr-opacity: 1 !default;
@@ -229,19 +235,20 @@ $caret-spacing: 0.5em !default;
 
 // scss-docs-start font-variables
 $font-family-sans-serif:
-  'Inter',
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  'Oxygen',
-  'Ubuntu',
-  'Cantarell',
-  'Fira Sans',
-  'Droid Sans',
-  'Helvetica Neue',
-  sans-serif !default;
-$font-family-serif: Georgia, 'Times New Roman', serif !default; // (C)
-$font-family-monospace: 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !default;
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    sans-serif !default;
+$font-family-serif: Georgia, "Times New Roman", serif !default; // (C)
+$font-family-monospace: "SFMono-Regular", Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace !default;
 // stylelint-enable value-keyword-case
 $font-family-base: var(--#{$variable-prefix}font-sans-serif) !default;
 $font-family-code: var(--#{$variable-prefix}font-monospace) !default;
@@ -293,12 +300,12 @@ $headings-color: rgba-to-hex($gray-900, $rgba-to-hex-bg) !default;
 
 // scss-docs-start display-headings
 $display-font-sizes: (
-  1: 4rem,
-  2: 3.5rem,
-  3: 3rem,
-  4: 2.5rem,
-  5: 2rem,
-  6: 1.5rem
+    1: 4rem,
+    2: 3.5rem,
+    3: 3rem,
+    4: 2.5rem,
+    5: 2rem,
+    6: 1.5rem,
 ) !default;
 
 $display-font-weight: 500 !default;
@@ -346,13 +353,13 @@ $zindex-notification: 999999 !default; // (C)
 
 // scss-docs-start zindex-levels-map
 $zindex-levels: (
-  n1: -1,
-  0: 0,
-  1: 1,
-  2: 2,
-  3: 3,
-  4: 4,
-  5: 5
+    n1: -1,
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 5,
 ) !default;
 // scss-docs-end zindex-levels-map
 
@@ -386,7 +393,10 @@ $table-hover-bg-factor: 0.06 !default;
 $table-hover-bg: rgba($black, $table-hover-bg-factor) !default;
 
 $table-border-factor: 0.12 !default;
-$table-border-color: rgba-to-hex(rgba($black, $table-border-factor), $rgba-to-hex-bg) !default;
+$table-border-color: rgba-to-hex(
+    rgba($black, $table-border-factor),
+    $rgba-to-hex-bg
+) !default;
 $table-group-separator-color: $table-border-color !default;
 
 $table-striped-bg-factor: 0.06 !default;
@@ -399,14 +409,14 @@ $table-bg-scale: -80% !default;
 $table-header-bg-color: #f5f5f7 !default; // (c)
 // scss-docs-start table-loop
 $table-variants: (
-  'primary': shift-color($primary, $table-bg-scale),
-  'secondary': shift-color($secondary, $table-bg-scale),
-  'success': shift-color($success, $table-bg-scale),
-  'info': shift-color($info, $table-bg-scale),
-  'warning': shift-color($warning, $table-bg-scale),
-  'danger': shift-color($danger, $table-bg-scale),
-  'light': rgba-to-hex($gray-100, $rgba-to-hex-bg),
-  'dark': $dark
+    "primary": shift-color($primary, $table-bg-scale),
+    "secondary": shift-color($secondary, $table-bg-scale),
+    "success": shift-color($success, $table-bg-scale),
+    "info": shift-color($info, $table-bg-scale),
+    "warning": shift-color($warning, $table-bg-scale),
+    "danger": shift-color($danger, $table-bg-scale),
+    "light": rgba-to-hex($gray-100, $rgba-to-hex-bg),
+    "dark": $dark,
 ) !default;
 // scss-docs-end table-loop
 
@@ -420,9 +430,13 @@ $input-btn-line-height: $line-height-base !default;
 
 $input-btn-focus-width: 0.05rem !default;
 $input-btn-focus-color-opacity: 0.1 !default;
-$input-btn-focus-color: rgba($component-active-bg, $input-btn-focus-color-opacity) !default;
+$input-btn-focus-color: rgba(
+    $component-active-bg,
+    $input-btn-focus-color-opacity
+) !default;
 $input-btn-focus-blur: 0.25rem !default;
-$input-btn-focus-box-shadow: 0 0 $input-btn-focus-blur $input-btn-focus-width $input-btn-focus-color !default;
+$input-btn-focus-box-shadow: 0 0 $input-btn-focus-blur $input-btn-focus-width
+    $input-btn-focus-color !default;
 
 $input-btn-padding-y-xs: 0.34rem !default; // (C)
 $input-btn-padding-x-xs: 0.625rem !default; // (C)
@@ -475,13 +489,13 @@ $btn-disabled-opacity: 0.45 !default;
 $btn-active-box-shadow: $box-shadow-xs !default;
 
 $btn-fab-box-shadow:
-  0px 3px 5px -1px rgba($black, 0.2),
-  0px 5px 8px rgba($black, 0.14),
-  0px 1px 14px rgba($black, 0.12) !default;
+    0px 3px 5px -1px rgba($black, 0.2),
+    0px 5px 8px rgba($black, 0.14),
+    0px 1px 14px rgba($black, 0.12) !default;
 $btn-fab-active-box-shadow:
-  0px 7px 8px -4px rgba($black, 0.2),
-  0px 12px 17px 2px rgba($black, 0.14),
-  0px 5px 22px 4px rgba($black, 0.12) !default;
+    0px 7px 8px -4px rgba($black, 0.2),
+    0px 12px 17px 2px rgba($black, 0.14),
+    0px 5px 22px 4px rgba($black, 0.12) !default;
 
 $btn-border-radius: $border-radius-lg !default;
 $btn-border-radius-xs: $border-radius-xs !default; // (C)
@@ -569,7 +583,10 @@ $input-disabled-border-color: $border-color !default;
 $input-color: $headings-color !default;
 $input-border-width: $input-btn-border-width !default;
 $input-border-color: rgba-to-hex(rgba($black, 0.22), $rgba-to-hex-bg) !default;
-$input-border-hover-color: rgba-to-hex($gray-600, $rgba-to-hex-bg) !default; // (C)
+$input-border-hover-color: rgba-to-hex(
+    $gray-600,
+    $rgba-to-hex-bg
+) !default; // (C)
 
 $input-border-radius: $border-radius-lg !default;
 $input-border-radius-sm: $border-radius !default;
@@ -577,18 +594,30 @@ $input-border-radius-lg: $border-radius-xl !default;
 $input-focus-border-width: 2px !default; //(C)
 $input-focus-box-shadow: none !default;
 $input-focus-border-color-scale: 50% !default; //(C)
-$input-focus-border-color: tint-color($component-active-bg, $input-focus-border-color-scale) !default;
+$input-focus-border-color: tint-color(
+    $component-active-bg,
+    $input-focus-border-color-scale
+) !default;
 
 $input-placeholder-color: rgba-to-hex($gray-400, $rgba-to-hex-bg) !default;
 
-$input-height-inner: add(($input-btn-font-size * $input-btn-line-height), ($input-btn-padding-y * 2)) !default;
+$input-height-inner: add(
+    ($input-btn-font-size * $input-btn-line-height),
+    ($input-btn-padding-y * 2)
+) !default;
 $input-height-inner-sm: add(
-  ($input-btn-font-size-sm * $input-btn-line-height-sm),
-  ($input-btn-padding-y-sm * 2)
+    ($input-btn-font-size-sm * $input-btn-line-height-sm),
+    ($input-btn-padding-y-sm * 2)
 ) !default; // (C)
-$input-height-inner-lg: add(($font-size-lg * $line-height-lg), ($input-btn-padding-y-lg * 2)) !default; // (C)
+$input-height-inner-lg: add(
+    ($font-size-lg * $line-height-lg),
+    ($input-btn-padding-y-lg * 2)
+) !default; // (C)
 
-$input-height: add($line-height-base * 1rem, add($input-padding-y * 2, 0.125rem, false)) !default;
+$input-height: add(
+    $line-height-base * 1rem,
+    add($input-padding-y * 2, 0.125rem, false)
+) !default;
 // scss-docs-end form-input-variables
 
 // scss-docs-start form-check-variables
@@ -605,7 +634,10 @@ $form-check-input-focus-box-shadow: $input-btn-focus-box-shadow !default;
 $form-check-label-cursor: pointer !default;
 $form-check-input-disabled-opacity: 0.45 !default;
 $form-check-label-disabled-color: $text-muted !default; // (C)
-$form-check-input-disabled-bg: rgba-to-hex(rgba($black, 0.305), $rgba-to-hex-bg) !default; // (C)
+$form-check-input-disabled-bg: rgba-to-hex(
+    rgba($black, 0.305),
+    $rgba-to-hex-bg
+) !default; // (C)
 
 $form-check-input-border-radius: $border-radius !default;
 $form-check-input-checked-color: $component-active-color !default;
@@ -627,7 +659,10 @@ $form-switch-focus-bg-image: url("data:image/svg+xml,%3csvg width='26' height='2
 $form-switch-checked-bg-image: url("data:image/svg+xml,%3csvg width='26' height='26' viewBox='0 0 26 26' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cg filter='url(%23filter0_d_2927_62067)'%3e%3ccircle cx='14' cy='13' r='9.5' fill='#{$form-switch-color}'/%3e%3c/g%3e%3cdefs%3e%3cfilter id='filter0_d_2927_62067' x='0' y='0' width='26' height='26' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'%3e%3cfeFlood flood-opacity='0' result='BackgroundImageFix'/%3e%3cfeColorMatrix in='SourceAlpha' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0' result='hardAlpha'/%3e%3cfeOffset dy='2'/%3e%3cfeGaussianBlur stdDeviation='3'/%3e%3cfeColorMatrix type='matrix' values='0 0 0 0 0.14902 0 0 0 0 0.168627 0 0 0 0 0.262745 0 0 0 0.14 0'/%3e%3cfeBlend mode='normal' in2='BackgroundImageFix' result='effect1_dropShadow_2927_62067'/%3e%3cfeBlend mode='normal' in='SourceGraphic' in2='effect1_dropShadow_2927_62067' result='shape'/%3e%3c/filter%3e%3c/defs%3e%3c/svg%3e") !default;
 $form-switch-checked-bg-position: 95% center !default;
 $form-switch-checked-bg-position-rtl: 4% center !default; // (C)
-$form-switch-bg: rgba-to-hex(rgba($black, 0.1), $rgba-to-hex-bg) !default; // (C)
+$form-switch-bg: rgba-to-hex(
+    rgba($black, 0.1),
+    $rgba-to-hex-bg
+) !default; // (C)
 $form-switch-box-shadow: 0 0 0.25rem 0 rgba(0, 0, 0, 0.16) inset !default; // (C)
 // scss-docs-end form-switch-variables
 
@@ -683,25 +718,40 @@ $form-floating-padding-x: $input-padding-x !default;
 $form-floating-padding-y: $input-padding-y !default;
 $form-floating-line-height: $line-height-base !default;
 $form-floating-input-padding-t: ($form-floating-padding-y * 1.5) !default;
-$form-floating-input-padding-b: calc(($form-floating-padding-y * 0.5) + $border-width) !default;
-$form-floating-input-bg: rgba-to-hex($gray-100, $rgba-to-hex-bg) !default; // (C)
+$form-floating-input-padding-b: calc(
+    ($form-floating-padding-y * 0.5) + $border-width
+) !default;
+$form-floating-input-bg: rgba-to-hex(
+    $gray-100,
+    $rgba-to-hex-bg
+) !default; // (C)
 $form-floating-label-padding-x: 0.375rem !default; // (C)
 $form-floating-label-margin: 0.625rem !default; // (C)
-$form-floating-hover-bg: rgba-to-hex(rgba($black, 0.079), $rgba-to-hex-bg) !default; // (C)
-$form-floating-height: calc(($font-size-base * $form-floating-line-height) + ($form-floating-padding-y * 2)) !default;
+$form-floating-hover-bg: rgba-to-hex(
+    rgba($black, 0.079),
+    $rgba-to-hex-bg
+) !default; // (C)
+$form-floating-height: calc(
+    ($font-size-base * $form-floating-line-height) +
+        ($form-floating-padding-y * 2)
+) !default;
 $form-floating-disabled-opacity: 0.38 !default; // (c)
 $form-floating-label-height: 0.75rem !default;
 $form-floating-label-opacity: 1 !default;
 $form-floating-transition:
-  opacity 0.2s ease-in-out,
-  transform 0.2s ease-in-out !default;
-$form-floating-label-transform: scale(0.867) translateY(-0.6rem) translateX(0.0625rem) !default;
-$form-floating-label-transform-rtl: scale(0.867) translateY(-0.6rem) translateX(-0.0625rem) !default; // (C)
+    opacity 0.2s ease-in-out,
+    transform 0.2s ease-in-out !default;
+$form-floating-label-transform: scale(0.867) translateY(-0.6rem)
+    translateX(0.0625rem) !default;
+$form-floating-label-transform-rtl: scale(0.867) translateY(-0.6rem)
+    translateX(-0.0625rem) !default; // (C)
 $form-floating-label-disabled-color: $text-muted !default;
 
 // Outline
-$form-floating-outline-label-transform: translateY(-0.8rem) translateX(-$input-focus-border-width) !default; // (C)
-$form-floating-outline-label-transform-rtl: translateY(-0.8rem) translateX(-$input-focus-border-width) !default; // (C)
+$form-floating-outline-label-transform: translateY(-0.8rem)
+    translateX(-$input-focus-border-width) !default; // (C)
+$form-floating-outline-label-transform-rtl: translateY(-0.8rem)
+    translateX(-$input-focus-border-width) !default; // (C)
 
 // scss-docs-end form-floating-variables
 
@@ -711,9 +761,12 @@ $form-floating-outline-label-transform-rtl: translateY(-0.8rem) translateX(-$inp
 $form-feedback-valid-color: $success !default;
 $form-feedback-invalid-color: $danger !default;
 
-$form-select-feedback-icon-padding: $form-select-indicator-padding + $input-height-inner !default; // (C)
-$form-select-feedback-icon-padding-sm: $form-select-indicator-padding + $input-height-inner-sm !default; // (C)
-$form-select-feedback-icon-padding-lg: $form-select-indicator-padding + $input-height-inner-lg !default; // (C)
+$form-select-feedback-icon-padding: $form-select-indicator-padding +
+    $input-height-inner !default; // (C)
+$form-select-feedback-icon-padding-sm: $form-select-indicator-padding +
+    $input-height-inner-sm !default; // (C)
+$form-select-feedback-icon-padding-lg: $form-select-indicator-padding +
+    $input-height-inner-lg !default; // (C)
 // scss-docs-end form-feedback-variables
 
 // * Navs
@@ -748,7 +801,10 @@ $nav-pills-border-radius: $border-radius-lg !default;
 $nav-pills-padding-y: $nav-link-padding-y !default; // (C)
 $nav-pills-padding-x: $nav-link-padding-x !default; // (C)
 
-$nav-pills-link-hover-bg: rgba-to-hex(rgba($primary, 0.16), $rgba-to-hex-bg) !default; // (C)
+$nav-pills-link-hover-bg: rgba-to-hex(
+    rgba($primary, 0.16),
+    $rgba-to-hex-bg
+) !default; // (C)
 
 $nav-pills-link-active-color: $white !default;
 $nav-pills-link-active-bg: transparent !default;
@@ -1010,7 +1066,11 @@ $alert-icon-size: 1.875rem !default; // (c)
 $progress-height: 0.375rem !default;
 $progress-font-size: 0.625rem !default;
 $progress-bg-scale: 84% !default; // (C)
-$progress-bg: shift-color($primary, $progress-bg-scale, $rgba-to-hex-bg) !default;
+$progress-bg: shift-color(
+    $primary,
+    $progress-bg-scale,
+    $rgba-to-hex-bg
+) !default;
 $progress-border-radius: $border-radius-pill !default;
 $progress-bar-color: $white !default;
 
@@ -1030,7 +1090,10 @@ $list-group-item-bg-hover-scale: 6% !default; //  (c)
 
 $list-group-hover-bg: rgba-to-hex($gray-100, $rgba-to-hex-bg) !default;
 $list-group-active-color: $primary !default;
-$list-group-active-bg: rgba-to-hex(rgba($primary, 0.16), $rgba-to-hex-bg) !default;
+$list-group-active-bg: rgba-to-hex(
+    rgba($primary, 0.16),
+    $rgba-to-hex-bg
+) !default;
 $list-group-active-border-color: $list-group-border-color !default;
 
 $list-group-disabled-color: $text-muted !default;
@@ -1040,7 +1103,10 @@ $list-group-action-color: $headings-color !default;
 $list-group-action-hover-color: $list-group-action-color !default;
 
 $list-group-action-active-color: $list-group-action-hover-color !default;
-$list-group-action-active-bg: rgba-to-hex(rgba($primary, 0.16), $rgba-to-hex-bg) !default;
+$list-group-action-active-bg: rgba-to-hex(
+    rgba($primary, 0.16),
+    $rgba-to-hex-bg
+) !default;
 
 // scss-docs-end list-group-variables
 
@@ -1068,8 +1134,8 @@ $breadcrumb-margin-bottom: 1rem !default;
 $breadcrumb-bg: transparent !default;
 $breadcrumb-divider-color: $body-color !default;
 $breadcrumb-active-color: $headings-color !default;
-$breadcrumb-divider: '/' !default;
-$breadcrumb-divider-flipped: '\\' !default;
+$breadcrumb-divider: "/" !default;
+$breadcrumb-divider-flipped: "\\" !default;
 $breadcrumb-color: $breadcrumb-divider-color !default; // (C)
 
 // Spinners

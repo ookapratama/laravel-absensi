@@ -90,24 +90,16 @@ class AbsensiService extends BaseService
         */
 
         // Check apakah sudah absen masuk untuk shift ini (untuk mencegah double entry di shift yang sama)
-        // REVISI: Check sesi terbuka atau sesi yang baru saja selesai hari ini
+        // REVISI: Hanya cek sesi hari ini. Sesi kemarin yang lupa checkout dianggap hangus/alpha.
         $existing = Absensi::where('pegawai_id', $pegawai->id)
             ->where('shift_id', $shiftId)
-            ->where(function($q) {
-                $q->whereNull('jam_pulang') // Sesi yang masih terbuka (bisa dari kemarin)
-                  ->orWhereDate('tanggal', today()); // Atau sudah absen hari ini
-            })
+            ->whereDate('tanggal', today()) // Pastikan hanya cek tanggal hari ini
             ->first();
 
-        if ($existing && $existing->jam_masuk) {
-            if (!$existing->jam_pulang) {
-                throw new \Exception('Anda masih memiliki sesi aktif untuk shift ini yang belum ditutup.');
-            }
-            throw new \Exception('Anda sudah absen masuk pada shift ini hari ini.');
+        if ($existing) {
+             throw new \Exception('Anda sudah absen masuk pada shift ini hari ini.');
         }
 
-        // CEK HARI LIBUR
-        // Jika hari ini terdaftar di tabel hari_liburs, tolak absen
         // CEK HARI LIBUR
         // REVISI: Hanya tolak absen jika shift tersebut dikonfigurasi mengikuti hari libur
         $hariLibur = \App\Models\HariLibur::whereDate('tanggal', today())->first();
@@ -121,13 +113,14 @@ class AbsensiService extends BaseService
         $jamPulang = Carbon::parse($shift->jam_pulang->format('H:i:s'));
 
         // Handle Cross-Day Shift (Misal: 20:00 - 04:00)
+        // REVISI: Karena aturan "Strict Same Day", kita abaikan cross-day logic untuk validasi tanggal.
+        // Tapi kita tetap butuh tahu range valid jam masuk.
+        
         $isCrossDay = $jamPulang->lt($jamMasuk);
-        if ($isCrossDay) {
-             // Jika cross-day, dan jam sekarang < jam pulang, berarti masih sesi malam kemarin (seharusnya).
-             // Tapi karena kita "one session per shift", kita fokus ke rentang HARI INI.
-             // Namun untuk cross-day yang dimulai HARI INI (malam), jam pulang dianggap besok.
-             $jamPulang->addDay();
-        }
+        // if ($isCrossDay) {
+        //      $jamPulang->addDay();
+        // }
+        // DISABLE CROSS DAY LOGIC sesuai permintaan user (hanya bisa absen di hari itu)
 
         // 1. Tidak boleh absen jika sudah lewat jam pulang (Waktu Shift Habis)
         // Kita bandingkan jika sekarang sudah jauh melewati jam pulang
@@ -140,15 +133,9 @@ class AbsensiService extends BaseService
         // Jika sekarang jam 07:00 pagi, jelas belum bisa.
         $batasAwal = $jamMasuk->copy()->subHours(2);
         
-        // Perlu logika khusus untuk membandingkan jam jika rentang hari
-        // Kita sederhanakan dengan membandingkan diffInHours atau time string jika hari sama
-        if (!$isCrossDay && $now->lt($batasAwal)) {
+        if ($now->lt($batasAwal)) {
              throw new \Exception('Absen masuk belum dibuka untuk shift ini (Dibuka: ' . $batasAwal->format('H:i') . ').');
         } 
-        // Logic Cross Day lebih kompleks: jika jam sekarang siang (misal 12.00) dan shift mulai 20.00
-        // batas awal 18.00. 12.00 < 18.00 -> belum buka.
-        // Tapi jika jam sekarang 01.00 (dini hari), itu masuk sesi kemarin atau besok?
-        // Untuk "absen masuk", kita asumsikan pegawai mulai kerja. Jadi harus mendekati jam masuk.
 
         // Validasi lokasi
         $validasiLokasi = $this->validateLocation(
@@ -199,10 +186,7 @@ class AbsensiService extends BaseService
     {
         // Check apakah sudah absen masuk hari ini
         // PERBAIKAN: Harus mencari absensi yang OPEN (masuk tapi belum pulang)
-        // Jika pegawai punya multiple shift, kita harus tahu mana yang mau dipulangkan.
-        // Karena di UI tombol "Pulang" menempel di kartu shift, kita sebaiknya terima shift_id juga di sini.
-        // Tapi untuk kompatibilitas, kita cari yang belum pulang.
-
+        
         $shiftId = $data['shift_id'] ?? null;
         
         $query = Absensi::where('pegawai_id', $pegawai->id)
@@ -213,11 +197,17 @@ class AbsensiService extends BaseService
             $query->where('shift_id', $shiftId);
         }
 
-        // Cari sesi terbaru yang belum pulang (bisa dari hari ini atau kemarin)
+        // Cari sesi terbaru yang belum pulang
         $existing = $query->orderBy('tanggal', 'desc')->orderBy('jam_masuk', 'desc')->first();
 
         if (!$existing) {
              throw new \Exception('Tidak ditemukan data absen masuk yang aktif (belum pulang)' . ($shiftId ? ' untuk shift ini.' : '.'));
+        }
+
+        // VALIDASI STRICT SAME DAY
+        // Jika tanggal absensi TIDAK sama dengan hari ini, tolak.
+        if (!$existing->tanggal->isToday()) {
+             throw new \Exception("Maaf, Anda tidak dapat melakukan absen pulang karena sudah berganti hari. Sesi tanggal " . $existing->tanggal->format('d-m-Y') . " dianggap tidak lengkap (Alpha).");
         }
 
         // VALIDASI WAKTU PULANG (REVISI: Sekarang bebas pulang kapan saja)
@@ -226,12 +216,14 @@ class AbsensiService extends BaseService
             $now = now();
             $jamPulang = Carbon::parse($shift->jam_pulang->format('H:i:s'));
             
-            // Handle Cross Day logic for check out
+            // Handle Cross Day logic for check out -> DISABLED
+            /*
             if (Carbon::parse($shift->jam_masuk->format('H:i:s'))->gt($jamPulang)) {
                 if ($now->format('H:i:s') > $shift->jam_masuk->format('H:i:s')) {
                     $jamPulang->addDay();
                 }
             }
+            */
 
             // Jika pulang lebih awal, keterangan wajib ada
             if ($now->lt($jamPulang)) {
@@ -462,7 +454,16 @@ class AbsensiService extends BaseService
         // Hitung total hari kerja efektif (sampai hari ini atau Full Bulan jika sudah lewat)
         $totalHariKerja = $this->getHariKerjaEfektif($bulan, $tahun);
 
-        $daysActive = $absensis->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
+        // REVISI USER: Yang dihitung sebagai hari aktif (bukan Alpha) adalah:
+        // 1. Status 'Izin', 'Sakit', 'Cuti'
+        // 2. Status 'Hadir'/'Terlambat' TAPI harus punya jam_pulang (completed)
+        $daysActive = $absensis->filter(function($item) {
+            if (in_array($item->status, ['Izin', 'Sakit', 'Cuti'])) {
+                return true;
+            }
+            // Jika Hadir/Terlambat, wajib ada jam_pulang agar tidak dihitung Alpha
+            return !is_null($item->jam_pulang);
+        })->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
         
         return [
             'hadir' => $absensis->where('status', 'Hadir')->whereNotNull('jam_pulang')->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
@@ -471,7 +472,7 @@ class AbsensiService extends BaseService
             'alfa' => max(0, $totalHariKerja - $daysActive),
             'total_hari_kerja' => $totalHariKerja,
         ];
-    }
+        }
 
     /**
      * Hitung hari kerja efektif (tidak termasuk sabtu, minggu, dan hari libur)
