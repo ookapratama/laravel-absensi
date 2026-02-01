@@ -92,7 +92,7 @@
                <tbody>
                   @forelse($logs as $log)
                      <tr>
-                        <td>
+                        <td data-order="{{ $log->created_at->timestamp }}">
                            <small class="text-muted">
                               {{ $log->created_at->format('d M Y') }}<br>
                               <strong>{{ $log->created_at->format('H:i:s') }}</strong>

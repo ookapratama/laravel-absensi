@@ -68,8 +68,7 @@ class DashboardController extends Controller
         $pegawai = $this->pegawaiService->getByUserId($user->id);
         
         if (!$pegawai) {
-            return view('pages.dashboard.dashboard')
-                ->with('error', 'Anda belum terdaftar sebagai pegawai.');
+            return view('pages.dashboard.unregistered');
         }
 
         $absensiHariIni = $pegawai->absensiHariIni();

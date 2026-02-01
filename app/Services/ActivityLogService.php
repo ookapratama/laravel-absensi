@@ -87,7 +87,7 @@ class ActivityLogService
     protected function applyFilters(array $filters = [])
     {
         $query = ActivityLog::with('user')
-            ->latest();
+            ->orderBy('id', 'desc');
 
         // Filter by action
         if (!empty($filters['action'])) {
