@@ -70,7 +70,7 @@
                      <th rowspan="2" class="align-middle text-center">%</th>
                   </tr>
                   <tr>
-                     <th class="text-center bg-success text-white">Hadir</th>
+                     <th class="text-center bg-success text-white">Tepat Waktu</th>
                      <th class="text-center bg-warning text-dark">Telat</th>
                      <th class="text-center bg-info text-white">Izin</th>
                      <th class="text-center bg-danger text-white">Alpha</th>
@@ -85,7 +85,7 @@
                      @php
                         $absensis = $pegawai->absensis;
                         $hadirCount = $absensis
-                            ->where('status', 'Hadir')
+                            ->where('status', 'Tepat Waktu')
                             ->whereNotNull('jam_pulang')
                             ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                             ->count();

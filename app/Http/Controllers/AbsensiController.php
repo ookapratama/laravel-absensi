@@ -244,7 +244,7 @@ class AbsensiController extends Controller
         $events = [];
 
         foreach ($absensis as $absen) {
-            $color = 'success';
+            $color = 'success'; // Default is Tepat Waktu
             if ($absen->status === 'Terlambat') $color = 'warning';
             if ($absen->status === 'Alpha') $color = 'danger';
             if (in_array($absen->status, ['Izin', 'Cuti', 'Sakit'])) $color = 'info';

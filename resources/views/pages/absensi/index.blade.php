@@ -222,7 +222,7 @@
                   </h5>
                   @if ($absensiHariIni && $absensiHariIni->status)
                      <span
-                        class="badge bg-{{ $absensiHariIni->status === 'Hadir' ? 'success' : ($absensiHariIni->status === 'Terlambat' ? 'warning' : 'info') }}">
+                        class="badge bg-{{ $absensiHariIni->status === 'Tepat Waktu' ? 'success' : ($absensiHariIni->status === 'Terlambat' ? 'warning' : 'info') }}">
                         {{ $absensiHariIni->status }}
                      </span>
                   @endif
@@ -358,7 +358,7 @@
                      <div class="d-flex justify-content-between">
                         <span class="text-muted">Status</span>
                         <span
-                           class="badge bg-{{ $absensiHariIni->status === 'Hadir' ? 'success' : ($absensiHariIni->status === 'Terlambat' ? 'warning' : 'info') }}">
+                           class="badge bg-{{ $absensiHariIni->status === 'Tepat Waktu' ? 'success' : ($absensiHariIni->status === 'Terlambat' ? 'warning' : 'info') }}">
                            {{ $absensiHariIni->status }}
                         </span>
                      </div>
@@ -404,7 +404,7 @@
                            </small>
                         </div>
                         <span
-                           class="badge bg-label-{{ $absen->status === 'Hadir' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
+                           class="badge bg-label-{{ $absen->status === 'Tepat Waktu' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
                            {{ $absen->status }}
                         </span>
                      </div>

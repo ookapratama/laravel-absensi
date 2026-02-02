@@ -121,7 +121,7 @@
                      <thead>
                         <tr>
                            <th>Divisi</th>
-                           <th class="text-center">Hadir</th>
+                           <th class="text-center">Tepat Waktu</th>
                            <th class="text-center">Telat</th>
                            <th class="text-center">Izin</th>
                            <th class="text-center">Jam Kerja</th>
@@ -266,7 +266,7 @@
                         <td>{{ $absen->lokasi_masuk ?? '-' }}</td>
                         <td class="text-center">
                            <span
-                              class="badge bg-{{ $absen->status === 'Hadir' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
+                              class="badge bg-{{ $absen->status === 'Tepat Waktu' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
                               {{ $absen->status }}
                            </span>
                         </td>

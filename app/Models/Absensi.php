@@ -154,18 +154,39 @@ class Absensi extends Model
 
     public function getDurasiKerjaMenitAttribute()
     {
-        if (!$this->jam_masuk || !$this->jam_pulang) {
+        if (!$this->jam_masuk || !$this->jam_pulang || !$this->shift) {
             return 0;
         }
 
-        $masuk = \Carbon\Carbon::parse($this->tanggal->format('Y-m-d') . ' ' . $this->jam_masuk->format('H:i:s'));
-        $pulang = \Carbon\Carbon::parse($this->tanggal->format('Y-m-d') . ' ' . $this->jam_pulang->format('H:i:s'));
+        // 1. Ambil waktu shift
+        $shiftMasuk = \Carbon\Carbon::parse($this->tanggal->format('Y-m-d') . ' ' . $this->shift->jam_masuk->format('H:i:s'));
+        $shiftPulang = \Carbon\Carbon::parse($this->tanggal->format('Y-m-d') . ' ' . $this->shift->jam_pulang->format('H:i:s'));
 
-        if ($pulang->lt($masuk)) {
-            $pulang->addDay();
+        if ($shiftPulang->lt($shiftMasuk)) {
+            $shiftPulang->addDay();
         }
 
-        return $masuk->diffInMinutes($pulang);
+        // 2. Ambil waktu absen
+        $absenMasuk = \Carbon\Carbon::parse($this->tanggal->format('Y-m-d') . ' ' . $this->jam_masuk->format('H:i:s'));
+        $absenPulang = \Carbon\Carbon::parse($this->tanggal->format('Y-m-d') . ' ' . $this->jam_pulang->format('H:i:s'));
+
+        // Handle case if absen pulang is on the next day relative to absen masuk
+        if ($absenPulang->lt($absenMasuk)) {
+            $absenPulang->addDay();
+        }
+
+        // Aturan:
+        // Start: Ambil yang paling akhir antara jam masuk shift atau jam absen masuk (jika terlambat)
+        $start = $absenMasuk->gt($shiftMasuk) ? $absenMasuk : $shiftMasuk;
+
+        // End: Ambil yang paling awal antara jam pulang shift atau jam absen pulang (jika pulang awal)
+        $end = $absenPulang->lt($shiftPulang) ? $absenPulang : $shiftPulang;
+
+        if ($end->lt($start)) {
+            return 0;
+        }
+
+        return $start->diffInMinutes($end);
     }
 
     /**

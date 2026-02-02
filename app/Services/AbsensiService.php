@@ -336,7 +336,7 @@ class AbsensiService extends BaseService
 
         // Jika tidak punya shift, atau shift tidak punya jam masuk, anggap Hadir
         if (!$shift || !$shift->jam_masuk) {
-            return 'Hadir';
+            return 'Tepat Waktu';
         }
 
         // Ambil jam masuk dari shift
@@ -352,7 +352,7 @@ class AbsensiService extends BaseService
             return 'Terlambat';
         }
 
-        return 'Hadir';
+        return 'Tepat Waktu';
     }
     /**
      * Determine status kehadiran (Hadir/Terlambat) based on specific shift
@@ -361,7 +361,7 @@ class AbsensiService extends BaseService
     {
         // Jika shift tidak punya jam masuk, anggap Hadir
         if (!$shift || !$shift->jam_masuk) {
-            return 'Hadir';
+            return 'Tepat Waktu';
         }
 
         // Ambil jam masuk dari shift
@@ -378,7 +378,7 @@ class AbsensiService extends BaseService
             return 'Terlambat';
         }
 
-        return 'Hadir';
+        return 'Tepat Waktu';
     }
     /**
      * Get rekap absensi per divisi
@@ -397,7 +397,7 @@ class AbsensiService extends BaseService
                 'divisis.id',
                 'divisis.nama as divisi',
                 DB::raw('COUNT(absensis.id) as total_sesi'),
-                DB::raw("COUNT(DISTINCT CASE WHEN absensis.status = 'Hadir' AND absensis.jam_pulang IS NOT NULL THEN absensis.pegawai_id END) as hadir"),
+                DB::raw("COUNT(DISTINCT CASE WHEN absensis.status = 'Tepat Waktu' AND absensis.jam_pulang IS NOT NULL THEN absensis.pegawai_id END) as hadir"),
                 DB::raw("COUNT(DISTINCT CASE WHEN absensis.status = 'Terlambat' AND absensis.jam_pulang IS NOT NULL THEN absensis.pegawai_id END) as terlambat"),
                 DB::raw("COUNT(DISTINCT CASE WHEN absensis.status IN ('Izin', 'Cuti', 'Sakit') THEN absensis.pegawai_id END) as izin"),
                 DB::raw("SUM(
@@ -439,7 +439,7 @@ class AbsensiService extends BaseService
             'total_pegawai' => $totalPegawai,
             'sudah_absen' => $absensis->whereNotNull('jam_masuk')->unique('pegawai_id')->count(),
             'belum_absen' => $totalPegawai - $absensis->whereNotNull('jam_masuk')->unique('pegawai_id')->count(),
-            'hadir' => $absensis->where('status', 'Hadir')->whereNotNull('jam_pulang')->unique('pegawai_id')->count(),
+            'hadir' => $absensis->where('status', 'Tepat Waktu')->whereNotNull('jam_pulang')->unique('pegawai_id')->count(),
             'terlambat' => $absensis->where('status', 'Terlambat')->whereNotNull('jam_pulang')->unique('pegawai_id')->count(),
             'izin' => $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count(),
         ];
@@ -466,7 +466,7 @@ class AbsensiService extends BaseService
         })->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
         
         return [
-            'hadir' => $absensis->where('status', 'Hadir')->whereNotNull('jam_pulang')->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
+            'hadir' => $absensis->where('status', 'Tepat Waktu')->whereNotNull('jam_pulang')->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
             'terlambat' => $absensis->where('status', 'Terlambat')->whereNotNull('jam_pulang')->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
             'izin' => $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count(),
             'alfa' => max(0, $totalHariKerja - $daysActive),

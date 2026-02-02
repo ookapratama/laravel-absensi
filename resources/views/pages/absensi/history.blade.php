@@ -56,7 +56,7 @@
       <!-- Stats -->
       <div class="row mb-4 g-3">
          @php
-            $hadir = $data->where('status', 'Hadir')->count();
+            $hadir = $data->where('status', 'Tepat Waktu')->count();
             $terlambat = $data->where('status', 'Terlambat')->count();
             $izin = $data->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count();
          @endphp
@@ -64,7 +64,7 @@
             <div class="card bg-label-success">
                <div class="card-body">
                   <h3 class="mb-0 text-success">{{ $hadir }}</h3>
-                  <span class="text-success">Hadir Tepat Waktu</span>
+                  <span class="text-success">Tepat Waktu</span>
                </div>
             </div>
          </div>
@@ -137,7 +137,7 @@
                         <td>{{ $absen->lokasi_masuk ?? '-' }}</td>
                         <td>
                            <span
-                              class="badge bg-{{ $absen->status === 'Hadir' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
+                              class="badge bg-{{ $absen->status === 'Tepat Waktu' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
                               {{ $absen->status }}
                            </span>
                         </td>
@@ -166,7 +166,7 @@
                               class="text-primary d-block mb-1">{{ $absen->tanggal->locale('id')->isoFormat('ddd, D MMM Y') }}</strong>
                         </div>
                         <span
-                           class="badge bg-{{ $absen->status === 'Hadir' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
+                           class="badge bg-{{ $absen->status === 'Tepat Waktu' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
                            {{ $absen->status }}
                         </span>
                      </div>

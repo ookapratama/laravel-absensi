@@ -40,7 +40,7 @@
                   <div class="d-flex flex-column gap-3">
                      <div class="d-flex align-items-center">
                         <span class="badge badge-dot bg-success me-2"></span>
-                        <span>Hadir Tepat Waktu</span>
+                        <span>Tepat Waktu</span>
                      </div>
                      <div class="d-flex align-items-center">
                         <span class="badge badge-dot bg-warning me-2"></span>
