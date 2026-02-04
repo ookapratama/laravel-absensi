@@ -10,11 +10,225 @@
     },
     "servers": [
         {
-            "url": "http://my-default-host.com",
+            "url": "http://localhost",
             "description": "API Server Utama"
         }
     ],
     "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login user and create token",
+                "description": "Masuk ke sistem dan mendapatkan Bearer Token untuk akses API selanjutnya",
+                "operationId": "1257f11ade1e6ee3a26cfe338badfb8e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login successful"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "access_token": {
+                                                    "type": "string",
+                                                    "example": "1|AbCdEf123456..."
+                                                },
+                                                "token_type": {
+                                                    "type": "string",
+                                                    "example": "Bearer"
+                                                },
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Admin User"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "admin@example.com"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid credentials"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    }
+                }
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get current user profile",
+                "description": "Mengambil data profil user yang sedang login",
+                "operationId": "1e256a87c0d7354e764995253e6a0927",
+                "responses": {
+                    "200": {
+                        "description": "User profile retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User profile retrieved"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Admin User"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "admin@example.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout user",
+                "description": "Hapus token autentikasi saat ini",
+                "operationId": "d0090497298d35d96a9fcde3666ff010",
+                "responses": {
+                    "200": {
+                        "description": "Logged out successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logged out successfully"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/users": {
             "get": {
                 "tags": [
@@ -117,6 +331,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
         {
             "name": "Users",
             "description": "Users"
