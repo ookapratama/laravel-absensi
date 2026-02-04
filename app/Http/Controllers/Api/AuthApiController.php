@@ -109,7 +109,20 @@ class AuthApiController extends Controller
      */
     public function me(Request $request)
     {
-        return ResponseHelper::success($request->user(), 'User profile retrieved');
+        $user = $request->user();
+        
+        // Eager load relationships needed for the resource
+        $user->load([
+            'role', 
+            'pegawai.divisi.shifts', 
+            'pegawai.kantor', 
+            'pegawai.shift',
+            'pegawai.absensis' => function($query) {
+                $query->latest('tanggal')->take(5);
+            }
+        ]);
+
+        return ResponseHelper::success(new \App\Http\Resources\UserResource($user), 'User profile retrieved');
     }
 
     /**

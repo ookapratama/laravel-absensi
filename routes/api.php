@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\UserApiController;
 use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\AbsensiApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -12,10 +13,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthApiController::class, 'me']);
     Route::post('/logout', [AuthApiController::class, 'logout']);
     
-    // Test user route (removed original closure to use consistent controller pattern)
-    // Route::get('/user', function (Request $request) {
-    //    return $request->user();
-    // });
+    // Absensi Routes
+    Route::prefix('absensi')->group(function () {
+        Route::get('/history', [AbsensiApiController::class, 'history']);
+    });
 });
 
 // User API Routes

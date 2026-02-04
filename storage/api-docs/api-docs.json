@@ -15,6 +15,116 @@
         }
     ],
     "paths": {
+        "/api/absensi/history": {
+            "get": {
+                "tags": [
+                    "Absensi"
+                ],
+                "summary": "Get attendance history for logged in user",
+                "description": "Mengambil riwayat absensi pegawai yang sedang login",
+                "operationId": "7f7d09a89a1cfc869ee2c566ef2e7ae4",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit data per page (default: 10)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "tanggal": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-01-01"
+                                                    },
+                                                    "jam_masuk": {
+                                                        "type": "string",
+                                                        "example": "08:00"
+                                                    },
+                                                    "jam_pulang": {
+                                                        "type": "string",
+                                                        "example": "17:00"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "Hadir"
+                                                    },
+                                                    "durasi_kerja": {
+                                                        "type": "string",
+                                                        "example": "8 Jam"
+                                                    },
+                                                    "foto_masuk_url": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/storage/foto.jpg"
+                                                    },
+                                                    "foto_pulang_url": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/storage/foto.jpg"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/login": {
             "post": {
                 "tags": [
@@ -331,6 +441,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Absensi",
+            "description": "Absensi"
+        },
         {
             "name": "Auth",
             "description": "Auth"
