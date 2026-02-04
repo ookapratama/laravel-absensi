@@ -274,6 +274,9 @@
                   @php
                      $isEarly = false;
                      $targetJamPulang = null;
+                     $batasMaksimalPulang = null;
+                     $sudahLewatBatas = false;
+
                      if ($shift && $absensiHariIni && $absensiHariIni->jam_masuk && !$absensiHariIni->jam_pulang) {
                          $now = now();
                          $jamPulang = \Carbon\Carbon::parse($shift->jam_pulang->format('H:i:s'));
@@ -286,6 +289,10 @@
                          }
                          $isEarly = $now->lt($jamPulang);
                          $targetJamPulang = $jamPulang->format('Y-m-d\TH:i:s');
+
+                         // Hitung batas maksimal (2 jam setelah jam pulang)
+                         $batasMaksimalPulang = $jamPulang->copy()->addHours(2);
+                         $sudahLewatBatas = $now->gt($batasMaksimalPulang);
                      }
                   @endphp
                   <div class="row g-3">
@@ -302,14 +309,22 @@
                      </div>
                      <div class="col-6">
                         <button type="button" class="btn btn-danger btn-lg w-100" id="btn-absen-pulang"
-                           data-target-pulang="{{ $targetJamPulang }}" @if (!$absensiHariIni || !$absensiHariIni->jam_masuk || $absensiHariIni->jam_pulang) disabled @endif>
+                           data-target-pulang="{{ $targetJamPulang }}" @if (!$absensiHariIni || !$absensiHariIni->jam_masuk || $absensiHariIni->jam_pulang || $sudahLewatBatas) disabled @endif>
                            <i class="ri-logout-box-line me-2"></i>
                            @if ($absensiHariIni && $absensiHariIni->jam_pulang)
                               Pulang: {{ $absensiHariIni->jam_pulang->format('H:i') }}
+                           @elseif ($sudahLewatBatas)
+                              Batas Waktu Terlewat
                            @else
                               Absen Pulang
                            @endif
                         </button>
+                        @if ($sudahLewatBatas && $absensiHariIni && !$absensiHariIni->jam_pulang)
+                           <small class="text-danger d-block mt-1">
+                              <i class="ri-error-warning-line"></i> Batas absen pulang:
+                              {{ $batasMaksimalPulang->format('H:i') }}
+                           </small>
+                        @endif
                      </div>
                   </div>
 

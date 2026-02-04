@@ -210,20 +210,18 @@ class AbsensiService extends BaseService
              throw new \Exception("Maaf, Anda tidak dapat melakukan absen pulang karena sudah berganti hari. Sesi tanggal " . $existing->tanggal->format('d-m-Y') . " dianggap tidak lengkap (Alpha).");
         }
 
-        // VALIDASI WAKTU PULANG (REVISI: Sekarang bebas pulang kapan saja)
+        // VALIDASI WAKTU PULANG
         $shift = $existing->shift;
         if ($shift) {
             $now = now();
             $jamPulang = Carbon::parse($shift->jam_pulang->format('H:i:s'));
             
-            // Handle Cross Day logic for check out -> DISABLED
-            /*
-            if (Carbon::parse($shift->jam_masuk->format('H:i:s'))->gt($jamPulang)) {
-                if ($now->format('H:i:s') > $shift->jam_masuk->format('H:i:s')) {
-                    $jamPulang->addDay();
-                }
+            // VALIDASI BATAS MAKSIMAL: 2 jam setelah jam pulang shift
+            $batasMaksimalPulang = $jamPulang->copy()->addHours(2);
+            
+            if ($now->gt($batasMaksimalPulang)) {
+                throw new \Exception("Waktu absen pulang sudah melewati batas maksimal. Batas pulang: " . $batasMaksimalPulang->format('H:i'));
             }
-            */
 
             // Jika pulang lebih awal, keterangan wajib ada
             if ($now->lt($jamPulang)) {
