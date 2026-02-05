@@ -38,15 +38,11 @@ class AbsensiController extends Controller
                 return redirect()->route('dashboard')->with('error', 'Shift tidak valid untuk divisi Anda.');
             }
             
-            // Ambil absensi spesifik untuk shift ini
-            // REVISI: Cari sesi yang masih terbuka (bisa dari kemarin) atau yang sudah selesai hari ini
+            // Ambil absensi spesifik untuk shift ini HANYA untuk hari ini
+            // Sesi kemarin yang lupa checkout akan diabaikan oleh UI agar user bisa masuk sesi baru hari ini
             $absensiHariIni = \App\Models\Absensi::where('pegawai_id', $pegawai->id)
                 ->where('shift_id', $shiftId)
-                ->where(function($q) {
-                    $q->whereNull('jam_pulang')
-                      ->orWhereDate('tanggal', today());
-                })
-                ->orderBy('tanggal', 'desc')
+                ->whereDate('tanggal', today())
                 ->first();
         } else {
             // Fallback ke logic lama (ambil absensi pertama hari ini) atau redirect ke dashboard
