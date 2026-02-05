@@ -459,8 +459,9 @@ class AbsensiService extends BaseService
             if (in_array($item->status, ['Izin', 'Sakit', 'Cuti'])) {
                 return true;
             }
-            // Jika Hadir/Terlambat, wajib ada jam_pulang agar tidak dihitung Alpha
-            return !is_null($item->jam_pulang);
+            // Jika Hadir/Terlambat, wajib ada jam_pulang (selesai) 
+            // ATAU jika masih hari ini (sedang berjalan) maka tetap dianggap aktif (bukan Alpha)
+            return !is_null($item->jam_pulang) || $item->tanggal->isToday();
         })->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
         
         return [

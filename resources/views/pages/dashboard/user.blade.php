@@ -298,13 +298,11 @@
                            $jamMasuk = \Carbon\Carbon::parse($shift->jam_masuk);
                            $jamPulang = \Carbon\Carbon::parse($shift->jam_pulang);
 
-                           // Cek apakah data absen spesifik untuk shift ini (termasuk yang masih terbuka dari kemarin)
+                           // Cek apakah data absen spesifik untuk shift ini HANYA UNTUK HARI INI
+                           // Sesi kemarin yang lupa checkout diabaikan (dianggap Alpha) agar hari ini bisa absen lagi.
                            $absenShift = \App\Models\Absensi::where('pegawai_id', $pegawai->id)
                                ->where('shift_id', $shift->id)
-                               ->where(function ($q) {
-                                   $q->whereNull('jam_pulang') // Sesi yang masih terbuka (bisa dari kemarin)
-                                       ->orWhereDate('tanggal', today()); // Atau sudah absen hari ini
-                               })
+                               ->whereDate('tanggal', today())
                                ->orderBy('tanggal', 'desc')
                                ->first();
 
@@ -340,7 +338,17 @@
                                        }
                                    }
 
-                                   if ($now->lt($jamPulangShift)) {
+                                   // Batas maksimal pulang: 2 jam setelah jam pulang shift
+                                   $batasMaksimalPulang = $jamPulangShift->copy()->addHours(2);
+
+                                   if ($now->gt($batasMaksimalPulang)) {
+                                       // Sudah lewat batas maksimal (2 jam), tidak bisa absen pulang lagi
+                                       $isDisabled = true;
+                                       $btnText = 'Sesi Berakhir';
+                                       $btnClass = 'btn-secondary';
+                                       $statusText = 'Alpha (Waktu Habis)';
+                                       $statusClass = 'text-danger';
+                                   } elseif ($now->lt($jamPulangShift)) {
                                        $isPulang = true; // State is 'Working'
                                        // $isDisabled = true; // DISABLE DULU BIAR BISA PULANG CEPAT
                                        $btnText = 'Absen Pulang';
@@ -348,7 +356,7 @@
                                        $statusText = 'Sedang Berjalan';
                                        $statusClass = 'text-warning';
                                    } else {
-                                       // Sudah lewat jam pulang, boleh pulang
+                                       // Sudah lewat jam pulang, tapi masih dalam batas 2 jam
                                        $isPulang = true;
                                        $btnText = 'Absen Pulang';
                                        $btnClass = 'btn-danger';
