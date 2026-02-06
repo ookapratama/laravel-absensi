@@ -98,4 +98,113 @@ class AbsensiApiController extends Controller
             ]
         ]);
     }
+    /**
+     * @OA\Post(
+     *     path="/api/absensi/masuk",
+     *     tags={"Absensi"},
+     *     summary="Clock-in (Absen Masuk)",
+     *     description="Melakukan absen masuk dengan foto dan lokasi",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"shift_id", "latitude", "longitude", "foto"},
+     *                 @OA\Property(property="shift_id", type="integer", example=1),
+     *                 @OA\Property(property="latitude", type="string", example="-5.147615"),
+     *                 @OA\Property(property="longitude", type="string", example="119.432731"),
+     *                 @OA\Property(property="foto", type="string", format="binary"),
+     *                 @OA\Property(property="device", type="string", example="iPhone 13")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Berhasil Absen Masuk",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Absen masuk berhasil"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Bad Request/Validation Error")
+     * )
+     */
+    public function masuk(Request $request)
+    {
+        $request->validate([
+            'shift_id' => 'required|exists:shifts,id',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'foto' => 'required|image|max:2048',
+        ]);
+
+        $user = $request->user();
+        if (!$user->pegawai) {
+            return ResponseHelper::error('User belum terdaftar sebagai pegawai', 400);
+        }
+
+        try {
+            $result = $this->service->absenMasuk($user->pegawai, $request->all());
+            return ResponseHelper::success($result, 'Absen masuk berhasil dilakukan.');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage(), 400);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/absensi/pulang",
+     *     tags={"Absensi"},
+     *     summary="Clock-out (Absen Pulang)",
+     *     description="Melakukan absen pulang dengan foto dan lokasi",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"latitude", "longitude", "foto"},
+     *                 @OA\Property(property="shift_id", type="integer", example=1, description="Optional if only one active session"),
+     *                 @OA\Property(property="latitude", type="string", example="-5.147615"),
+     *                 @OA\Property(property="longitude", type="string", example="119.432731"),
+     *                 @OA\Property(property="foto", type="string", format="binary"),
+     *                 @OA\Property(property="keterangan", type="string", example="Pulang lebih awal karena urusan keluarga"),
+     *                 @OA\Property(property="device", type="string", example="iPhone 13")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Berhasil Absen Pulang",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Absen pulang berhasil"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Bad Request/Validation Error")
+     * )
+     */
+    public function pulang(Request $request)
+    {
+        $request->validate([
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'foto' => 'required|image|max:2048',
+        ]);
+
+        $user = $request->user();
+        if (!$user->pegawai) {
+            return ResponseHelper::error('User belum terdaftar sebagai pegawai', 400);
+        }
+
+        try {
+            $result = $this->service->absenPulang($user->pegawai, $request->all());
+            return ResponseHelper::success($result, 'Absen pulang berhasil dilakukan.');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage(), 400);
+        }
+    }
 }

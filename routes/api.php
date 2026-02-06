@@ -16,6 +16,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Absensi Routes
     Route::prefix('absensi')->group(function () {
         Route::get('/history', [AbsensiApiController::class, 'history']);
+        Route::post('/masuk', [AbsensiApiController::class, 'masuk']);
+        Route::post('/pulang', [AbsensiApiController::class, 'pulang']);
     });
 });
 
