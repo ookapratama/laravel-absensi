@@ -36,10 +36,10 @@
                               <input type="file" id="upload" name="foto" class="account-file-input" hidden
                                  accept="image/png, image/jpeg" />
                            </label>
-                           <button type="button" class="btn btn-outline-secondary account-image-reset mb-3">
+                           {{-- <button type="button" class="btn btn-outline-secondary account-image-reset mb-3">
                               <i class="ri-refresh-line d-block d-sm-none"></i>
                               <span class="d-none d-sm-block">Reset</span>
-                           </button>
+                           </button> --}}
                            <div class="text-muted small">Allowed JPG, GIF or PNG. Max size of 2048K</div>
                            @error('foto')
                               <div class="text-danger small mt-1">{{ $message }}</div>
@@ -128,7 +128,7 @@
                      </div>
                      <div class="mt-2">
                         <button type="submit" class="btn btn-primary me-2">Save changes</button>
-                        <button type="reset" class="btn btn-outline-secondary">Discard</button>
+                        {{-- <button type="reset" class="btn btn-outline-secondary">Discard</button> --}}
                      </div>
                   </div>
                </form>
