@@ -60,6 +60,10 @@ class AppServiceProvider extends ServiceProvider
             \App\Interfaces\Repositories\ShiftRepositoryInterface::class,
             \App\Repositories\ShiftRepository::class
         );
+        $this->app->bind(
+            \App\Interfaces\Repositories\InformasiRepositoryInterface::class,
+            \App\Repositories\InformasiRepository::class
+        );
     }
 
     /**

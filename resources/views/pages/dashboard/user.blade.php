@@ -179,6 +179,21 @@
          </div>
       </div>
 
+      <!-- Informasi Kantor (Moved & Dismissible) -->
+      <div class="alert alert-primary alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert">
+         <div class="d-flex align-items-center">
+            <i class="ri-notification-3-line ri-24px me-3 text-primary"></i>
+            <div>
+               <h6 class="alert-heading mb-1 fw-bold text-primary">Informasi Kantor</h6>
+               <p class="mb-0 small">
+                  Pastikan untuk selalu melakukan absen tepat waktu dan di dalam radius kantor
+                  ({{ $pegawai->kantor->radius_meter }}m).
+               </p>
+            </div>
+         </div>
+         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+
       <!-- Monthly Summary Stats -->
       <div class="row g-4 mb-4">
          <div class="col-sm-6 col-xl-3">
@@ -266,6 +281,42 @@
             </div>
          </div>
       </div>
+
+      <!-- Media Informasi Section -->
+      @if ($informasis->count() > 0)
+         <div class="row mb-4">
+            <div class="col-12">
+               <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="mb-0 fw-bold"><i class="ri-information-line me-2"></i>Informasi Terbaru</h5>
+               </div>
+               <div class="row g-4 text-start">
+                  @foreach ($informasis as $info)
+                     <div class="col-md-4 col-sm-6">
+                        <a href="{{ route('informasi.show', $info->id) }}" class="text-decoration-none">
+                           <div class="card h-100 border-0 shadow-sm overflow-hidden stat-card">
+                              <img src="{{ $info->gambar_url }}" class="card-img-top" alt="{{ $info->judul }}"
+                                 style="height: 160px; object-fit: cover;">
+                              <div class="card-body p-4">
+                                 <div class="d-flex align-items-center mb-2">
+                                    <span
+                                       class="badge bg-label-primary fs-xsmall">{{ $info->created_at->format('d M Y') }}</span>
+                                 </div>
+                                 <h6 class="card-title fw-bold text-heading mb-2 line-clamp-2"
+                                    style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    {{ $info->judul }}</h6>
+                                 <p class="card-text small text-muted mb-0 line-clamp-3"
+                                    style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                    {{ Str::limit(strip_tags($info->isi), 80) }}
+                                 </p>
+                              </div>
+                           </div>
+                        </a>
+                     </div>
+                  @endforeach
+               </div>
+            </div>
+         </div>
+      @endif
 
       <div class="row">
          <!-- Left Column: Today's Status & Quick Actions -->
@@ -442,7 +493,8 @@
                               <div class="card-body p-3">
                                  <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h6 class="mb-0 fw-bold">{{ $shift->nama }}</h6>
-                                    <span class="badge bg-white {{ $statusClass }} shadow-sm">{{ $statusText }}</span>
+                                    <span
+                                       class="badge bg-white {{ $statusClass }} shadow-sm">{{ $statusText }}</span>
                                  </div>
                                  <div class="mb-3">
                                     <div class="d-flex align-items-center text-muted small mb-1">
@@ -549,17 +601,6 @@
                </div>
             </div>
 
-            <!-- Promotion / Announcement placeholder -->
-            <div class="card bg-label-primary border-0">
-               <div class="card-body">
-                  <div class="d-flex align-items-center mb-3">
-                     <i class="ri-notification-3-line ri-24px me-2"></i>
-                     <h6 class="mb-0">Informasi Kantor</h6>
-                  </div>
-                  <p class="small mb-0">Pastikan untuk selalu melakukan absen tepat waktu dan di dalam radius kantor
-                     ({{ $pegawai->kantor->radius_meter }}m).</p>
-               </div>
-            </div>
          </div>
       </div>
    </div>

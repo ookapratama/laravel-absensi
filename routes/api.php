@@ -25,6 +25,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/update', [\App\Http\Controllers\Api\ProfileApiController::class, 'update']);
         Route::post('/password', [\App\Http\Controllers\Api\ProfileApiController::class, 'updatePassword']);
     });
+
+    // Informasi Routes
+    Route::prefix('informasi')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\InformasiApiController::class, 'index']);
+        Route::get('/{id}', [\App\Http\Controllers\Api\InformasiApiController::class, 'show']);
+    });
 });
 
 // User API Routes

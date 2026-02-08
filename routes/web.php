@@ -101,5 +101,9 @@ Route::middleware(['auth'])->group(function () {
     Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::get('profile/password', [\App\Http\Controllers\ProfileController::class, 'editPassword'])->name('profile.password.edit');
     Route::put('profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+    // ============== INFORMASI ==============
+    Route::resource('informasi', \App\Http\Controllers\InformasiController::class)
+        ->middleware('check.permission:informasi');
 });
 

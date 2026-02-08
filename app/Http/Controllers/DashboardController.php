@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Services\AbsensiService;
 use App\Services\PegawaiService;
+use App\Services\InformasiService;
 
 class DashboardController extends Controller
 {
     public function __construct(
         protected AbsensiService $absensiService,
-        protected PegawaiService $pegawaiService
+        protected PegawaiService $pegawaiService,
+        protected InformasiService $informasiService
     ) {}
 
     /**
@@ -77,12 +79,14 @@ class DashboardController extends Controller
 
         $historyAbsensi = $this->absensiService->getByPegawaiBulan($pegawai->id, $bulan, $tahun);
         $statistik = $this->absensiService->getStatistikPegawai($pegawai->id, $bulan, $tahun);
+        $informasis = $this->informasiService->getLatest(5);
 
         return view('pages.dashboard.user', compact(
             'pegawai', 
             'absensiHariIni', 
             'historyAbsensi', 
-            'statistik'
+            'statistik',
+            'informasis'
         ));
     }
 }
