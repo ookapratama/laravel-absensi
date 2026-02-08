@@ -95,5 +95,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{izin}', [IzinController::class, 'show'])->name('show');
         Route::delete('/{izin}/cancel', [IzinController::class, 'cancel'])->name('cancel');
     });
+
+    // ============== PROFILE ==============
+    Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::get('profile/password', [\App\Http\Controllers\ProfileController::class, 'editPassword'])->name('profile.password.edit');
+    Route::put('profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password.update');
 });
 

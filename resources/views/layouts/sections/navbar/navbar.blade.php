@@ -474,19 +474,14 @@
                <div class="dropdown-divider"></div>
             </li>
             <li>
-               <a class="dropdown-item"
-                  href="{{ Route::has('profile.show') ? route('profile.show') : url('pages/profile-user') }}">
+               <a class="dropdown-item" href="{{ route('profile.edit') }}">
                   <i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle">My Profile</span>
                </a>
             </li>
 
             <li>
-               <a class="dropdown-item" href="{{ url('pages/account-settings-billing') }}">
-                  <span class="d-flex align-items-center align-middle">
-                     <i class="flex-shrink-0 ri-file-text-line ri-22px me-3"></i>
-                     <span class="flex-grow-1 align-middle">Billing</span>
-                     <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger">4</span>
-                  </span>
+               <a class="dropdown-item" href="{{ route('profile.password.edit') }}">
+                  <i class="ri-lock-password-line ri-22px me-3"></i><span class="align-middle">Update Password</span>
                </a>
             </li>
 

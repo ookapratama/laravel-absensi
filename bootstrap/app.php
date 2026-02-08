@@ -40,5 +40,10 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e instanceof \Illuminate\Auth\AuthenticationException) {
                 return null; // Biarkan default handling (redirect ke /login)
             }
+
+            // Handle CSRF Token Mismatch (Error 419)
+            if ($e instanceof \Illuminate\Session\TokenMismatchException) {
+                return redirect()->back()->withInput()->with('error', 'Sesi login telah habis atau token tidak valid. Silakan coba lagi.');
+            }
         });
     })->create();

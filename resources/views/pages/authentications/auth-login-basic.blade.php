@@ -46,6 +46,24 @@
                   <h4 class="mb-1">Welcome to {{ config('variables.templateName') }}! 👋</h4>
                   <p class="mb-5">Please sign-in to your account and start the adventure</p>
 
+                  @if (session('error'))
+                     <div class="alert alert-danger alert-dismissible" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                     </div>
+                  @endif
+
+                  @if ($errors->any())
+                     <div class="alert alert-danger alert-dismissible" role="alert">
+                        <ul class="mb-0">
+                           @foreach ($errors->all() as $error)
+                              <li>{{ $error }}</li>
+                           @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                     </div>
+                  @endif
+
                   <form id="formAuthentication" class="mb-5" action="{{ route('login') }}" method="POST">
                      @csrf
                      <div class="form-floating form-floating-outline mb-5">
@@ -68,7 +86,7 @@
                      </div>
                      <div class="mb-5 d-flex justify-content-between mt-5">
                         <div class="form-check mt-2">
-                           <input class="form-check-input" type="checkbox" id="remember-me">
+                           <input class="form-check-input" type="checkbox" id="remember-me" name="remember">
                            <label class="form-check-label" for="remember-me">
                               Remember Me
                            </label>
