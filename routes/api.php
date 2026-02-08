@@ -19,6 +19,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/masuk', [AbsensiApiController::class, 'masuk']);
         Route::post('/pulang', [AbsensiApiController::class, 'pulang']);
     });
+
+    // Profile Routes
+    Route::prefix('profile')->group(function () {
+        Route::post('/update', [\App\Http\Controllers\Api\ProfileApiController::class, 'update']);
+        Route::post('/password', [\App\Http\Controllers\Api\ProfileApiController::class, 'updatePassword']);
+    });
 });
 
 // User API Routes
