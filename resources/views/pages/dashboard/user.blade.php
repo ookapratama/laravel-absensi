@@ -119,6 +119,7 @@
          letter-spacing: 0.5px;
       }
    </style>
+   @vite(['resources/assets/vendor/libs/swiper/swiper.scss'])
 @endsection
 
 @section('content')
@@ -282,37 +283,48 @@
          </div>
       </div>
 
-      <!-- Media Informasi Section -->
+      <!-- Media Informasi (Carousel) -->
       @if ($informasis->count() > 0)
          <div class="row mb-4">
             <div class="col-12">
                <div class="d-flex justify-content-between align-items-center mb-3">
                   <h5 class="mb-0 fw-bold"><i class="ri-information-line me-2"></i>Informasi Terbaru</h5>
+                  <div class="d-flex gap-2">
+                     <div class="swiper-button-prev-custom cursor-pointer text-primary"><i
+                           class="ri-arrow-left-s-line ri-24px"></i></div>
+                     <div class="swiper-button-next-custom cursor-pointer text-primary"><i
+                           class="ri-arrow-right-s-line ri-24px"></i></div>
+                  </div>
                </div>
-               <div class="row g-4 text-start">
-                  @foreach ($informasis as $info)
-                     <div class="col-md-4 col-sm-6">
-                        <a href="{{ route('informasi.show', $info->id) }}" class="text-decoration-none">
-                           <div class="card h-100 border-0 shadow-sm overflow-hidden stat-card">
-                              <img src="{{ $info->gambar_url }}" class="card-img-top" alt="{{ $info->judul }}"
-                                 style="height: 160px; object-fit: cover;">
-                              <div class="card-body p-4">
-                                 <div class="d-flex align-items-center mb-2">
-                                    <span
-                                       class="badge bg-label-primary fs-xsmall">{{ $info->created_at->format('d M Y') }}</span>
+
+               <div class="swiper swiper-informasi pb-5">
+                  <div class="swiper-wrapper">
+                     @foreach ($informasis as $info)
+                        <div class="swiper-slide h-auto">
+                           <a href="{{ route('informasi.show', $info->id) }}"
+                              class="text-decoration-none h-100 d-block">
+                              <div class="card h-100 border-0 shadow-sm overflow-hidden stat-card">
+                                 <img src="{{ $info->gambar_url }}" class="card-img-top" alt="{{ $info->judul }}"
+                                    style="height: 160px; object-fit: cover;">
+                                 <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-2">
+                                       <span
+                                          class="badge bg-label-primary fs-xsmall">{{ $info->created_at->format('d M Y') }}</span>
+                                    </div>
+                                    <h6 class="card-title fw-bold text-heading mb-2 line-clamp-2"
+                                       style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 3em;">
+                                       {{ $info->judul }}</h6>
+                                    <p class="card-text small text-muted mb-0 line-clamp-3"
+                                       style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                       {{ Str::limit(strip_tags($info->isi), 80) }}
+                                    </p>
                                  </div>
-                                 <h6 class="card-title fw-bold text-heading mb-2 line-clamp-2"
-                                    style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                    {{ $info->judul }}</h6>
-                                 <p class="card-text small text-muted mb-0 line-clamp-3"
-                                    style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                                    {{ Str::limit(strip_tags($info->isi), 80) }}
-                                 </p>
                               </div>
-                           </div>
-                        </a>
-                     </div>
-                  @endforeach
+                           </a>
+                        </div>
+                     @endforeach
+                  </div>
+                  <div class="swiper-pagination"></div>
                </div>
             </div>
          </div>
@@ -559,7 +571,7 @@
                   </a>
                </div>
                <div class="col-6 col-md">
-                  <a href="{{ url('user/profile') }}" class="quick-action-btn shadow-sm">
+                  <a href="{{ route('profile.edit') }}" class="quick-action-btn shadow-sm">
                      <i class="ri-user-settings-line"></i>
                      <span>Profil Saya</span>
                   </a>
@@ -606,19 +618,57 @@
    </div>
 @endsection
 
+@section('vendor-script')
+   @vite(['resources/assets/vendor/libs/swiper/swiper.js'])
+@endsection
+
 @section('page-script')
    <script>
-      function updateClock() {
-         const now = new Date();
-         const options = {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-         };
-         document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID', options);
-      }
-      setInterval(updateClock, 1000);
-      updateClock();
+      document.addEventListener('DOMContentLoaded', function() {
+         // Initialize Clock
+         function updateClock() {
+            const now = new Date();
+            const options = {
+               hour: '2-digit',
+               minute: '2-digit',
+               second: '2-digit',
+               hour12: false
+            };
+            const clockEl = document.getElementById('clock');
+            if (clockEl) clockEl.textContent = now.toLocaleTimeString('id-ID', options);
+         }
+         setInterval(updateClock, 1000);
+         updateClock();
+
+         // Initialize Swiper
+         if (typeof Swiper !== 'undefined') {
+            new Swiper('.swiper-informasi', {
+               slidesPerView: 1,
+               spaceBetween: 20,
+               pagination: {
+                  el: '.swiper-pagination',
+                  clickable: true,
+               },
+               navigation: {
+                  nextEl: '.swiper-button-next-custom',
+                  prevEl: '.swiper-button-prev-custom',
+               },
+               breakpoints: {
+                  640: {
+                     slidesPerView: 2,
+                     spaceBetween: 20,
+                  },
+                  1024: {
+                     slidesPerView: 3,
+                     spaceBetween: 30,
+                  },
+               },
+               autoplay: {
+                  delay: 5000,
+                  disableOnInteraction: false,
+               },
+            });
+         }
+      });
    </script>
 @endsection

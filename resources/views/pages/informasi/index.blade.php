@@ -15,12 +15,6 @@
          </a>
       </div>
 
-      @if (session('success'))
-         <div class="alert alert-success alert-dismissible" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-         </div>
-      @endif
 
       <div class="card">
          <div class="card-datatable table-responsive">
@@ -57,11 +51,11 @@
                                  <i class="ri-edit-box-line"></i>
                               </a>
                               <form action="{{ route('informasi.destroy', $informasi->id) }}" method="POST"
-                                 onsubmit="return confirm('Apakah Anda yakin ingin menghapus informasi ini?')">
+                                 class="delete-form">
                                  @csrf
                                  @method('DELETE')
-                                 <button type="submit"
-                                    class="btn btn-sm btn-icon btn-text-danger rounded-pill waves-effect">
+                                 <button type="button"
+                                    class="btn btn-sm btn-icon btn-text-danger rounded-pill waves-effect btn-delete">
                                     <i class="ri-delete-bin-7-line"></i>
                                  </button>
                               </form>
@@ -82,11 +76,34 @@
 
 @section('page-script')
    <script>
-      $(document).ready(function() {
-         $('.datatable').DataTable({
-            responsive: true,
-            dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-         });
+      document.addEventListener('DOMContentLoaded', function() {
+         // Gunakan jQuery dari window jika tersedia
+         const jQuery = window.jQuery;
+         if (typeof jQuery !== 'undefined') {
+            jQuery('.datatable').DataTable({
+               responsive: true,
+               dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+            });
+
+            // SweetAlert Delete Confirmation
+            jQuery('.btn-delete').on('click', function() {
+               const form = jQuery(this).closest('form');
+               if (window.AlertHandler) {
+                  window.AlertHandler.confirm(
+                     'Hapus Informasi?',
+                     'Data yang dihapus tidak dapat dikembalikan!',
+                     'Ya, Hapus!',
+                     function() {
+                        form.submit();
+                     }
+                  );
+               } else {
+                  if (confirm('Apakah Anda yakin ingin menghapus informasi ini?')) {
+                     form.submit();
+                  }
+               }
+            });
+         }
       });
    </script>
 @endsection
