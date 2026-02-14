@@ -84,25 +84,40 @@
                   @foreach ($data as $index => $pegawai)
                      @php
                         $absensis = $pegawai->absensis;
+
+                        // 1. Tepat Waktu (Hadir)
                         $hadirCount = $absensis
                             ->where('status', 'Tepat Waktu')
                             ->whereNotNull('jam_pulang')
                             ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                             ->count();
+
+                        // 2. Terlambat (Telat)
                         $terlambatCount = $absensis
                             ->where('status', 'Terlambat')
                             ->whereNotNull('jam_pulang')
                             ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                             ->count();
-                        $izinCount = $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count();
 
-                        // Total UNIQ days present or on leave
-                        $daysActive = $absensis
-                            ->unique(function ($item) {
-                                return $item->tanggal->format('Y-m-d');
-                            })
+                        // 3. Izin (Includ Sakit, Cuti)
+                        $izinCount = $absensis
+                            ->whereIn('status', ['Izin', 'Cuti', 'Sakit'])
+                            ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                             ->count();
 
+                        // 4. Days Active (untuk hitung Alpha & Persentase)
+                        // Menggunakan logic: Izin/Sakit/Cuti ATAU (Sudah Pulang) ATAU (Masuk hari ini)
+                        $daysActive = $absensis
+                            ->filter(function ($item) {
+                                if (in_array($item->status, ['Izin', 'Sakit', 'Cuti'])) {
+                                    return true;
+                                }
+                                return !is_null($item->jam_pulang) || $item->tanggal->isToday();
+                            })
+                            ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
+                            ->count();
+
+                        // 5. Alpha
                         $alphaCount = max(0, $hariBerjalan - $daysActive);
 
                         // Total work hours (based on actual duration)
@@ -143,9 +158,9 @@
                         <td class="text-center"><span class="badge bg-label-secondary">{{ $absensis->count() }}</span>
                         </td>
                         <td class="text-center">
-                           <span class="fw-bold">{{ $totalJam }}h</span>
+                           <span class="fw-bold">{{ $totalJam }} Jam</span>
                            @if ($sisaMenit > 0)
-                              <small>{{ $sisaMenit }}m</small>
+                              <small>{{ $sisaMenit }} Menit</small>
                            @endif
                         </td>
                         <td class="text-center">

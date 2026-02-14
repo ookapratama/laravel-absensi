@@ -418,7 +418,7 @@ class AbsensiService extends BaseService
         return $data->map(function($item) {
             $jam = floor($item->total_menit / 60);
             $menit = $item->total_menit % 60;
-            $item->total_jam_format = "{$jam}h" . ($menit > 0 ? " {$menit}m" : "");
+            $item->total_jam_format = "{$jam} Jam" . ($menit > 0 ? " {$menit} Menit" : "");
             return $item;
         });
     }
