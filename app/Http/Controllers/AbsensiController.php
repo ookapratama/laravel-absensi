@@ -204,11 +204,45 @@ class AbsensiController extends Controller
 
         $data = $this->pegawaiService->rekapPaginate($bulan, $tahun);
         
-        // Hitung hari kerja efektif bulan ini
-        $absensiService = app(\App\Services\AbsensiService::class);
-        $hariEfektif = $absensiService->getHariKerjaEfektif($bulan, $tahun);
+        // Menggunakan service yang sudah di-inject
+        $hariEfektif = $this->service->getHariKerjaEfektif($bulan, $tahun);
 
         return view('pages.absensi.rekap', compact('data', 'bulan', 'tahun', 'hariEfektif'));
+    }
+
+    /**
+     * Export rekap absensi ke Excel
+     */
+    public function exportExcel(Request $request)
+    {
+        $bulan = (int)$request->get('bulan', now()->month);
+        $tahun = (int)$request->get('tahun', now()->year);
+
+        $data = $this->pegawaiService->rekapAll($bulan, $tahun);
+        $jenisIzins = \App\Models\JenisIzin::where('is_aktif', true)->get();
+        
+        $hariEfektif = $this->service->getHariKerjaEfektif($bulan, $tahun);
+
+        // Hitung total hari libur di bulan tersebut
+        $start = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
+        $end = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth();
+        if ($tahun == now()->year && $bulan == now()->month) $end = now();
+        
+        $totalLibur = \App\Models\HariLibur::whereBetween('tanggal', [$start->format('Y-m-d'), $end->format('Y-m-d')])->count();
+
+        $filename = "Rekap_Absensi_" . $bulan . "_" . $tahun . ".xls";
+
+        // Bagikan leaveTypes secara global untuk digunakan di dalam template blade logic
+        $GLOBALS['leaveTypes'] = $jenisIzins->pluck('nama')->toArray();
+
+        $content = view('pages.absensi.exports.rekap-excel', compact(
+            'data', 'bulan', 'tahun', 'hariEfektif', 'jenisIzins', 'totalLibur'
+        ))->render();
+
+        return response($content)
+            ->header('Content-Type', 'application/vnd.ms-excel')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->header('Cache-Control', 'max-age=0');
     }
 
     /**

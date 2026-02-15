@@ -78,6 +78,7 @@ Route::middleware(['auth'])->group(function () {
         // Dashboard & Rekap untuk Admin
         Route::get('/dashboard', [AbsensiController::class, 'dashboard'])->name('dashboard')->middleware('check.permission:absensi.dashboard');
         Route::get('/rekap', [AbsensiController::class, 'rekap'])->name('rekap')->middleware('check.permission:absensi.rekap');
+        Route::get('/rekap/export', [AbsensiController::class, 'exportExcel'])->name('rekap.export')->middleware('check.permission:absensi.rekap');
     });
 
     // ============== IZIN ==============

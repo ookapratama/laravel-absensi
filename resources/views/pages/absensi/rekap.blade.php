@@ -214,8 +214,7 @@
          const bulan = document.querySelector('select[name="bulan"]').value;
          const tahun = document.querySelector('select[name="tahun"]').value;
 
-         // For now, show alert - you can implement actual export later
-         window.AlertHandler.showSuccess('Fitur export Excel akan segera tersedia', true);
+         window.location.href = `{{ route('absensi.rekap.export') }}?bulan=${bulan}&tahun=${tahun}`;
       }
    </script>
 @endsection
