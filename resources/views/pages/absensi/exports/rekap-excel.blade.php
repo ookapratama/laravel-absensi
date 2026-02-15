@@ -8,29 +8,38 @@
             style="background-color: #f2f2f2; border: 1px solid #000; text-align: center; vertical-align: middle;">Nama
          </th>
          <th colspan="{{ 6 + $jenisIzins->count() }}"
-            style="background-color: #d9ead3; border: 1px solid #000; text-align: center;">Kehadiran Hari</th>
-         <th colspan="7" style="background-color: #fce5cd; border: 1px solid #000; text-align: center;">Waktu Kerja
+            style="background-color: #d9d9d9; border: 1px solid #000; text-align: center;">Kehadiran Hari</th>
+         <th colspan="6" style="background-color: #d9d9d9; border: 1px solid #000; text-align: center;">Waktu Kerja
          </th>
       </tr>
       <tr>
-         <!-- Kehadiran Hari Sub-columns -->
-         <th style="background-color: #d9ead3; border: 1px solid #000;">Hadir</th>
-         <th style="background-color: #d9ead3; border: 1px solid #000;">Absen</th>
-         <th style="background-color: #d9ead3; border: 1px solid #000;">Tepat Waktu</th>
+         <!-- Kehadiran Hari Sub-columns (Orange) -->
+         <th style="background-color: #ffa500; border: 1px solid #000; color: #ffffff; text-align: center;">Hadir</th>
+         <th style="background-color: #ffa500; border: 1px solid #000; color: #ffffff; text-align: center;">Absen</th>
+         <th style="background-color: #ffa500; border: 1px solid #000; color: #ffffff; text-align: center;">Tepat Waktu
+         </th>
          @foreach ($jenisIzins as $j)
-            <th style="background-color: #d9ead3; border: 1px solid #000;">{{ $j->nama }}</th>
+            <th style="background-color: #ffa500; border: 1px solid #000; color: #ffffff; text-align: center;">
+               {{ $j->nama }}</th>
          @endforeach
-         <th style="background-color: #d9ead3; border: 1px solid #000;">Libur</th>
-         <th style="background-color: #d9ead3; border: 1px solid #000;">Persentase</th>
-         <th style="background-color: #d9ead3; border: 1px solid #000;">Scoring</th>
+         <th style="background-color: #ffa500; border: 1px solid #000; color: #ffffff; text-align: center;">Libur</th>
+         <th style="background-color: #ffa500; border: 1px solid #000; color: #ffffff; text-align: center;">Persentase
+         </th>
+         <th style="background-color: #ffa500; border: 1px solid #000; color: #ffffff; text-align: center;">Scoring</th>
 
-         <!-- Waktu Kerja Sub-columns -->
-         <th style="background-color: #fce5cd; border: 1px solid #000;">Denda Keterlambatan</th>
-         <th style="background-color: #fce5cd; border: 1px solid #000;">Jam Masuk</th>
-         <th style="background-color: #fce5cd; border: 1px solid #000;">Terlambat</th>
-         <th style="background-color: #fce5cd; border: 1px solid #000;">Durasi Menit</th>
-         <th style="background-color: #fce5cd; border: 1px solid #000;">Akumulasi Kehadiran</th>
-         <th style="background-color: #fce5cd; border: 1px solid #000;">Akumulasi Jam Kerja</th>
+         <!-- Waktu Kerja Sub-columns (Dark Red) -->
+         <th style="background-color: #990000; border: 1px solid #000; color: #ffffff; text-align: center;">Denda
+            Keterlambatan</th>
+         <th style="background-color: #990000; border: 1px solid #000; color: #ffffff; text-align: center;">Jam Masuk
+         </th>
+         <th style="background-color: #990000; border: 1px solid #000; color: #ffffff; text-align: center;">Terlambat
+         </th>
+         <th style="background-color: #990000; border: 1px solid #000; color: #ffffff; text-align: center;">Durasi Menit
+         </th>
+         <th style="background-color: #990000; border: 1px solid #000; color: #ffffff; text-align: center;">Akumulasi
+            Kehadiran</th>
+         <th style="background-color: #990000; border: 1px solid #000; color: #ffffff; text-align: center;">Akumulasi
+            Jam Kerja</th>
       </tr>
    </thead>
    <tbody>

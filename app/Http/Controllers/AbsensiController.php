@@ -230,19 +230,16 @@ class AbsensiController extends Controller
         
         $totalLibur = \App\Models\HariLibur::whereBetween('tanggal', [$start->format('Y-m-d'), $end->format('Y-m-d')])->count();
 
-        $filename = "Rekap_Absensi_" . $bulan . "_" . $tahun . ".xls";
+        $filename = "Rekap_Absensi_" . $bulan . "_" . $tahun . ".xlsx";
 
-        // Bagikan leaveTypes secara global untuk digunakan di dalam template blade logic
+        // Bagikan leaveTypes secara global untuk digunakan di dalam template blade logic saat dirender oleh library
         $GLOBALS['leaveTypes'] = $jenisIzins->pluck('nama')->toArray();
 
-        $content = view('pages.absensi.exports.rekap-excel', compact(
-            'data', 'bulan', 'tahun', 'hariEfektif', 'jenisIzins', 'totalLibur'
-        ))->render();
-
-        return response($content)
-            ->header('Content-Type', 'application/vnd.ms-excel')
-            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
-            ->header('Cache-Control', 'max-age=0');
+        // Gunakan library Maatwebsite/Excel untuk export yang kompatibel (.xlsx)
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\RekapAbsensiExport($data, $bulan, $tahun, $hariEfektif, $jenisIzins, $totalLibur),
+            $filename
+        );
     }
 
     /**
