@@ -277,7 +277,7 @@
                               $badgeColor = 'info';
 
                               if ($absen->status === 'Tepat Waktu') {
-                                  $displayStatus = 'Tepat Waktu';
+                                  $displayStatus = 'Hadir';
                                   $badgeColor = 'success';
                               } elseif ($absen->status === 'Terlambat') {
                                   $displayStatus = 'Telat';
@@ -286,7 +286,14 @@
 
                               // Jika tidak ada jam pulang dan bukan hari ini, anggap Alpha
                               if (
-                                  !in_array($absen->status, ['Izin', 'Sakit', 'Cuti']) &&
+                                  !in_array($absen->status, [
+                                      'Izin',
+                                      'Sakit',
+                                      'Cuti',
+                                      'Izin Pribadi',
+                                      'Cuti Tahunan',
+                                      'Dinas Luar Kota',
+                                  ]) &&
                                   !$absen->jam_pulang &&
                                   !$absen->tanggal->isToday()
                               ) {

@@ -223,11 +223,14 @@ class AbsensiController extends Controller
 
         $data = $this->pegawaiService->rekapPaginate($bulan, $tahun);
         
-        // Hitung hari efektif (Full dan Reguler)
-        $hariEfektifFull = $this->service->getHariKerjaEfektif($bulan, $tahun, false);
-        $hariEfektifReguler = $this->service->getHariKerjaEfektif($bulan, $tahun, true);
+        // Hitung detail hari efektif
+        $detailFull = $this->service->getDetailHariKerja($bulan, $tahun, false);
+        $detailReguler = $this->service->getDetailHariKerja($bulan, $tahun, true);
 
-        return view('pages.absensi.rekap', compact('data', 'bulan', 'tahun', 'hariEfektifFull', 'hariEfektifReguler'));
+        return view('pages.absensi.rekap', compact(
+            'data', 'bulan', 'tahun', 
+            'detailFull', 'detailReguler'
+        ));
     }
 
     /**

@@ -181,16 +181,34 @@
                          ->whereYear('tanggal', date('Y'))
                          ->get();
                      $hadir = $absensi
-                         ->where('status', 'Hadir')
-                         ->whereNotNull('jam_pulang')
+                         ->filter(function ($i) {
+                             if ($i->status === 'Terlambat') {
+                                 return false;
+                             }
+                             $isHadir = in_array($i->status, ['Tepat Waktu', 'Hadir', 'Dinas Luar Kota', 'Tugas']);
+                             $hasClockIn = !is_null($i->jam_masuk);
+                             return ($isHadir || $hasClockIn) && (!is_null($i->jam_pulang) || $i->tanggal->isToday());
+                         })
                          ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                          ->count();
                      $terlambat = $absensi
-                         ->where('status', 'Terlambat')
-                         ->whereNotNull('jam_pulang')
+                         ->filter(
+                             fn($i) => $i->status === 'Terlambat' &&
+                                 (!is_null($i->jam_pulang) || $i->tanggal->isToday()),
+                         )
                          ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                          ->count();
-                     $izin = $absensi->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count();
+                     $izin = $absensi
+                         ->whereIn('status', [
+                             'Izin',
+                             'Cuti',
+                             'Sakit',
+                             'Izin Pribadi',
+                             'Cuti Tahunan',
+                             'Dinas Luar Kota',
+                         ])
+                         ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
+                         ->count();
                   @endphp
                   <div class="d-flex align-items-center mb-3">
                      <i class="ri-line-chart-line me-2"></i>

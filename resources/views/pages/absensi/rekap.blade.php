@@ -56,6 +56,64 @@
          </div>
       </div>
 
+      <!-- Info Hari Kerja -->
+      <div class="row g-4 mb-4">
+         <div class="col-md-6">
+            <div class="card bg-label-primary border-0 shadow-sm">
+               <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                     <h6 class="mb-0 fw-bold text-primary"><i class="ri-calendar-check-line me-1"></i> Shift Reguler (Ikut
+                        Libur)</h6>
+                     <span class="badge bg-primary">{{ $detailReguler['total'] }} Hari Kerja</span>
+                  </div>
+                  <ul class="list-unstyled mb-0 small text-muted">
+                     <li><i class="ri-checkbox-blank-circle-fill ri-8px me-2 text-primary"></i> Target: 1 s/d
+                        {{ $detailReguler['period_end']->format('d M Y') }}</li>
+                     <li><i class="ri-checkbox-blank-circle-fill ri-8px me-2 text-danger"></i> Libur Minggu:
+                        {{ count($detailReguler['sundays']) }} hari</li>
+                     <li><i class="ri-checkbox-blank-circle-fill ri-8px me-2 text-warning"></i> Libur Nasional:
+                        {{ $detailReguler['holidays']->count() }} hari</li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+         <div class="col-md-6">
+            <div class="card bg-label-info border-0 shadow-sm">
+               <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                     <h6 class="mb-0 fw-bold text-info"><i class="ri-calendar-event-line me-1"></i> Shift Full (Masuk
+                        Minggu)</h6>
+                     <span class="badge bg-info">{{ $detailFull['total'] }} Hari Kerja</span>
+                  </div>
+                  <ul class="list-unstyled mb-0 small text-muted">
+                     <li><i class="ri-checkbox-blank-circle-fill ri-8px me-2 text-info"></i> Target: 1 s/d
+                        {{ $detailFull['period_end']->format('d M Y') }}</li>
+                     <li><i class="ri-checkbox-blank-circle-fill ri-8px me-2 text-success"></i> Libur Minggu: (Tetap Masuk)
+                     </li>
+                     <li><i class="ri-checkbox-blank-circle-fill ri-8px me-2 text-warning"></i> Libur Nasional:
+                        {{ $detailFull['holidays']->count() }} hari</li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+
+         @if ($detailReguler['holidays']->count() > 0)
+            <div class="col-12 mt-3">
+               <div class="alert alert-warning border-0 shadow-sm mb-0">
+                  <div class="d-flex align-items-center">
+                     <i class="ri-notification-3-line me-2"></i>
+                     <div class="small">
+                        <strong>Daftar Libur Nasional:</strong>
+                        @foreach ($detailReguler['holidays'] as $h)
+                           {{ $h->tanggal->format('d M') }} ({{ $h->nama }}){{ !$loop->last ? ',' : '' }}
+                        @endforeach
+                     </div>
+                  </div>
+               </div>
+            </div>
+         @endif
+      </div>
+
       <!-- Rekap Table -->
       <div class="card">
          <div class="card-datatable table-responsive">
@@ -71,7 +129,7 @@
                      <th rowspan="2" class="align-middle text-center">Aksi</th>
                   </tr>
                   <tr>
-                     <th class="text-center bg-success text-white">Tepat Waktu</th>
+                     <th class="text-center bg-success text-white">Hadir</th>
                      <th class="text-center bg-warning text-dark">Telat</th>
                      <th class="text-center bg-info text-white">Izin</th>
                      <th class="text-center bg-danger text-white">Alpha</th>
@@ -82,16 +140,21 @@
                   @foreach ($data as $index => $pegawai)
                      @php
                         $isReguler = $pegawai->shift && $pegawai->shift->ikut_libur;
-                        $hariBerjalan = $isReguler ? $hariEfektifReguler : $hariEfektifFull;
+                        $hariBerjalan = $isReguler ? $detailReguler['total'] : $detailFull['total'];
 
                         $absensis = $pegawai->absensis;
 
-                        // 1. Tepat Waktu (Hadir)
+                        // 1. Hadir (Tepat Waktu + Dinas + Lainnya yang ada Jam Masuk)
                         $hadirCount = $absensis
-                            ->filter(
-                                fn($i) => $i->status === 'Tepat Waktu' &&
-                                    (!is_null($i->jam_pulang) || $i->tanggal->isToday()),
-                            )
+                            ->filter(function ($i) {
+                                if ($i->status === 'Terlambat') {
+                                    return false;
+                                }
+                                $isHadir = in_array($i->status, ['Tepat Waktu', 'Hadir', 'Dinas Luar Kota', 'Tugas']);
+                                $hasClockIn = !is_null($i->jam_masuk);
+                                return ($isHadir || $hasClockIn) &&
+                                    (!is_null($i->jam_pulang) || $i->tanggal->isToday());
+                            })
                             ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                             ->count();
 
@@ -104,9 +167,16 @@
                             ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                             ->count();
 
-                        // 3. Izin (Includ Sakit, Cuti)
+                        // 3. Izin (Includ Sakit, Cuti, dll)
                         $izinCount = $absensis
-                            ->whereIn('status', ['Izin', 'Cuti', 'Sakit'])
+                            ->whereIn('status', [
+                                'Izin',
+                                'Cuti',
+                                'Sakit',
+                                'Izin Pribadi',
+                                'Cuti Tahunan',
+                                'Dinas Luar Kota',
+                            ])
                             ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                             ->count();
 
@@ -114,7 +184,16 @@
                         // Menggunakan logic: Izin/Sakit/Cuti ATAU (Sudah Pulang) ATAU (Masuk hari ini)
                         $daysActive = $absensis
                             ->filter(function ($item) {
-                                if (in_array($item->status, ['Izin', 'Sakit', 'Cuti'])) {
+                                if (
+                                    in_array($item->status, [
+                                        'Izin',
+                                        'Sakit',
+                                        'Cuti',
+                                        'Izin Pribadi',
+                                        'Cuti Tahunan',
+                                        'Dinas Luar Kota',
+                                    ])
+                                ) {
                                     return true;
                                 }
                                 return !is_null($item->jam_pulang) || $item->tanggal->isToday();

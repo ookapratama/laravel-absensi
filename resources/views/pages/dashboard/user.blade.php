@@ -598,9 +598,36 @@
                            </small>
                         </div>
                         <div>
-                           <span
-                              class="badge bg-label-{{ $absen->status === 'Hadir' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
-                              {{ $absen->status }}
+                           @php
+                              $displayStatus = $absen->status;
+                              $badgeColor = 'label-info';
+
+                              if ($absen->status === 'Tepat Waktu') {
+                                  $displayStatus = 'Hadir';
+                                  $badgeColor = 'label-success';
+                              } elseif ($absen->status === 'Terlambat') {
+                                  $displayStatus = 'Telat';
+                                  $badgeColor = 'label-warning';
+                              }
+
+                              if (
+                                  !in_array($absen->status, [
+                                      'Izin',
+                                      'Sakit',
+                                      'Cuti',
+                                      'Izin Pribadi',
+                                      'Cuti Tahunan',
+                                      'Dinas Luar Kota',
+                                  ]) &&
+                                  !$absen->jam_pulang &&
+                                  !$absen->tanggal->isToday()
+                              ) {
+                                  $displayStatus = 'Alpha';
+                                  $badgeColor = 'label-danger';
+                              }
+                           @endphp
+                           <span class="badge bg-{{ $badgeColor }}">
+                              {{ $displayStatus }}
                            </span>
                         </div>
                      </div>

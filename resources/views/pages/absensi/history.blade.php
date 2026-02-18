@@ -67,7 +67,10 @@
                      <i class="ri-checkbox-circle-line ri-24px"></i>
                   </div>
                   <h4 class="mb-0 fw-bold">{{ $statistik['hadir'] }}</h4>
-                  <small class="text-success fw-medium">Hadir</small>
+                  <small class="text-success fw-medium" data-bs-toggle="tooltip" data-bs-placement="top"
+                     title="Total hari kerja (Tepat Waktu & Telat)">
+                     Hadir <i class="ri-information-line"></i>
+                  </small>
                </div>
             </div>
          </div>
@@ -91,7 +94,10 @@
                      <i class="ri-close-circle-line ri-24px"></i>
                   </div>
                   <h4 class="mb-0 fw-bold">{{ $statistik['alfa'] }}</h4>
-                  <small class="text-danger fw-medium">Alpha</small>
+                  <small class="text-danger fw-medium" data-bs-toggle="tooltip" data-bs-placement="top"
+                     title="Hari tanpa absen atau lupa absen pulang">
+                     Alpha <i class="ri-information-line"></i>
+                  </small>
                </div>
             </div>
          </div>
@@ -120,6 +126,21 @@
                   <small class="text-warning fw-medium">Terlambat</small>
                </div>
             </div>
+         </div>
+      </div>
+
+      <!-- Info Note -->
+      <div class="alert alert-outline-primary d-flex align-items-center mb-4" role="alert">
+         <span class="alert-icon me-2">
+            <i class="ri-information-line ri-22px"></i>
+         </span>
+         <div class="d-flex flex-column ps-1">
+            <h6 class="alert-heading mb-1 text-primary fw-bold">Informasi Perhitungan</h6>
+            <span style="font-size: 0.85rem;">
+               <strong>Alpha</strong> dihitung dari total hari wajib kerja yang tidak memiliki riwayat absen tuntas
+               (termasuk hari bolos & lupa absen pulang). Target kerja bulan ini:
+               <strong>{{ $statistik['total_hari_kerja'] }} hari</strong>.
+            </span>
          </div>
       </div>
 
@@ -177,16 +198,27 @@
                               $displayStatus = $absen->status;
                               $badgeColor = 'info';
 
-                              if ($absen->status === 'Tepat Waktu') {
+                              if (in_array($absen->status, ['Tepat Waktu', 'Hadir'])) {
                                   $displayStatus = 'Hadir';
                                   $badgeColor = 'success';
                               } elseif ($absen->status === 'Terlambat') {
+                                  $displayStatus = 'Telat';
                                   $badgeColor = 'warning';
+                              } elseif (in_array($absen->status, ['Dinas Luar Kota', 'Tugas'])) {
+                                  $displayStatus = $absen->status;
+                                  $badgeColor = 'info';
                               }
 
                               // Jika tidak ada jam pulang dan bukan hari ini, anggap Alpha (kecuali Izin/Sakit/Cuti)
                               if (
-                                  !in_array($absen->status, ['Izin', 'Sakit', 'Cuti']) &&
+                                  !in_array($absen->status, [
+                                      'Izin',
+                                      'Sakit',
+                                      'Cuti',
+                                      'Izin Pribadi',
+                                      'Cuti Tahunan',
+                                      'Dinas Luar Kota',
+                                  ]) &&
                                   !$absen->jam_pulang &&
                                   !$absen->tanggal->isToday()
                               ) {
@@ -226,16 +258,27 @@
                            $displayStatus = $absen->status;
                            $badgeColor = 'info';
 
-                           if ($absen->status === 'Tepat Waktu') {
+                           if (in_array($absen->status, ['Tepat Waktu', 'Hadir'])) {
                                $displayStatus = 'Hadir';
                                $badgeColor = 'success';
                            } elseif ($absen->status === 'Terlambat') {
+                               $displayStatus = 'Telat';
                                $badgeColor = 'warning';
+                           } elseif (in_array($absen->status, ['Dinas Luar Kota', 'Tugas'])) {
+                               $displayStatus = $absen->status;
+                               $badgeColor = 'info';
                            }
 
                            // Jika tidak ada jam pulang dan bukan hari ini, anggap Alpha (kecuali Izin/Sakit/Cuti)
                            if (
-                               !in_array($absen->status, ['Izin', 'Sakit', 'Cuti']) &&
+                               !in_array($absen->status, [
+                                   'Izin',
+                                   'Sakit',
+                                   'Cuti',
+                                   'Izin Pribadi',
+                                   'Cuti Tahunan',
+                                   'Dinas Luar Kota',
+                               ]) &&
                                !$absen->jam_pulang &&
                                !$absen->tanggal->isToday()
                            ) {

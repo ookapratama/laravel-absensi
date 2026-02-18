@@ -452,52 +452,82 @@ class AbsensiService extends BaseService
 
         $absensis = $this->repository->getByPegawaiBulan($pegawaiId, $bulan, $tahun);
         
-        // Hitung total hari kerja efektif (sampai hari ini atau Full Bulan jika sudah lewat)
+        // Hitung total hari kerja efektif (Termasuk Hari Ini)
         $totalHariKerja = $this->getHariKerjaEfektif($bulan, $tahun, $excludeSundays);
 
-        // REVISI USER: Yang dihitung sebagai hari aktif (bukan Alpha) adalah:
-        // 1. Status 'Izin', 'Sakit', 'Cuti'
-        // 2. Status 'Hadir'/'Terlambat' TAPI harus punya jam_pulang (completed)
+        // Hari Aktif (Hadir/Telat/Izin yang Sah)
         $daysActive = $absensis->filter(function($item) {
-            if (in_array($item->status, ['Izin', 'Sakit', 'Cuti'])) {
-                return true;
-            }
-            // Jika Hadir/Terlambat, wajib ada jam_pulang (selesai) 
-            // ATAU jika masih hari ini (sedang berjalan) maka tetap dianggap aktif (bukan Alpha)
+            // Semua jenis izin/cuti/sakit yang ada di database
+            $allIzinTypes = ['Izin', 'Sakit', 'Cuti', 'Izin Pribadi', 'Cuti Tahunan', 'Cuti Melahirkan', 'Cuti Menikah', 'Cuti Duka', 'Dinas Luar Kota'];
+            if (in_array($item->status, $allIzinTypes)) return true;
+            
+            // Hadir/Telat harus ada jam_pulang (Tuntas)
+            // KECUALI kalau hari ini, Masuk saja sudah cukup untuk tidak Alpha (sedang berjalan)
             return !is_null($item->jam_pulang) || $item->tanggal->isToday();
         })->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
+
+        $alphaCount = max(0, $totalHariKerja - $daysActive);
         
-        // Hitung kategori hari yang sah (Hadir/Telat/Izin)
-        $hadir = $absensis->filter(function($item) {
-            return in_array($item->status, ['Tepat Waktu', 'Terlambat']) && 
-                   (!is_null($item->jam_pulang) || $item->tanggal->isToday());
-        })->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
-
-        $tepatWaktu = $absensis->filter(function($item) {
-            return $item->status === 'Tepat Waktu' && 
-                   (!is_null($item->jam_pulang) || $item->tanggal->isToday());
-        })->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
-
-        $terlambat = $absensis->filter(function($item) {
-            return $item->status === 'Terlambat' && 
-                   (!is_null($item->jam_pulang) || $item->tanggal->isToday());
+        $tepatWaktu = $absensis->filter(fn($item) => in_array($item->status, ['Tepat Waktu', 'Hadir']) && (!is_null($item->jam_pulang) || $item->tanggal->isToday()))->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
+        $terlambat = $absensis->filter(fn($item) => $item->status === 'Terlambat' && (!is_null($item->jam_pulang) || $item->tanggal->isToday()))->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
+        $dinasWork = $absensis->filter(fn($item) => in_array($item->status, ['Dinas Luar Kota', 'Tugas']))->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
+        
+        // Sesuai Request: Record yang ada Jam Masuk (meskipun statusnya Izin/Info) harus masuk hitungan Hadir
+        $othersWithJam = $absensis->filter(function($item) {
+            $sudahDihitung = in_array($item->status, ['Tepat Waktu', 'Hadir', 'Terlambat', 'Dinas Luar Kota', 'Tugas']);
+            return !$sudahDihitung && !is_null($item->jam_masuk);
         })->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
 
         return [
-            'total_masuk' => $hadir, // Total Hari Masuk (Tepat Waktu + Telat)
-            'hadir' => $tepatWaktu,   // Khusus Tepat Waktu (Match label Hadir di Riwayat & Tepat Waktu di Rekap)
-            'tepat_waktu' => $tepatWaktu, 
+            'hadir' => $tepatWaktu + $terlambat + $dinasWork + $othersWithJam, // Total Hadir Fisik / Berjam-jam
+            'tepat_waktu' => $tepatWaktu,
             'terlambat' => $terlambat,
-            'izin' => $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
+            'izin' => $absensis->whereIn('status', ['Izin', 'Sakit', 'Cuti', 'Izin Pribadi', 'Cuti Tahunan', 'Cuti Melahirkan', 'Cuti Menikah', 'Cuti Duka', 'Dinas Luar Kota'])->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
             'cepat_pulang' => $absensis->filter(function($item) {
                 if (!$item->jam_pulang || !$item->shift) return false;
                 $jam_pulang = \Carbon\Carbon::parse($item->jam_pulang->format('H:i:s'));
                 $shift_pulang = \Carbon\Carbon::parse($item->shift->jam_pulang->format('H:i:s'));
                 return $jam_pulang->lt($shift_pulang);
             })->count(),
-            'alfa' => max(0, $totalHariKerja - $daysActive),
+            'alfa' => $alphaCount,
             'total_hari_kerja' => $totalHariKerja,
         ];
+    }
+
+    /**
+     * Helper untuk hitung target hari kerja sampai kemarin saja
+     */
+    private function getHariKerjaEfektifSampaiKemarin($bulan, $tahun, $excludeSundays)
+    {
+        $start = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
+        $end = \Carbon\Carbon::today()->subDay();
+
+        // Jika kita sedang melihat bulan lalu, gunakan akhir bulan tersebut
+        $bulanLalu = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth();
+        if ($end->gt($bulanLalu)) {
+            $end = $bulanLalu;
+        }
+
+        // Kalau tanggal 1 bulan ini saja belum sampai kemarin (Awal bulan)
+        if ($end->lt($start)) return 0;
+
+        return $this->getHariKerjaEfektifDenganEnd($start, $end, $excludeSundays);
+    }
+
+    private function getHariKerjaEfektifDenganEnd($start, $end, $excludeSundays)
+    {
+        $holidays = \App\Models\HariLibur::whereBetween('tanggal', [$start->format('Y-m-d'), $end->format('Y-m-d')])->pluck('tanggal')->map(fn($d) => $d->format('Y-m-d'))->toArray();
+        $count = 0;
+        $current = $start->copy();
+        while ($current <= $end) {
+            $isHoliday = in_array($current->format('Y-m-d'), $holidays);
+            $isSunday = $current->isSunday();
+            if (!$isHoliday && !($excludeSundays && $isSunday)) {
+                $count++;
+            }
+            $current->addDay();
+        }
+        return $count;
     }
 
     /**
@@ -505,10 +535,14 @@ class AbsensiService extends BaseService
      */
     public function getHariKerjaEfektif($bulan, $tahun, $excludeSundays = false)
     {
+        return $this->getDetailHariKerja($bulan, $tahun, $excludeSundays)['total'];
+    }
+
+    public function getDetailHariKerja($bulan, $tahun, $excludeSundays = false)
+    {
         $start = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
         $end = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth();
         
-        // Jika bulan ini, hitung sampai hari ini saja
         if ($tahun == now()->year && $bulan == now()->month) {
             $end = now();
         }
@@ -516,23 +550,33 @@ class AbsensiService extends BaseService
         $holidays = \App\Models\HariLibur::whereBetween('tanggal', [
                 $start->format('Y-m-d'), 
                 $end->format('Y-m-d')
-            ])->pluck('tanggal')
-            ->map(fn($d) => $d->format('Y-m-d'))
-            ->toArray();
+            ])->get();
 
-        $count = 0;
+        $holidayDates = $holidays->pluck('tanggal')->map(fn($d) => $d->format('Y-m-d'))->toArray();
+
+        $details = [
+            'total' => 0,
+            'holidays' => $holidays,
+            'sundays' => [],
+            'period_end' => $end
+        ];
+
         $current = $start->copy();
         while ($current <= $end) {
-            $isHoliday = in_array($current->format('Y-m-d'), $holidays);
+            $dateStr = $current->format('Y-m-d');
+            $isHoliday = in_array($dateStr, $holidayDates);
             $isSunday = $current->isSunday();
 
-            // Jika excludeSundays aktif, skip hari Minggu
+            if ($isSunday) {
+                $details['sundays'][] = $current->copy();
+            }
+
             if (!$isHoliday && !($excludeSundays && $isSunday)) {
-                $count++;
+                $details['total']++;
             }
             $current->addDay();
         }
 
-        return $count;
+        return $details;
     }
 }

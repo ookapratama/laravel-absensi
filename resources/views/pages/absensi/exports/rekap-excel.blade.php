@@ -50,18 +50,34 @@
 
             $absensis = $pegawai->absensis;
 
-            // Hadir: Total unique days present (Tepat Waktu or Terlambat, must have checked out)
+            // Hadir: Total unique days present (Tepat Waktu, Hadir, Terlambat, Dinas, or Any with Jam Masuk)
             $hadirCount = $absensis
-                ->whereIn('status', ['Tepat Waktu', 'Terlambat'])
-                ->whereNotNull('jam_pulang')
+                ->filter(function ($i) {
+                    $isHadir = in_array($i->status, ['Tepat Waktu', 'Hadir', 'Terlambat', 'Dinas Luar Kota', 'Tugas']);
+                    $hasClockIn = !is_null($i->jam_masuk);
+                    return ($isHadir || $hasClockIn) && (!is_null($i->jam_pulang) || $i->tanggal->isToday());
+                })
                 ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                 ->count();
 
-            // Tepat Waktu: Total sessions with Tepat Waktu status
-            $tepatWaktuCount = $absensis->where('status', 'Tepat Waktu')->whereNotNull('jam_pulang')->count();
+            // Tepat Waktu / Hadir Murni (Tanpa Telat)
+            $tepatWaktuCount = $absensis
+                ->filter(function ($i) {
+                    if ($i->status === 'Terlambat') {
+                        return false;
+                    }
+                    $isHadir = in_array($i->status, ['Tepat Waktu', 'Hadir', 'Dinas Luar Kota', 'Tugas']);
+                    $hasClockIn = !is_null($i->jam_masuk);
+                    return ($isHadir || $hasClockIn) && (!is_null($i->jam_pulang) || $i->tanggal->isToday());
+                })
+                ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
+                ->count();
 
-            // Terlambat: Total sessions with Terlambat status
-            $terlambatCount = $absensis->where('status', 'Terlambat')->whereNotNull('jam_pulang')->count();
+            // Telat: Total sessions with Terlambat status
+            $terlambatCount = $absensis
+                ->filter(fn($i) => $i->status === 'Terlambat' && (!is_null($i->jam_pulang) || $i->tanggal->isToday()))
+                ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
+                ->count();
 
             // Izin counts per type
             $izinCounts = [];
@@ -75,30 +91,34 @@
             // Total unique days covered (Hadir + any Izin/Sakit/Cuti)
             $daysActive = $absensis
                 ->filter(function ($item) {
-                    if (in_array($item->status, ['Izin', 'Sakit', 'Cuti'])) {
+                    if (
+                        in_array($item->status, [
+                            'Izin',
+                            'Sakit',
+                            'Cuti',
+                            'Izin Pribadi',
+                            'Cuti Tahunan',
+                            'Dinas Luar Kota',
+                        ])
+                    ) {
                         return true;
                     }
-                    // Check other leave types too
-                    if (in_array($item->status, $GLOBALS['leaveTypes'] ?? [])) {
-                        return true;
-                    }
-                    // Present or Late, must have checked out, OR if it's today (ongoing session)
-        return !is_null($item->jam_pulang) || $item->tanggal->isToday();
-    })
-    ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
-    ->count();
+                    return !is_null($item->jam_pulang) || $item->tanggal->isToday();
+                })
+                ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
+                ->count();
 
-// Alpha (Absen)
-$alphaCount = max(0, $hariAktifTarget - $daysActive);
+            // Alpha (Absen)
+            $alphaCount = max(0, $hariAktifTarget - $daysActive);
 
-// Percentage
-$persentase = $hariAktifTarget > 0 ? round(($daysActive / $hariAktifTarget) * 100, 2) : 0;
+            // Percentage
+            $persentase = $hariAktifTarget > 0 ? round(($daysActive / $hariAktifTarget) * 100, 2) : 0;
 
-// Duration work
-$totalMenit = $absensis->sum('durasi_kerja_menit');
-$totalJam = floor($totalMenit / 60);
-$sisaMenit = $totalMenit % 60;
-$durasiFormat = "{$totalJam} Jam " . ($sisaMenit > 0 ? "{$sisaMenit} Menit" : '');
+            // Duration work
+            $totalMenit = $absensis->sum('durasi_kerja_menit');
+            $totalJam = floor($totalMenit / 60);
+            $sisaMenit = $totalMenit % 60;
+            $durasiFormat = "{$totalJam} Jam " . ($sisaMenit > 0 ? "{$sisaMenit} Menit" : '');
          @endphp
          <tr>
             <td style="border: 1px solid #000; text-align: center;">{{ $index + 1 }}</td>

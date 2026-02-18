@@ -466,13 +466,21 @@
                                $displayStatus = 'Hadir';
                                $badgeColor = 'label-success';
                            } elseif ($absen->status === 'Terlambat') {
+                               $displayStatus = 'Telat';
                                $badgeColor = 'label-warning';
                            } else {
                                $badgeColor = 'label-info';
                            }
 
                            if (
-                               !in_array($absen->status, ['Izin', 'Sakit', 'Cuti']) &&
+                               !in_array($absen->status, [
+                                   'Izin',
+                                   'Sakit',
+                                   'Cuti',
+                                   'Izin Pribadi',
+                                   'Cuti Tahunan',
+                                   'Dinas Luar Kota',
+                               ]) &&
                                !$absen->jam_pulang &&
                                !$absen->tanggal->isToday()
                            ) {
