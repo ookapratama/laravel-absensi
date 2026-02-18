@@ -16,8 +16,9 @@
       <div class="row justify-content-center">
          <div class="col-lg-8">
             <div class="card overflow-hidden">
-               <img class="img-fluid" src="{{ $informasi->gambar_url }}" alt="Card image cap"
-                  style="width: 100%; max-height: 400px; object-fit: cover;">
+               <img class="img-fluid cursor-pointer" src="{{ $informasi->gambar_url }}" alt="Thumbnail"
+                  style="width: 100%; max-height: 400px; object-fit: cover;" data-bs-toggle="modal"
+                  data-bs-target="#imagePreviewModal">
                <div class="card-body p-sm-7 p-4">
                   <div class="d-flex justify-content-between mb-4">
                      <div class="d-flex align-items-center">
@@ -39,7 +40,37 @@
       </div>
    </div>
 
+   <!-- Modal Preview Image -->
+   <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-full" role="document">
+         <div class="modal-content bg-transparent border-0 shadow-none">
+            <div class="modal-body p-0 text-center">
+               <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-2"
+                  data-bs-dismiss="modal" aria-label="Close" style="z-index: 100; font-size: 1.5rem;"></button>
+               <img src="{{ $informasi->gambar_url }}"
+                  class="img-fluid rounded shadow-lg animate__animated animate__zoomIn" alt="Full Preview"
+                  style="max-height: 95vh; width: auto;">
+            </div>
+         </div>
+      </div>
+   </div>
+
    <style>
+      .modal-full {
+         max-width: 95vw;
+         margin: 10px auto;
+      }
+
+      .cursor-pointer {
+         cursor: pointer;
+         transition: transform 0.3s ease, opacity 0.3s ease;
+      }
+
+      .cursor-pointer:hover {
+         opacity: 0.9;
+         transform: scale(1.01);
+      }
+
       .informasi-content img {
          max-width: 100%;
          height: auto;
