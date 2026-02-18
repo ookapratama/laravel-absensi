@@ -78,11 +78,11 @@
                   </tr>
                </thead>
                <tbody>
-                  @php
-                     $hariBerjalan = $hariEfektif;
-                  @endphp
                   @foreach ($data as $index => $pegawai)
                      @php
+                        $isReguler = $pegawai->shift && $pegawai->shift->ikut_libur;
+                        $hariBerjalan = $isReguler ? $hariEfektifReguler : $hariEfektifFull;
+
                         $absensis = $pegawai->absensis;
 
                         // 1. Tepat Waktu (Hadir)

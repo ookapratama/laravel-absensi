@@ -204,10 +204,11 @@ class AbsensiController extends Controller
 
         $data = $this->pegawaiService->rekapPaginate($bulan, $tahun);
         
-        // Menggunakan service yang sudah di-inject
-        $hariEfektif = $this->service->getHariKerjaEfektif($bulan, $tahun);
+        // Hitung hari efektif (Full dan Reguler)
+        $hariEfektifFull = $this->service->getHariKerjaEfektif($bulan, $tahun, false);
+        $hariEfektifReguler = $this->service->getHariKerjaEfektif($bulan, $tahun, true);
 
-        return view('pages.absensi.rekap', compact('data', 'bulan', 'tahun', 'hariEfektif'));
+        return view('pages.absensi.rekap', compact('data', 'bulan', 'tahun', 'hariEfektifFull', 'hariEfektifReguler'));
     }
 
     /**
@@ -221,7 +222,8 @@ class AbsensiController extends Controller
         $data = $this->pegawaiService->rekapAll($bulan, $tahun);
         $jenisIzins = \App\Models\JenisIzin::where('is_aktif', true)->get();
         
-        $hariEfektif = $this->service->getHariKerjaEfektif($bulan, $tahun);
+        $hariEfektifFull = $this->service->getHariKerjaEfektif($bulan, $tahun, false);
+        $hariEfektifReguler = $this->service->getHariKerjaEfektif($bulan, $tahun, true);
 
         // Hitung total hari libur di bulan tersebut
         $start = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
@@ -237,7 +239,7 @@ class AbsensiController extends Controller
 
         // Gunakan library Maatwebsite/Excel untuk export yang kompatibel (.xlsx)
         return \Maatwebsite\Excel\Facades\Excel::download(
-            new \App\Exports\RekapAbsensiExport($data, $bulan, $tahun, $hariEfektif, $jenisIzins, $totalLibur),
+            new \App\Exports\RekapAbsensiExport($data, $bulan, $tahun, $hariEfektifFull, $hariEfektifReguler, $jenisIzins, $totalLibur),
             $filename
         );
     }

@@ -447,10 +447,13 @@ class AbsensiService extends BaseService
      */
     public function getStatistikPegawai($pegawaiId, $bulan, $tahun)
     {
+        $pegawai = Pegawai::with('shift')->find($pegawaiId);
+        $excludeSundays = $pegawai && $pegawai->shift && $pegawai->shift->ikut_libur;
+
         $absensis = $this->repository->getByPegawaiBulan($pegawaiId, $bulan, $tahun);
         
         // Hitung total hari kerja efektif (sampai hari ini atau Full Bulan jika sudah lewat)
-        $totalHariKerja = $this->getHariKerjaEfektif($bulan, $tahun);
+        $totalHariKerja = $this->getHariKerjaEfektif($bulan, $tahun, $excludeSundays);
 
         // REVISI USER: Yang dihitung sebagai hari aktif (bukan Alpha) adalah:
         // 1. Status 'Izin', 'Sakit', 'Cuti'
@@ -476,7 +479,7 @@ class AbsensiService extends BaseService
     /**
      * Hitung hari kerja efektif (tidak termasuk sabtu, minggu, dan hari libur)
      */
-    public function getHariKerjaEfektif($bulan, $tahun)
+    public function getHariKerjaEfektif($bulan, $tahun, $excludeSundays = false)
     {
         $start = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
         $end = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth();
@@ -496,11 +499,11 @@ class AbsensiService extends BaseService
         $count = 0;
         $current = $start->copy();
         while ($current <= $end) {
-            // Check weekend (Saturday/Sunday)
-            $isWeekend = $current->isWeekend();
             $isHoliday = in_array($current->format('Y-m-d'), $holidays);
+            $isSunday = $current->isSunday();
 
-            if (!$isWeekend && !$isHoliday) {
+            // Jika excludeSundays aktif, skip hari Minggu
+            if (!$isHoliday && !($excludeSundays && $isSunday)) {
                 $count++;
             }
             $current->addDay();

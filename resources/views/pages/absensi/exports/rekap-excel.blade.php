@@ -45,6 +45,9 @@
    <tbody>
       @foreach ($data as $index => $pegawai)
          @php
+            $isReguler = $pegawai->shift && $pegawai->shift->ikut_libur;
+            $hariAktifTarget = $isReguler ? $hariEfektifReguler : $hariEfektifFull;
+
             $absensis = $pegawai->absensis;
 
             // Hadir: Total unique days present (Tepat Waktu or Terlambat, must have checked out)
@@ -76,23 +79,26 @@
                         return true;
                     }
                     // Check other leave types too
-                    return in_array($item->status, $GLOBALS['leaveTypes'] ?? []);
-                })
-                ->merge($absensis->whereNotNull('jam_pulang'))
-                ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
-                ->count();
+                    if (in_array($item->status, $GLOBALS['leaveTypes'] ?? [])) {
+                        return true;
+                    }
+                    // Present or Late, must have checked out, OR if it's today (ongoing session)
+        return !is_null($item->jam_pulang) || $item->tanggal->isToday();
+    })
+    ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
+    ->count();
 
-            // Alpha (Absen)
-            $alphaCount = max(0, $hariEfektif - $daysActive);
+// Alpha (Absen)
+$alphaCount = max(0, $hariAktifTarget - $daysActive);
 
-            // Percentage
-            $persentase = $hariEfektif > 0 ? round(($daysActive / $hariEfektif) * 100, 2) : 0;
+// Percentage
+$persentase = $hariAktifTarget > 0 ? round(($daysActive / $hariAktifTarget) * 100, 2) : 0;
 
-            // Duration work
-            $totalMenit = $absensis->sum('durasi_kerja_menit');
-            $totalJam = floor($totalMenit / 60);
-            $sisaMenit = $totalMenit % 60;
-            $durasiFormat = "{$totalJam} Jam " . ($sisaMenit > 0 ? "{$sisaMenit} Menit" : '');
+// Duration work
+$totalMenit = $absensis->sum('durasi_kerja_menit');
+$totalJam = floor($totalMenit / 60);
+$sisaMenit = $totalMenit % 60;
+$durasiFormat = "{$totalJam} Jam " . ($sisaMenit > 0 ? "{$sisaMenit} Menit" : '');
          @endphp
          <tr>
             <td style="border: 1px solid #000; text-align: center;">{{ $index + 1 }}</td>

@@ -13,16 +13,18 @@ class RekapAbsensiExport implements FromView, ShouldAutoSize, WithStyles
     protected $data;
     protected $bulan;
     protected $tahun;
-    protected $hariEfektif;
+    protected $hariEfektifFull;
+    protected $hariEfektifReguler;
     protected $jenisIzins;
     protected $totalLibur;
 
-    public function __construct($data, $bulan, $tahun, $hariEfektif, $jenisIzins, $totalLibur)
+    public function __construct($data, $bulan, $tahun, $hariEfektifFull, $hariEfektifReguler, $jenisIzins, $totalLibur)
     {
         $this->data = $data;
         $this->bulan = $bulan;
         $this->tahun = $tahun;
-        $this->hariEfektif = $hariEfektif;
+        $this->hariEfektifFull = $hariEfektifFull;
+        $this->hariEfektifReguler = $hariEfektifReguler;
         $this->jenisIzins = $jenisIzins;
         $this->totalLibur = $totalLibur;
     }
@@ -34,7 +36,8 @@ class RekapAbsensiExport implements FromView, ShouldAutoSize, WithStyles
             'data' => $this->data,
             'bulan' => $this->bulan,
             'tahun' => $this->tahun,
-            'hariEfektif' => $this->hariEfektif,
+            'hariEfektifFull' => $this->hariEfektifFull,
+            'hariEfektifReguler' => $this->hariEfektifReguler,
             'jenisIzins' => $this->jenisIzins,
             'totalLibur' => $this->totalLibur
         ]);
