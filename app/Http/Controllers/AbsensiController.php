@@ -169,8 +169,27 @@ class AbsensiController extends Controller
         $tahun = $request->get('tahun', now()->year);
 
         $data = $this->service->getByPegawaiBulan($pegawai->id, $bulan, $tahun);
+        $statistik = $this->service->getStatistikPegawai($pegawai->id, $bulan, $tahun);
 
-        return view('pages.absensi.history', compact('data', 'pegawai', 'bulan', 'tahun'));
+        return view('pages.absensi.history', compact('data', 'pegawai', 'bulan', 'tahun', 'statistik'));
+    }
+
+    /**
+     * Detail history absensi untuk admin
+     */
+    public function showPegawaiHistory(Request $request, $pegawai_id)
+    {
+        $pegawai = \App\Models\Pegawai::findOrFail($pegawai_id);
+
+        $bulan = $request->get('bulan', now()->month);
+        $tahun = $request->get('tahun', now()->year);
+
+        $data = $this->service->getByPegawaiBulan($pegawai->id, $bulan, $tahun);
+        $statistik = $this->service->getStatistikPegawai($pegawai->id, $bulan, $tahun);
+
+        $isAdminView = true;
+
+        return view('pages.absensi.history', compact('data', 'pegawai', 'bulan', 'tahun', 'statistik', 'isAdminView'));
     }
 
     /**
@@ -273,24 +292,38 @@ class AbsensiController extends Controller
         $events = [];
 
         foreach ($absensis as $absen) {
-            $color = 'success'; // Default is Tepat Waktu
-            if ($absen->status === 'Terlambat') $color = 'warning';
-            if ($absen->status === 'Alpha') $color = 'danger';
-            if (in_array($absen->status, ['Izin', 'Cuti', 'Sakit'])) $color = 'info';
+        $color = 'success'; // Default is Tepat Waktu (Hadir)
+        $statusDisplay = $absen->status;
 
-            $events[] = [
-                'id' => 'absen-' . $absen->id,
-                'title' => $absen->status . ($absen->jam_masuk ? ' (' . $absen->jam_masuk->format('H:i') . ')' : ''),
-                'start' => $absen->tanggal->format('Y-m-d') . ($absen->jam_masuk ? 'T' . $absen->jam_masuk->format('H:i:s') : ''),
-                'end' => $absen->tanggal->format('Y-m-d') . ($absen->jam_pulang ? 'T' . $absen->jam_pulang->format('H:i:s') : ''),
-                'allDay' => $absen->jam_masuk ? false : true,
-                'extendedProps' => [
-                    'calendar' => $color,
-                    'description' => $absen->keterangan ?? 'Absensi Shift: ' . ($absen->shift->nama ?? '-'),
-                ]
-            ];
+        if ($absen->status === 'Tepat Waktu') {
+            $statusDisplay = 'Hadir';
+            $color = 'success';
+        } elseif ($absen->status === 'Terlambat') {
+            $color = 'warning';
+        } elseif ($absen->status === 'Alpha') {
+            $color = 'danger';
+        } elseif (in_array($absen->status, ['Izin', 'Cuti', 'Sakit'])) {
+            $color = 'info';
         }
 
+        // Logic check Alpha for missed checkout
+        if (!in_array($absen->status, ['Izin', 'Sakit', 'Cuti']) && !$absen->jam_pulang && !$absen->tanggal->isToday()) {
+            $statusDisplay = 'Alpha';
+            $color = 'danger';
+        }
+
+        $events[] = [
+            'id' => 'absen-' . $absen->id,
+            'title' => $statusDisplay . ($absen->jam_masuk ? ' (' . $absen->jam_masuk->format('H:i') . ')' : ''),
+            'start' => $absen->tanggal->format('Y-m-d') . ($absen->jam_masuk ? 'T' . $absen->jam_masuk->format('H:i:s') : ''),
+            'end' => $absen->tanggal->format('Y-m-d') . ($absen->jam_pulang ? 'T' . $absen->jam_pulang->format('H:i:s') : ''),
+            'allDay' => $absen->jam_masuk ? false : true,
+            'extendedProps' => [
+                'calendar' => $color,
+                'description' => $absen->keterangan ?? 'Absensi Shift: ' . ($absen->shift->nama ?? '-'),
+            ]
+        ];
+    }
         // Holiday Events
         $holidays = \App\Models\HariLibur::whereBetween('tanggal', [$start, $end])->get();
         foreach ($holidays as $holiday) {

@@ -16,7 +16,8 @@
          <h4 class="fw-bold mb-0">
             <span class="text-muted fw-light">Absensi /</span> Riwayat
          </h4>
-         <a href="{{ route('absensi.index') }}" class="btn btn-outline-secondary">
+         <a href="{{ isset($isAdminView) ? route('absensi.rekap') : route('absensi.index') }}"
+            class="btn btn-outline-secondary">
             <i class="ri-arrow-left-line me-1"></i>Kembali
          </a>
       </div>
@@ -24,7 +25,9 @@
       <!-- Filter -->
       <div class="card mb-4">
          <div class="card-body">
-            <form method="GET" action="{{ route('absensi.history') }}" class="row g-3">
+            <form method="GET"
+               action="{{ isset($isAdminView) ? route('absensi.pegawai-history', $pegawai->id) : route('absensi.history') }}"
+               class="row g-3">
                <div class="col-md-4">
                   <label class="form-label">Bulan</label>
                   <select name="bulan" class="form-select">
@@ -55,32 +58,66 @@
 
       <!-- Stats -->
       <div class="row mb-4 g-3">
-         @php
-            $hadir = $data->where('status', 'Tepat Waktu')->count();
-            $terlambat = $data->where('status', 'Terlambat')->count();
-            $izin = $data->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count();
-         @endphp
-         <div class="col-md-4 col-sm-6">
-            <div class="card bg-label-success">
-               <div class="card-body">
-                  <h3 class="mb-0 text-success">{{ $hadir }}</h3>
-                  <span class="text-success">Tepat Waktu</span>
+         <!-- Baris 1: Hadir, Izin, Alpha -->
+         <div class="col-md-4 col-6">
+            <div class="card bg-label-success shadow-sm">
+               <div class="card-body text-center">
+                  <div
+                     class="avatar avatar-md mx-auto mb-2 bg-success text-white rounded d-flex align-items-center justify-content-center">
+                     <i class="ri-checkbox-circle-line ri-24px"></i>
+                  </div>
+                  <h4 class="mb-0 fw-bold">{{ $statistik['hadir'] }}</h4>
+                  <small class="text-success fw-medium">Hadir</small>
                </div>
             </div>
          </div>
-         <div class="col-md-4 col-sm-6">
-            <div class="card bg-label-warning">
-               <div class="card-body">
-                  <h3 class="mb-0 text-warning">{{ $terlambat }}</h3>
-                  <span class="text-warning">Terlambat</span>
+         <div class="col-md-4 col-6">
+            <div class="card bg-label-info shadow-sm">
+               <div class="card-body text-center">
+                  <div
+                     class="avatar avatar-md mx-auto mb-2 bg-info text-white rounded d-flex align-items-center justify-content-center">
+                     <i class="ri-file-list-3-line ri-24px"></i>
+                  </div>
+                  <h4 class="mb-0 fw-bold">{{ $statistik['izin'] }}</h4>
+                  <small class="text-info fw-medium">Izin/Cuti/Sakit</small>
                </div>
             </div>
          </div>
-         <div class="col-md-4 col-sm-12">
-            <div class="card bg-label-info">
-               <div class="card-body">
-                  <h3 class="mb-0 text-info">{{ $izin }}</h3>
-                  <span class="text-info">Izin/Cuti/Sakit</span>
+         <div class="col-md-4 col-12">
+            <div class="card bg-label-danger shadow-sm">
+               <div class="card-body text-center">
+                  <div
+                     class="avatar avatar-md mx-auto mb-2 bg-danger text-white rounded d-flex align-items-center justify-content-center">
+                     <i class="ri-close-circle-line ri-24px"></i>
+                  </div>
+                  <h4 class="mb-0 fw-bold">{{ $statistik['alfa'] }}</h4>
+                  <small class="text-danger fw-medium">Alpha</small>
+               </div>
+            </div>
+         </div>
+
+         <!-- Baris 2: Cepat Pulang, Terlambat -->
+         <div class="col-md-6 col-6">
+            <div class="card bg-label-secondary shadow-sm">
+               <div class="card-body text-center">
+                  <div
+                     class="avatar avatar-md mx-auto mb-2 bg-secondary text-white rounded d-flex align-items-center justify-content-center">
+                     <i class="ri-logout-box-r-line ri-24px"></i>
+                  </div>
+                  <h4 class="mb-0 fw-bold">{{ $statistik['cepat_pulang'] }}</h4>
+                  <small class="text-secondary fw-medium">Cepat Pulang</small>
+               </div>
+            </div>
+         </div>
+         <div class="col-md-6 col-6">
+            <div class="card bg-label-warning shadow-sm">
+               <div class="card-body text-center">
+                  <div
+                     class="avatar avatar-md mx-auto mb-2 bg-warning text-white rounded d-flex align-items-center justify-content-center">
+                     <i class="ri-timer-line ri-24px"></i>
+                  </div>
+                  <h4 class="mb-0 fw-bold">{{ $statistik['terlambat'] }}</h4>
+                  <small class="text-warning fw-medium">Terlambat</small>
                </div>
             </div>
          </div>
@@ -112,7 +149,7 @@
                               @if ($absen->foto_masuk)
                                  <a href="javascript:void(0);"
                                     onclick="previewFoto('{{ $absen->foto_masuk_url }}', 'Foto Masuk - {{ $absen->pegawai->nama_lengkap }}')"
-                                    class="ms-1">
+                                    class="ms-1 d-inline-flex align-items-center">
                                     <i class="ri-image-line text-primary"></i>
                                  </a>
                               @endif
@@ -126,7 +163,7 @@
                               @if ($absen->foto_pulang)
                                  <a href="javascript:void(0);"
                                     onclick="previewFoto('{{ $absen->foto_pulang_url }}', 'Foto Pulang - {{ $absen->pegawai->nama_lengkap }}')"
-                                    class="ms-1">
+                                    class="ms-1 d-inline-flex align-items-center">
                                     <i class="ri-image-line text-primary"></i>
                                  </a>
                               @endif
@@ -136,9 +173,29 @@
                         </td>
                         <td>{{ $absen->lokasi_masuk ?? '-' }}</td>
                         <td>
-                           <span
-                              class="badge bg-{{ $absen->status === 'Tepat Waktu' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
-                              {{ $absen->status }}
+                           @php
+                              $displayStatus = $absen->status;
+                              $badgeColor = 'info';
+
+                              if ($absen->status === 'Tepat Waktu') {
+                                  $displayStatus = 'Hadir';
+                                  $badgeColor = 'success';
+                              } elseif ($absen->status === 'Terlambat') {
+                                  $badgeColor = 'warning';
+                              }
+
+                              // Jika tidak ada jam pulang dan bukan hari ini, anggap Alpha (kecuali Izin/Sakit/Cuti)
+                              if (
+                                  !in_array($absen->status, ['Izin', 'Sakit', 'Cuti']) &&
+                                  !$absen->jam_pulang &&
+                                  !$absen->tanggal->isToday()
+                              ) {
+                                  $displayStatus = 'Alpha';
+                                  $badgeColor = 'danger';
+                              }
+                           @endphp
+                           <span class="badge bg-{{ $badgeColor }}">
+                              {{ $displayStatus }}
                            </span>
                         </td>
                         <td>{{ $absen->keterangan ?? '-' }}</td>
@@ -165,9 +222,29 @@
                            <strong
                               class="text-primary d-block mb-1">{{ $absen->tanggal->locale('id')->isoFormat('ddd, D MMM Y') }}</strong>
                         </div>
-                        <span
-                           class="badge bg-{{ $absen->status === 'Tepat Waktu' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
-                           {{ $absen->status }}
+                        @php
+                           $displayStatus = $absen->status;
+                           $badgeColor = 'info';
+
+                           if ($absen->status === 'Tepat Waktu') {
+                               $displayStatus = 'Hadir';
+                               $badgeColor = 'success';
+                           } elseif ($absen->status === 'Terlambat') {
+                               $badgeColor = 'warning';
+                           }
+
+                           // Jika tidak ada jam pulang dan bukan hari ini, anggap Alpha (kecuali Izin/Sakit/Cuti)
+                           if (
+                               !in_array($absen->status, ['Izin', 'Sakit', 'Cuti']) &&
+                               !$absen->jam_pulang &&
+                               !$absen->tanggal->isToday()
+                           ) {
+                               $displayStatus = 'Alpha';
+                               $badgeColor = 'danger';
+                           }
+                        @endphp
+                        <span class="badge bg-{{ $badgeColor }}">
+                           {{ $displayStatus }}
                         </span>
                      </div>
 
@@ -220,7 +297,8 @@
 
                      @if ($absen->keterangan)
                         <div class="mt-2">
-                           <small class="text-muted d-block mb-1"><i class="ri-file-text-line me-1"></i>Keterangan</small>
+                           <small class="text-muted d-block mb-1"><i
+                                 class="ri-file-text-line me-1"></i>Keterangan</small>
                            <p class="mb-0 small">{{ $absen->keterangan }}</p>
                         </div>
                      @endif

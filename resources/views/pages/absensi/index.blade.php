@@ -221,9 +221,30 @@
                      <i class="ri-camera-line me-2"></i>Absensi Hari Ini
                   </h5>
                   @if ($absensiHariIni && $absensiHariIni->status)
-                     <span
-                        class="badge bg-{{ $absensiHariIni->status === 'Tepat Waktu' ? 'success' : ($absensiHariIni->status === 'Terlambat' ? 'warning' : 'info') }}">
-                        {{ $absensiHariIni->status }}
+                     @php
+                        $displayStatus = $absensiHariIni->status;
+                        $badgeColor = 'info';
+
+                        if ($absensiHariIni->status === 'Tepat Waktu') {
+                            $displayStatus = 'Hadir';
+                            $badgeColor = 'success';
+                        } elseif ($absensiHariIni->status === 'Terlambat') {
+                            $badgeColor = 'warning';
+                        }
+
+                        // Khusus di halaman absen, jika belum pulang sampai ganti hari, status jadi Alpha
+                        // (Meskipun biasanya di halaman ini hanya tampil data hari ini, tapi untuk jaga-jaga)
+                        if (
+                            !in_array($absensiHariIni->status, ['Izin', 'Sakit', 'Cuti']) &&
+                            !$absensiHariIni->jam_pulang &&
+                            !$absensiHariIni->tanggal->isToday()
+                        ) {
+                            $displayStatus = 'Alpha';
+                            $badgeColor = 'danger';
+                        }
+                     @endphp
+                     <span class="badge bg-{{ $badgeColor }}">
+                        {{ $displayStatus }}
                      </span>
                   @endif
                </div>
@@ -372,9 +393,28 @@
                      </div>
                      <div class="d-flex justify-content-between">
                         <span class="text-muted">Status</span>
-                        <span
-                           class="badge bg-{{ $absensiHariIni->status === 'Tepat Waktu' ? 'success' : ($absensiHariIni->status === 'Terlambat' ? 'warning' : 'info') }}">
-                           {{ $absensiHariIni->status }}
+                        @php
+                           $displayStatus = $absensiHariIni->status;
+                           $badgeColor = 'info';
+
+                           if ($absensiHariIni->status === 'Tepat Waktu') {
+                               $displayStatus = 'Hadir';
+                               $badgeColor = 'success';
+                           } elseif ($absensiHariIni->status === 'Terlambat') {
+                               $badgeColor = 'warning';
+                           }
+
+                           if (
+                               !in_array($absensiHariIni->status, ['Izin', 'Sakit', 'Cuti']) &&
+                               !$absensiHariIni->jam_pulang &&
+                               !$absensiHariIni->tanggal->isToday()
+                           ) {
+                               $displayStatus = 'Alpha';
+                               $badgeColor = 'danger';
+                           }
+                        @endphp
+                        <span class="badge bg-{{ $badgeColor }}">
+                           {{ $displayStatus }}
                         </span>
                      </div>
                   </div>
@@ -418,9 +458,30 @@
                               {{ $absen->jam_pulang ? $absen->jam_pulang->format('H:i') : '-' }}
                            </small>
                         </div>
-                        <span
-                           class="badge bg-label-{{ $absen->status === 'Tepat Waktu' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
-                           {{ $absen->status }}
+                        @php
+                           $displayStatus = $absen->status;
+                           $badgeColor = 'info';
+
+                           if ($absen->status === 'Tepat Waktu') {
+                               $displayStatus = 'Hadir';
+                               $badgeColor = 'label-success';
+                           } elseif ($absen->status === 'Terlambat') {
+                               $badgeColor = 'label-warning';
+                           } else {
+                               $badgeColor = 'label-info';
+                           }
+
+                           if (
+                               !in_array($absen->status, ['Izin', 'Sakit', 'Cuti']) &&
+                               !$absen->jam_pulang &&
+                               !$absen->tanggal->isToday()
+                           ) {
+                               $displayStatus = 'Alpha';
+                               $badgeColor = 'label-danger';
+                           }
+                        @endphp
+                        <span class="badge bg-{{ $badgeColor }}">
+                           {{ $displayStatus }}
                         </span>
                      </div>
                   @empty

@@ -27,7 +27,8 @@ class AbsensiRepository extends BaseRepository implements AbsensiRepositoryInter
 
     public function getByPegawaiBulan($pegawaiId, $bulan, $tahun)
     {
-        return $this->model->where('pegawai_id', $pegawaiId)
+        return $this->model->with('shift')
+            ->where('pegawai_id', $pegawaiId)
             ->whereMonth('tanggal', $bulan)
             ->whereYear('tanggal', $tahun)
             ->orderBy('tanggal', 'desc')

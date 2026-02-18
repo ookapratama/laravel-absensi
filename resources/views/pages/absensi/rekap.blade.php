@@ -68,6 +68,7 @@
                      <th colspan="5" class="text-center">Rekap (Bulan Ini)</th>
                      <th rowspan="2" class="align-middle text-center">Total Jam</th>
                      <th rowspan="2" class="align-middle text-center">%</th>
+                     <th rowspan="2" class="align-middle text-center">Aksi</th>
                   </tr>
                   <tr>
                      <th class="text-center bg-success text-white">Tepat Waktu</th>
@@ -87,15 +88,19 @@
 
                         // 1. Tepat Waktu (Hadir)
                         $hadirCount = $absensis
-                            ->where('status', 'Tepat Waktu')
-                            ->whereNotNull('jam_pulang')
+                            ->filter(
+                                fn($i) => $i->status === 'Tepat Waktu' &&
+                                    (!is_null($i->jam_pulang) || $i->tanggal->isToday()),
+                            )
                             ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                             ->count();
 
                         // 2. Terlambat (Telat)
                         $terlambatCount = $absensis
-                            ->where('status', 'Terlambat')
-                            ->whereNotNull('jam_pulang')
+                            ->filter(
+                                fn($i) => $i->status === 'Terlambat' &&
+                                    (!is_null($i->jam_pulang) || $i->tanggal->isToday()),
+                            )
                             ->unique(fn($i) => $i->tanggal->format('Y-m-d'))
                             ->count();
 
@@ -171,6 +176,12 @@
                               </div>
                               <small class="fw-bold">{{ $persentase }}%</small>
                            </div>
+                        </td>
+                        <td class="text-center">
+                           <a href="{{ route('absensi.pegawai-history', $pegawai->id) }}"
+                              class="btn btn-sm btn-icon btn-label-primary" title="Lihat Detail Riwayat">
+                              <i class="ri-eye-line"></i>
+                           </a>
                         </td>
                      </tr>
                   @endforeach

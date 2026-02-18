@@ -174,7 +174,13 @@
                            <h6 class="mb-0">{{ $pegawai->nama_lengkap }}</h6>
                            <small class="text-muted">{{ $pegawai->divisi->nama ?? '-' }}</small>
                         </div>
-                        <span class="badge bg-label-warning">Belum Absen</span>
+                        <div class="d-flex align-items-center">
+                           <span class="badge bg-label-warning me-2">Belum Absen</span>
+                           <a href="{{ route('absensi.pegawai-history', $pegawai->id) }}"
+                              class="btn btn-sm btn-icon btn-label-primary shadow-sm" title="Lihat Detail Riwayat">
+                              <i class="ri-eye-line"></i>
+                           </a>
+                        </div>
                      </div>
                   @empty
                      <div class="text-center text-muted py-4">
@@ -208,6 +214,7 @@
                      <th>Lokasi</th>
                      <th class="text-center">Status</th>
                      <th>Keterangan</th>
+                     <th class="text-center">Aksi</th>
                   </tr>
                </thead>
                <tbody>
@@ -265,18 +272,45 @@
                         </td>
                         <td>{{ $absen->lokasi_masuk ?? '-' }}</td>
                         <td class="text-center">
-                           <span
-                              class="badge bg-{{ $absen->status === 'Tepat Waktu' ? 'success' : ($absen->status === 'Terlambat' ? 'warning' : 'info') }}">
-                              {{ $absen->status }}
+                           @php
+                              $displayStatus = $absen->status;
+                              $badgeColor = 'info';
+
+                              if ($absen->status === 'Tepat Waktu') {
+                                  $displayStatus = 'Tepat Waktu';
+                                  $badgeColor = 'success';
+                              } elseif ($absen->status === 'Terlambat') {
+                                  $displayStatus = 'Telat';
+                                  $badgeColor = 'warning';
+                              }
+
+                              // Jika tidak ada jam pulang dan bukan hari ini, anggap Alpha
+                              if (
+                                  !in_array($absen->status, ['Izin', 'Sakit', 'Cuti']) &&
+                                  !$absen->jam_pulang &&
+                                  !$absen->tanggal->isToday()
+                              ) {
+                                  $displayStatus = 'Alpha';
+                                  $badgeColor = 'danger';
+                              }
+                           @endphp
+                           <span class="badge bg-{{ $badgeColor }}">
+                              {{ $displayStatus }}
                            </span>
                         </td>
                         <td>
                            <small class="text-muted">{{ $absen->keterangan ?? '-' }}</small>
                         </td>
+                        <td class="text-center">
+                           <a href="{{ route('absensi.pegawai-history', $absen->pegawai_id) }}"
+                              class="btn btn-sm btn-icon btn-label-primary shadow-sm" title="Lihat Detail Riwayat">
+                              <i class="ri-eye-line"></i>
+                           </a>
+                        </td>
                      </tr>
                   @empty
                      <tr>
-                        <td colspan="9" class="text-center py-4 text-muted">
+                        <td colspan="10" class="text-center py-4 text-muted">
                            <i class="ri-inbox-line ri-3x mb-2"></i>
                            <p class="mb-0">Belum ada data absensi hari ini</p>
                         </td>

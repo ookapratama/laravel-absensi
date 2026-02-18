@@ -467,14 +467,38 @@ class AbsensiService extends BaseService
             return !is_null($item->jam_pulang) || $item->tanggal->isToday();
         })->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
         
+        // Hitung kategori hari yang sah (Hadir/Telat/Izin)
+        $hadir = $absensis->filter(function($item) {
+            return in_array($item->status, ['Tepat Waktu', 'Terlambat']) && 
+                   (!is_null($item->jam_pulang) || $item->tanggal->isToday());
+        })->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
+
+        $tepatWaktu = $absensis->filter(function($item) {
+            return $item->status === 'Tepat Waktu' && 
+                   (!is_null($item->jam_pulang) || $item->tanggal->isToday());
+        })->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
+
+        $terlambat = $absensis->filter(function($item) {
+            return $item->status === 'Terlambat' && 
+                   (!is_null($item->jam_pulang) || $item->tanggal->isToday());
+        })->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count();
+
         return [
-            'hadir' => $absensis->where('status', 'Tepat Waktu')->whereNotNull('jam_pulang')->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
-            'terlambat' => $absensis->where('status', 'Terlambat')->whereNotNull('jam_pulang')->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
-            'izin' => $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->count(),
+            'total_masuk' => $hadir, // Total Hari Masuk (Tepat Waktu + Telat)
+            'hadir' => $tepatWaktu,   // Khusus Tepat Waktu (Match label Hadir di Riwayat & Tepat Waktu di Rekap)
+            'tepat_waktu' => $tepatWaktu, 
+            'terlambat' => $terlambat,
+            'izin' => $absensis->whereIn('status', ['Izin', 'Cuti', 'Sakit'])->unique(fn($i) => $i->tanggal->format('Y-m-d'))->count(),
+            'cepat_pulang' => $absensis->filter(function($item) {
+                if (!$item->jam_pulang || !$item->shift) return false;
+                $jam_pulang = \Carbon\Carbon::parse($item->jam_pulang->format('H:i:s'));
+                $shift_pulang = \Carbon\Carbon::parse($item->shift->jam_pulang->format('H:i:s'));
+                return $jam_pulang->lt($shift_pulang);
+            })->count(),
             'alfa' => max(0, $totalHariKerja - $daysActive),
             'total_hari_kerja' => $totalHariKerja,
         ];
-        }
+    }
 
     /**
      * Hitung hari kerja efektif (tidak termasuk sabtu, minggu, dan hari libur)
