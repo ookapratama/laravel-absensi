@@ -580,7 +580,8 @@ class AbsensiService extends BaseService
             'total' => 0,
             'holidays' => $holidays,
             'period_end' => $end,
-            'working_dates' => []
+            'working_dates' => [],
+            'sundays' => []
         ];
 
         $current = $start->copy();
@@ -590,6 +591,10 @@ class AbsensiService extends BaseService
             // Cek holiday (Global)
             $isHoliday = $holidays->where('tanggal', $current->startOfDay())->isNotEmpty();
             $isSunday = $current->isSunday();
+
+            if ($isSunday) {
+                $details['sundays'][] = $dateStr;
+            }
 
             if (!$isHoliday && !($excludeSundays && $isSunday)) {
                 $details['total']++;
