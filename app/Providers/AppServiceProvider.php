@@ -130,7 +130,7 @@ class AppServiceProvider extends ServiceProvider
         // Share template variables config
         config([
             'variables' => [
-                'templateName' => 'SOFIKOPI',
+                'templateName' => 'DATA CIPTA CELEBES',
                 'templateVersion' => '1.0.0',
                 'templateFree' => false,
                 'templatePrefix' => '',

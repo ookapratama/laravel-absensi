@@ -34,8 +34,10 @@
                <!-- Logo -->
                <div class="app-brand justify-content-center mt-5">
                   <a href="{{ url('/') }}" class="app-brand-link gap-2">
-                     <span class="app-brand-logo demo"><img src="{{ asset('assets/img/favicon/sofikopi.svg') }}"
-                           alt="Logo" width="50" height="50"></span>
+                     <span class="app-brand-logo demo">
+                        <img src="{{ asset('assets/img/favicon/dcc-logo.svg') }}" alt="DCC Logo" width="60"
+                           height="60">
+                     </span>
                      <span
                         class="app-brand-text demo text-heading fw-semibold">{{ config('variables.templateName') }}</span>
                   </a>

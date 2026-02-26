@@ -46,7 +46,7 @@ $cyan: #28c3d7 !default;
 // scss-docs-end color-variables
 
 // scss-docs-start theme-color-variables
-$primary: #c51e2e;
+$primary: #000000;
 $secondary: #6d788d !default;
 $success: $green !default;
 $info: $blue !default;
@@ -168,7 +168,7 @@ $container-max-widths: (
     md: 720px,
     lg: 960px,
     xl: 1140px,
-    xxl: 1440px // Custom xxl size,,
+    xxl: 1440px // Custom xxl size,,,
 ) !default;
 // scss-docs-end container-max-widths
 

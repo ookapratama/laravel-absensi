@@ -40,7 +40,7 @@
    <!-- Canonical SEO -->
    <link rel="canonical" href="{{ config('variables.productPage') ? config('variables.productPage') : '' }}">
    <!-- Favicon -->
-   <link rel="icon" type="image/svg+xml" href="{{ asset('assets/img/favicon/sofikopi.svg') }}" />
+   <link rel="icon" type="image/svg+xml" href="{{ asset('assets/img/favicon/dcc-logo.svg') }}" />
 
 
    <!-- Include Styles -->
