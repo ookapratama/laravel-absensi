@@ -12,13 +12,16 @@ use Illuminate\Support\Facades\DB;
 class AbsensiService extends BaseService
 {
     protected FileUploadService $fileUploadService;
+    // protected TelegramService $telegramService;
 
     public function __construct(
         AbsensiRepository $repository,
-        FileUploadService $fileUploadService
+        FileUploadService $fileUploadService,
+        // TelegramService $telegramService
     ) {
         parent::__construct($repository);
         $this->fileUploadService = $fileUploadService;
+        // $this->telegramService = $telegramService;
     }
 
     /**
@@ -177,7 +180,12 @@ class AbsensiService extends BaseService
             'status' => $status,
         ];
 
-        return $this->create($absensiData);
+        $absensi = $this->create($absensiData);
+
+        // Notify Telegram
+        // $this->telegramService->notifyAbsenMasuk($absensi);
+
+        return $absensi;
     }
 
     /**
@@ -222,7 +230,14 @@ class AbsensiService extends BaseService
         $shift = $existing->shift;
         if ($shift) {
             $now = now();
-            $jamPulang = Carbon::parse($shift->jam_pulang->format('H:i:s'));
+            
+            // Perbaikan logic cross-day: jam pulang harus berbasis pada tanggal absen masuk
+            $jamPulang = Carbon::parse($existing->tanggal->format('Y-m-d') . ' ' . $shift->jam_pulang->format('H:i:s'));
+            
+            if ($shift->is_cross_day) {
+                // Jam pulang adalah besoknya dari tanggal jam masuk
+                $jamPulang->addDay();
+            }
             
             // VALIDASI BATAS MAKSIMAL: 2 jam setelah jam pulang shift
             $batasMaksimalPulang = $jamPulang->copy()->addHours(2);
@@ -272,7 +287,12 @@ class AbsensiService extends BaseService
             'keterangan' => $data['keterangan'] ?? $existing->keterangan,
         ]);
 
-        return $existing->fresh();
+        $absensi = $existing->fresh();
+
+        // Notify Telegram
+        // $this->telegramService->notifyAbsenPulang($absensi);
+
+        return $absensi;
     }
 
     /**
