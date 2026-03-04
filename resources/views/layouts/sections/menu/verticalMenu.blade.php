@@ -13,7 +13,7 @@
                <img src="{{ asset('assets/img/favicon/dcc-logo.svg') }}" alt="DCC Logo" width="40" height="40"
                   style="color: #000;">
             </span>
-            <span class="app-brand-text demo menu-text fw-semibold ms-2">{{ config('variables.templateName') }}</span>
+            <span class="app-brand-text demo menu-text fw-semibold">{{ config('variables.templateName') }}</span>
          </a>
 
          <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">

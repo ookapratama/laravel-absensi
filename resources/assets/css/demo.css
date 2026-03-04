@@ -3,22 +3,52 @@
 * File include item demo only specific css only
 ******************************************************************************/
 
-.light-style .menu .app-brand.demo {
-    height: 64px;
-}
-
+.light-style .menu .app-brand.demo,
 .dark-style .menu .app-brand.demo {
-    height: 64px;
+    height: auto !important;
+    min-height: 110px;
+    padding: 1.5rem 1rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
 
-.app-brand-logo.demo svg {
-    width: 38px;
-    height: 20px;
+.app-brand.demo .app-brand-link {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    gap: 0.75rem;
 }
 
 .app-brand-text.demo {
-    font-size: 1.25rem;
-    letter-spacing: 0.15px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    white-space: normal;
+    line-height: 1.4;
+    word-break: break-word;
+    flex-shrink: 1;
+    margin: 0;
+}
+
+/* Maintain toggle button position at the top right */
+.app-brand.demo .layout-menu-toggle {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.5rem;
+}
+
+/* Hide text and reset height when sidebar is collapsed */
+.layout-menu-collapsed .menu-vertical .app-brand.demo {
+    min-height: 64px !important;
+    height: 64px !important;
+    padding: 0.5rem !important;
+}
+
+.layout-menu-collapsed .app-brand-text.demo {
+    display: none;
 }
 
 /* ! For .layout-navbar-fixed added fix padding top tpo .layout-page */
