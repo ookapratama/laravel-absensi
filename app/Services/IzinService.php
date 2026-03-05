@@ -12,16 +12,16 @@ use Illuminate\Support\Facades\DB;
 class IzinService extends BaseService
 {
     protected FileUploadService $fileUploadService;
-    protected TelegramService $telegramService;
+    // protected TelegramService $telegramService;
 
     public function __construct(
         IzinRepository $repository,
         FileUploadService $fileUploadService,
-        TelegramService $telegramService
+        // TelegramService $telegramService
     ) {
         parent::__construct($repository);
         $this->fileUploadService = $fileUploadService;
-        $this->telegramService = $telegramService;
+        // $this->telegramService = $telegramService;
     }
 
     /**
@@ -110,7 +110,7 @@ class IzinService extends BaseService
         ]);
 
         // Notify Telegram
-        $this->telegramService->notifyIzinCreated($izin);
+        // $this->telegramService->notifyIzinCreated($izin);
 
         return $izin;
     }
@@ -141,7 +141,7 @@ class IzinService extends BaseService
             $izin = $izin->fresh();
 
             // Notify Telegram
-            $this->telegramService->notifyIzinStatus($izin);
+            // $this->telegramService->notifyIzinStatus($izin);
 
             return $izin;
         });
@@ -168,7 +168,7 @@ class IzinService extends BaseService
         $izin = $izin->fresh();
 
         // Notify Telegram
-        $this->telegramService->notifyIzinStatus($izin);
+        // $this->telegramService->notifyIzinStatus($izin);
 
         return $izin;
     }
